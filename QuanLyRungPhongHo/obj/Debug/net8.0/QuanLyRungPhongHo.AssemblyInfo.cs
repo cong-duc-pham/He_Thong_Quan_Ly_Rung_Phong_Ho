@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("QuanLyRungPhongHo")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+16e39c2f59e514d92d36390e73e7441832b9db4e")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6c2382e8b6719e6dac6e75c4a7351f7d44ce842f")]
 [assembly: System.Reflection.AssemblyProductAttribute("QuanLyRungPhongHo")]
 [assembly: System.Reflection.AssemblyTitleAttribute("QuanLyRungPhongHo")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

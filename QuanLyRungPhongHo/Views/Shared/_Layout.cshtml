@@ -6,12 +6,8 @@
     <title>@ViewData["Title"] - Quản lý Rừng Phòng Hộ</title>
 
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-
     <link href="~/css/styles.css" rel="stylesheet" />
 </head>
 <body>
@@ -27,13 +23,24 @@
             </div>
         </div>
         <div class="header-right">
-            <div class="user-info">
-                <span>Xin chào, <strong>Nguyễn Văn A</strong></span>
-                <span class="role">(Admin Tỉnh)</span>
-            </div>
-            <a href="#" class="logout">
-                <i class="fas fa-sign-out-alt"></i> Đăng xuất
-            </a>
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                <div class="user-info">
+                    <span>Xin chào, <strong>@(User.FindFirst("HoTen")?.Value ?? User.Identity.Name)</strong></span>
+                    <span class="role">(@(User.FindFirst("ChucVu")?.Value ?? "Nhân viên"))</span>
+                </div>
+                <form asp-controller="Account" asp-action="Logout" method="post" style="display: inline;">
+                    <button type="submit" class="logout" style="border: none; background: none; cursor: pointer;">
+                        <i class="fas fa-sign-out-alt"></i> Đăng xuất
+                    </button>
+                </form>
+            }
+            else
+            {
+                <a href="@Url.Action("Login", "Account")" class="logout">
+                    <i class="fas fa-sign-in-alt"></i> Đăng nhập
+                </a>
+            }
         </div>
     </header>
 
@@ -61,35 +68,40 @@
                         </ul>
                     </li>
                     <li class="menu-item">
-                        <a href="#">
+                        <a href="@Url.Action("Index", "NhanSu")">
                             <i class="fas fa-users"></i>
                             <span>Quản lý nhân sự</span>
                         </a>
                     </li>
                     <li class="menu-item">
-                        <a href="#">
+                        <a href="@Url.Action("Index", "SinhVat")">
                             <i class="fas fa-tree"></i>
                             <span>Sinh vật rừng</span>
                         </a>
                     </li>
                     <li class="menu-item">
-                        <a href="#">
+                        <a href="@Url.Action("Index", "NhatKyBaoVe")">
                             <i class="fas fa-exclamation-triangle"></i>
                             <span>Nhật ký bảo vệ</span>
                         </a>
                     </li>
-                    <li class="menu-item admin-only">
-                        <a href="#">
-                            <i class="fas fa-user-shield"></i>
-                            <span>Quản trị hệ thống</span>
-                        </a>
-                    </li>
-                    <li class="menu-item admin-only">
-                        <a href="#">
-                            <i class="fas fa-chart-bar"></i>
-                            <span>Báo cáo thống kê</span>
-                        </a>
-                    </li>
+
+                    @* Hiển thị menu Admin chỉ cho user có role Admin *@
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <li class="menu-item admin-only">
+                            <a href="@Url.Action("Index", "TaiKhoan")">
+                                <i class="fas fa-user-shield"></i>
+                                <span>Quản trị hệ thống</span>
+                            </a>
+                        </li>
+                        <li class="menu-item admin-only">
+                            <a href="@Url.Action("ThongKe", "Home")">
+                                <i class="fas fa-chart-bar"></i>
+                                <span>Báo cáo thống kê</span>
+                            </a>
+                        </li>
+                    }
                 </ul>
             </nav>
         </aside>
@@ -101,17 +113,15 @@
 
     <footer class="border-top footer text-muted">
         <div class="container">
-            &copy; 2025 - QuanLyRungPhongHo - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            &copy; @DateTime.Now.Year - Hệ Thống Quản Lý Rừng Phòng Hộ - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
     </footer>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-
     <script src="~/js/main.js" asp-append-version="true"></script>
-
     <script src="~/js/site.js" asp-append-version="true"></script>
 
     @await RenderSectionAsync("Scripts", required: false)
 </body>
-</html\]
+</html>

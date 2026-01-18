@@ -124,7 +124,7 @@ body {
         }
 
         .sidebar.collapsed .has-submenu {
-            pointer-events: none; 
+            pointer-events: none;
         }
 
             .sidebar.collapsed .has-submenu.open {
@@ -169,7 +169,7 @@ body {
 .menu-item.active > a {
     background: rgba(255,255,255,0.25);
     border-left: 4px solid white;
-    padding-left: 16px; 
+    padding-left: 16px;
 }
 
 .menu-item i {
@@ -178,14 +178,14 @@ body {
     font-size: 18px;
     text-align: center;
     transition: all 0.3s;
-    flex-shrink: 0; 
+    flex-shrink: 0;
 }
 
 .menu-item span {
     margin-left: 15px;
-    white-space: nowrap; 
+    white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis; 
+    text-overflow: ellipsis;
     transition: all 0.3s;
     flex: 1;
 }
@@ -220,24 +220,24 @@ body {
 .submenu li a {
     display: flex;
     align-items: center;
-    padding: 12px 20px; 
+    padding: 12px 20px;
     color: white;
     text-decoration: none;
     font-size: 15px;
     transition: all 0.3s;
-    white-space: nowrap; 
+    white-space: nowrap;
 }
 
     .submenu li a:hover {
         background: rgba(255, 255, 255, 0.15);
-        padding-left: 25px; 
+        padding-left: 25px;
     }
 
     .submenu li a.active {
         background: rgba(255,255,255,0.3);
         font-weight: bold;
         border-left: 3px solid white;
-        padding-left: 17px; 
+        padding-left: 17px;
     }
 
     .submenu li a i {
@@ -257,7 +257,7 @@ body {
 
 main {
     margin-left: 260px;
-    padding: 30px;
+    padding: 20px 15px;
     transition: margin-left 0.3s ease;
     width: 100%;
     flex: 1;

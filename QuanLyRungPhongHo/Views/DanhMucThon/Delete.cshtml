@@ -1,0 +1,87 @@
+@model QuanLyRungPhongHo.Models.DanhMucThon
+
+@{
+    ViewData["Title"] = "Xóa Thôn/Bản";
+}
+@section Styles {
+    <link rel="stylesheet" href="~/css/digioi.css" asp-append-version="true" />
+}
+<div class="digioi-form-container">
+    <div class="digioi-card">
+        <div class="digioi-card-header">
+            <h4>
+                <i class="bi bi-exclamation-triangle"></i> Xác Nhận Xóa Thôn/Bản
+            </h4>
+        </div>
+
+        <div class="digioi-card-body">
+
+            <div class="digioi-alert digioi-alert-warning">
+                <i class="bi bi-info-circle"></i>
+                <strong>Cảnh báo:</strong> Bạn có chắc chắn muốn xóa thôn/bản này không?
+                Hành động này không thể hoàn tác!
+            </div>
+
+            <div class="digioi-info-row">
+                <div class="digioi-info-label">Mã Thôn:</div>
+                <div class="digioi-info-value">
+                    <span class="digioi-badge digioi-badge-secondary">@Model.MaThon</span>
+                </div>
+            </div>
+
+            <div class="digioi-info-row">
+                <div class="digioi-info-label">Tên Thôn/Bản:</div>
+                <div class="digioi-info-value">
+                    <span class="digioi-text-success fw-bold">@Model.TenThon</span>
+                </div>
+            </div>
+
+            <div class="digioi-info-row">
+                <div class="digioi-info-label">Thuộc Xã:</div>
+                <div class="digioi-info-value">
+                    <span class="digioi-badge digioi-badge-success">@Model.DanhMucXa.TenXa</span>
+                </div>
+            </div>
+
+            <div class="digioi-info-row">
+                <div class="digioi-info-label">Số Lô Rừng:</div>
+                <div class="digioi-info-value">
+                    <span class="digioi-badge digioi-badge-info">@Model.LoRungs.Count lô</span>
+                </div>
+            </div>
+
+            @if (Model.LoRungs.Any())
+            {
+                <div class="digioi-alert digioi-alert-danger">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                    <strong>Lưu ý:</strong> Thôn/bản này đã có
+                    <strong>@Model.LoRungs.Count</strong> lô rừng.
+                    Vui lòng xóa các lô rừng trước khi xóa!
+                </div>
+            }
+
+            <form asp-action="Delete" method="post">
+                <input type="hidden" asp-for="MaThon" />
+
+                <div class="digioi-form-actions">
+                    <a asp-action="Index" class="digioi-btn digioi-btn-secondary">
+                        <i class="bi bi-x-circle"></i> Hủy
+                    </a>
+
+                    <button type="submit"
+                            class="digioi-btn digioi-btn-danger"
+                            @(Model.LoRungs.Any() ? "disabled" : "")>
+                        <i class="bi bi-trash"></i> Xác Nhận Xóa
+                    </button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+
+    <div class="digioi-back-link">
+        <a asp-action="Index">
+            <i class="bi bi-arrow-left"></i> Quay lại danh sách
+        </a>
+    </div>
+</div>

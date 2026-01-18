@@ -1,0 +1,203 @@
+@model IEnumerable<QuanLyRungPhongHo.Models.DanhMucThon>
+
+@{
+    ViewData["Title"] = "Danh mục Thôn/Bản";
+    var danhMucXa = ViewBag.DanhMucXa as List<QuanLyRungPhongHo.Models.DanhMucXa>;
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/digioi.css" asp-append-version="true" />
+}
+
+<div class="digioi-page">
+
+    <!-- HEADER -->
+    <div class="digioi-header">
+        <h2>
+            <i class="bi bi-geo-alt"></i> Danh mục Thôn/Bản
+        </h2>
+        <a asp-action="Create" class="digioi-btn digioi-btn-success">
+            <i class="bi bi-plus-circle"></i> Thêm Thôn/Bản
+        </a>
+    </div>
+
+    <!-- THÔNG BÁO -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="digioi-alert digioi-alert-success">
+            <i class="bi bi-check-circle"></i> @TempData["SuccessMessage"]
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="digioi-alert digioi-alert-danger">
+            <i class="bi bi-exclamation-triangle"></i> @TempData["ErrorMessage"]
+        </div>
+    }
+
+    <!-- FORM TÌM KIẾM -->
+    <div class="digioi-card digioi-filter-card">
+        <form asp-action="Index" method="get" class="digioi-filter-form">
+
+            <div class="digioi-form-group">
+                <label>
+                    <i class="bi bi-filter"></i> Lọc theo Xã
+                </label>
+                <select name="searchXa">
+                    <option value="">-- Tất cả các xã --</option>
+                    @foreach (var xa in danhMucXa)
+                    {
+                        <option value="@xa.MaXa"
+                                selected="@(ViewData["CurrentFilterXa"]?.ToString() == xa.MaXa)">
+                            @xa.TenXa
+                        </option>
+                    }
+                </select>
+            </div>
+
+            <div class="digioi-form-group">
+                <label>
+                    <i class="bi bi-search"></i> Tìm kiếm
+                </label>
+                <input type="text"
+                       name="searchString"
+                       value="@ViewData["CurrentFilter"]"
+                       placeholder="Tìm theo Mã hoặc Tên thôn..." />
+            </div>
+
+            <div class="digioi-form-group">
+                <label>&nbsp;</label>
+                <button type="submit" class="digioi-btn digioi-btn-success">
+                    <i class="bi bi-search"></i> Lọc
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- THỐNG KÊ -->
+    <div class="digioi-info-bar">
+        <span class="digioi-badge digioi-badge-info">
+            Tổng số: @ViewData["TotalRecords"] thôn/bản
+        </span>
+
+        @if (!string.IsNullOrEmpty(ViewData["CurrentFilterXa"]?.ToString())
+        || !string.IsNullOrEmpty(ViewData["CurrentFilter"]?.ToString()))
+        {
+            <a asp-action="Index" class="digioi-btn digioi-btn-outline">
+                <i class="bi bi-x-circle"></i> Xóa bộ lọc
+            </a>
+        }
+    </div>
+
+    <!-- TABLE -->
+    <div class="digioi-card">
+        <div class="digioi-table-wrap">
+            <table class="digioi-table">
+                <thead>
+                    <tr>
+                        <th>STT</th>
+                        <th>Mã Thôn</th>
+                        <th>Tên Thôn/Bản</th>
+                        <th>Thuộc Xã</th>
+                        <th class="text-center">Số Lô</th>
+                        <th class="text-center">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Any())
+                    {
+                        int stt = ((int)ViewData["PageNumber"] - 1) * 10 + 1;
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@stt</td>
+                                <td><strong>@item.MaThon</strong></td>
+                                <td>@item.TenThon</td>
+                                <td>
+                                    <span class="digioi-badge digioi-badge-success">
+                                        @item.DanhMucXa.TenXa
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    <span class="digioi-badge digioi-badge-secondary">
+                                        @item.LoRungs.Count
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    <div class="digioi-btn-group">
+                                        <a asp-action="Edit"
+                                           asp-route-id="@item.MaThon"
+                                           class="digioi-btn digioi-btn-warning">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </a>
+                                        <a asp-action="Delete"
+                                           asp-route-id="@item.MaThon"
+                                           class="digioi-btn digioi-btn-danger">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            stt++;
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="6" class="digioi-empty">
+                                <i class="bi bi-inbox"></i>
+                                <p>Không tìm thấy dữ liệu</p>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- PHÂN TRANG -->
+    @if ((int)ViewData["TotalPages"] > 1)
+    {
+        <div class="digioi-pagination">
+            @{
+                int currentPage = (int)ViewData["PageNumber"];
+                int totalPages = (int)ViewData["TotalPages"];
+                string currentFilterXa = ViewData["CurrentFilterXa"]?.ToString();
+                string currentFilter = ViewData["CurrentFilter"]?.ToString();
+            }
+
+            <a class="digioi-page @(currentPage == 1 ? "disabled" : "")"
+               asp-action="Index"
+               asp-route-pageNumber="@(currentPage - 1)"
+               asp-route-searchXa="@currentFilterXa"
+               asp-route-searchString="@currentFilter">
+                ‹
+            </a>
+
+            @for (int i = 1; i <= totalPages; i++)
+            {
+                <a class="digioi-page @(i == currentPage ? "active" : "")"
+                   asp-action="Index"
+                   asp-route-pageNumber="@i"
+                   asp-route-searchXa="@currentFilterXa"
+                   asp-route-searchString="@currentFilter">
+                    @i
+                </a>
+            }
+
+            <a class="digioi-page @(currentPage == totalPages ? "disabled" : "")"
+               asp-action="Index"
+               asp-route-pageNumber="@(currentPage + 1)"
+               asp-route-searchXa="@currentFilterXa"
+               asp-route-searchString="@currentFilter">
+                ›
+            </a>
+        </div>
+
+        <div class="digioi-page-info">
+            Trang @currentPage / @totalPages
+        </div>
+    }
+
+</div>
+

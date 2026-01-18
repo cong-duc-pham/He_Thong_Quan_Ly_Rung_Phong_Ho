@@ -22,7 +22,15 @@ namespace QuanLyRungPhongHo.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            // === Định nghĩa Primary Key bằng Fluent API ===
+            // Cấu hình relationship 1-1 giữa TaiKhoan và NhanSu
+            // TaiKhoan là dependent (có foreign key MaNV)
+            modelBuilder.Entity<TaiKhoan>()
+                .HasOne(tk => tk.NhanSu)
+                .WithOne(ns => ns.TaiKhoan)
+                .HasForeignKey<TaiKhoan>(tk => tk.MaNV)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            // Cấu hình các primary keys
             modelBuilder.Entity<DanhMucXa>()
                 .HasKey(x => x.MaXa);
 
@@ -33,28 +41,16 @@ namespace QuanLyRungPhongHo.Data
                 .HasKey(l => l.MaLo);
 
             modelBuilder.Entity<NhanSu>()
-                .HasKey(ns => ns.MaNV);
+                .HasKey(n => n.MaNV);
 
             modelBuilder.Entity<TaiKhoan>()
-                .HasKey(tk => tk.MaTK);
+                .HasKey(t => t.MaTK);
 
             modelBuilder.Entity<SinhVat>()
-                .HasKey(sv => sv.MaSV);
+                .HasKey(s => s.MaSV);
 
             modelBuilder.Entity<NhatKyBaoVe>()
                 .HasKey(nk => nk.MaNK);
-
-            // === Fix quan hệ one-to-one NhanSu - TaiKhoan ===
-            modelBuilder.Entity<NhanSu>()
-                .HasOne(ns => ns.TaiKhoan)
-                .WithOne(tk => tk.NhanSu)
-                .HasForeignKey<TaiKhoan>(tk => tk.MaNV)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            // === Thêm unique cho TenDangNhap ===
-            modelBuilder.Entity<TaiKhoan>()
-                .HasIndex(tk => tk.TenDangNhap)
-                .IsUnique();
         }
     }
 }

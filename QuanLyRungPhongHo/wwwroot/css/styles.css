@@ -325,6 +325,60 @@ main {
     margin-left: 70px;
 }
 
+/* ===== PAGE ===== */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.page-back {
+    margin-top: 1rem;
+}
+
+/* ===== CARD ===== */
+.card-main {
+    border-radius: 12px;
+}
+
+.card-header-success {
+    background-color: #2d8c47;
+    color: #fff;
+}
+
+.card-header-warning {
+    background-color: #ffc107;
+}
+
+.card-header-danger {
+    background-color: #dc3545;
+    color: #fff;
+}
+
+/* ===== FORM ===== */
+.form-section {
+    margin-bottom: 1.5rem;
+}
+
+.form-section-title {
+    color: #2d8c47;
+    border-bottom: 2px solid #e9ecef;
+    padding-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+/* ===== TABLE ===== */
+.table-main thead {
+    background-color: #2d8c47;
+    color: #fff;
+}
+
+.table-main tbody tr:hover {
+    background-color: #f0f8f4;
+}
+
+
 /* Responsive - Mobile */
 @media (max-width: 992px) {
     .sidebar {

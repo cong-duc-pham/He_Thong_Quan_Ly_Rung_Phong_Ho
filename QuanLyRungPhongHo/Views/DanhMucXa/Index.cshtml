@@ -1,0 +1,192 @@
+@model IEnumerable<QuanLyRungPhongHo.Models.DanhMucXa>
+
+@{
+    ViewData["Title"] = "Danh mục Xã";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/digioi.css" asp-append-version="true" />
+}
+
+<div class="digioi-page">
+
+    <!-- Header -->
+    <div class="digioi-header">
+        <h2>
+            <i class="bi bi-building"></i> Danh mục Xã
+        </h2>
+        <a asp-action="Create" class="btn btn-success">
+            <i class="bi bi-plus-circle"></i> Thêm Xã
+        </a>
+    </div>
+
+    <!-- Thông báo -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show">
+            <i class="bi bi-check-circle"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show">
+            <i class="bi bi-exclamation-triangle"></i> @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- Tìm kiếm -->
+    <div class="digioi-card mb-3">
+        <div class="card-body">
+            <form asp-action="Index" method="get" class="digioi-search">
+                <div class="input-group">
+                    <span class="input-group-text bg-success text-white">
+                        <i class="bi bi-search"></i>
+                    </span>
+                    <input type="text"
+                           name="searchString"
+                           value="@ViewData["CurrentFilter"]"
+                           class="form-control"
+                           placeholder="Tìm theo Mã xã hoặc Tên xã..." />
+                    <button class="btn btn-success" type="submit">
+                        Tìm kiếm
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Thông tin -->
+    <div class="mb-3">
+        <span class="badge bg-info text-dark">
+            Tổng số: @ViewData["TotalRecords"] xã
+        </span>
+
+        @if (!string.IsNullOrEmpty(ViewData["CurrentFilter"]?.ToString()))
+        {
+            <span class="badge bg-warning text-dark">
+                Tìm kiếm: "@ViewData["CurrentFilter"]"
+            </span>
+            <a asp-action="Index" class="btn btn-sm btn-outline-secondary">
+                <i class="bi bi-x-circle"></i> Xóa lọc
+            </a>
+        }
+    </div>
+
+    <!-- Bảng -->
+    <div class="digioi-card">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0 digioi-table">
+                    <thead>
+                        <tr>
+                            <th style="width:10%">STT</th>
+                            <th style="width:20%">Mã Xã</th>
+                            <th style="width:45%">Tên Xã</th>
+                            <th style="width:10%" class="text-center">Số Thôn</th>
+                            <th style="width:15%" class="text-center">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Any())
+                        {
+                            int stt = ((int)ViewData["PageNumber"] - 1) * 10 + 1;
+                            foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>@stt</td>
+                                    <td><strong>@item.MaXa</strong></td>
+                                    <td>@item.TenXa</td>
+                                    <td class="text-center">
+                                        <span class="badge bg-secondary">
+                                            @item.DanhMucThons.Count
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="btn-group btn-group-sm">
+                                            <a asp-action="Edit"
+                                               asp-route-id="@item.MaXa"
+                                               class="btn btn-warning">
+                                                <i class="bi bi-pencil-square"></i>
+                                            </a>
+                                            <a asp-action="Delete"
+                                               asp-route-id="@item.MaXa"
+                                               class="btn btn-danger">
+                                                <i class="bi bi-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                stt++;
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="5" class="text-center text-muted py-4">
+                                    <i class="bi bi-inbox fs-1"></i>
+                                    <div>Không có dữ liệu</div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Phân trang -->
+    @if ((int)ViewData["TotalPages"] > 1)
+    {
+        <nav class="mt-4">
+            <ul class="pagination justify-content-center">
+                @{
+                    int currentPage = (int)ViewData["PageNumber"];
+                    int totalPages = (int)ViewData["TotalPages"];
+                    string currentFilter = ViewData["CurrentFilter"]?.ToString();
+                }
+
+                <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+                    <a class="page-link"
+                       asp-action="Index"
+                       asp-route-pageNumber="@(currentPage - 1)"
+                       asp-route-searchString="@currentFilter">
+                        «
+                    </a>
+                </li>
+
+                @for (int i = 1; i <= totalPages; i++)
+                {
+                    if (i == currentPage)
+                    {
+                        <li class="page-item active">
+                            <span class="page-link">@i</span>
+                        </li>
+                    }
+                    else if (i >= currentPage - 2 && i <= currentPage + 2)
+                    {
+                        <li class="page-item">
+                            <a class="page-link"
+                               asp-action="Index"
+                               asp-route-pageNumber="@i"
+                               asp-route-searchString="@currentFilter">
+                                @i
+                            </a>
+                        </li>
+                    }
+                }
+
+                <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+                    <a class="page-link"
+                       asp-action="Index"
+                       asp-route-pageNumber="@(currentPage + 1)"
+                       asp-route-searchString="@currentFilter">
+                        »
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    }
+</div>

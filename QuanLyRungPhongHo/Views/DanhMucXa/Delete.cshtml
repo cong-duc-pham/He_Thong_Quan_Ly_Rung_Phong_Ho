@@ -1,0 +1,86 @@
+@model QuanLyRungPhongHo.Models.DanhMucXa
+
+@{
+    ViewData["Title"] = "Xóa Xã";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/digioi.css" asp-append-version="true" />
+}
+
+<div class="digioi-page">
+    <div class="digioi-form-center">
+
+        <div class="digioi-card danger">
+            <div class="digioi-header danger">
+                <h4>
+                    <i class="bi bi-exclamation-triangle"></i> Xác Nhận Xóa Xã
+                </h4>
+            </div>
+
+            <div class="card-body">
+
+                <div class="alert alert-warning">
+                    <i class="bi bi-info-circle"></i>
+                    <strong>Cảnh báo:</strong> Bạn có chắc chắn muốn xóa xã này không?
+                    Hành động này <strong>không thể hoàn tác</strong>.
+                </div>
+
+                <!-- Thông tin xã -->
+                <div class="mb-3">
+                    <strong>Mã Xã:</strong>
+                    <span class="badge bg-secondary ms-2">@Model.MaXa</span>
+                </div>
+
+                <div class="mb-3">
+                    <strong>Tên Xã:</strong>
+                    <span class="text-success fw-bold ms-2">@Model.TenXa</span>
+                </div>
+
+                <div class="mb-4">
+                    <strong>Số Thôn/Bản:</strong>
+                    <span class="badge bg-info text-dark ms-2">
+                        @Model.DanhMucThons.Count thôn
+                    </span>
+                </div>
+
+                @if (Model.DanhMucThons.Any())
+                {
+                    <div class="alert alert-danger">
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                        <strong>Lưu ý:</strong>
+                        Xã này đã có <strong>@Model.DanhMucThons.Count</strong> thôn/bản.
+                        Vui lòng xóa các thôn/bản trước khi xóa xã.
+                    </div>
+                }
+
+                <!-- Nút -->
+                <form asp-action="Delete" method="post">
+                    <input type="hidden" asp-for="MaXa" />
+
+                    <div class="form-actions">
+                        <a asp-action="Index" class="btn btn-cancel">
+                            <i class="bi bi-x-circle"></i> Hủy
+                        </a>
+                        <button type="submit"
+                                class="btn btn-danger"
+                                @(Model.DanhMucThons.Any() ? "disabled" : "")>
+                            <i class="bi bi-trash"></i> Xác Nhận Xóa
+                        </button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+
+        <div class="back-link">
+            <a asp-action="Index">
+                <i class="bi bi-arrow-left"></i> Quay lại danh sách
+            </a>
+        </div>
+
+    </div>
+</div>
+@section Scripts {
+    <script src="~/js/digioi.js" asp-append-version="true"></script>
+}

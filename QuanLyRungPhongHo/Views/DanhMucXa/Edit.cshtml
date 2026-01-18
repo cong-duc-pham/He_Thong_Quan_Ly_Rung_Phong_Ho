@@ -1,0 +1,73 @@
+@model QuanLyRungPhongHo.Models.DanhMucXa
+
+@{
+    ViewData["Title"] = "Sửa Xã";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/digioi.css" asp-append-version="true" />
+}
+
+<div class="digioi-page">
+    <div class="digioi-form-center">
+
+        <div class="digioi-card">
+            <div class="digioi-header warning">
+                <h4>
+                    <i class="bi bi-pencil-square"></i> Sửa Thông Tin Xã
+                </h4>
+            </div>
+
+            <div class="card-body">
+                <form asp-action="Edit" method="post">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                    <!-- Mã xã -->
+                    <div class="mb-3">
+                        <label asp-for="MaXa" class="form-label">
+                            <i class="bi bi-tag"></i> Mã Xã
+                        </label>
+                        <input asp-for="MaXa"
+                               class="form-control"
+                               readonly />
+                        <div class="form-text">Mã xã không thể thay đổi.</div>
+                    </div>
+
+                    <!-- Tên xã -->
+                    <div class="mb-4">
+                        <label asp-for="TenXa" class="form-label">
+                            <i class="bi bi-building"></i> Tên Xã
+                            <span class="text-danger">*</span>
+                        </label>
+                        <input asp-for="TenXa"
+                               class="form-control"
+                               placeholder="Nhập tên xã"
+                               maxlength="100" />
+                        <span asp-validation-for="TenXa" class="text-danger"></span>
+                    </div>
+
+                    <!-- Nút -->
+                    <div class="form-actions">
+                        <a asp-action="Index" class="btn btn-cancel">
+                            <i class="bi bi-x-circle"></i> Hủy
+                        </a>
+                        <button type="submit" class="btn btn-warning">
+                            <i class="bi bi-check-circle"></i> Cập nhật
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="back-link">
+            <a asp-action="Index">
+                <i class="bi bi-arrow-left"></i> Quay lại danh sách
+            </a>
+        </div>
+
+    </div>
+</div>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}

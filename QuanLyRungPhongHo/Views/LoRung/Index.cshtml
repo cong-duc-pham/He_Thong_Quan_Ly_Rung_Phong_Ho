@@ -1,0 +1,193 @@
+@model IEnumerable<QuanLyRungPhongHo.Models.LoRung>
+
+@{
+    ViewData["Title"] = "Quản lý Lô Rừng";
+    var danhMucXa = ViewBag.DanhMucXa as List<QuanLyRungPhongHo.Models.DanhMucXa>;
+    var loaiRung = ViewBag.LoaiRung as List<string>;
+    var trangThai = ViewBag.TrangThai as List<string>;
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/digioi.css" asp-append-version="true" />
+}
+
+<div class="digioi-page">
+
+    <!-- Header -->
+    <div class="digioi-header">
+        <h2>
+            <i class="bi bi-tree"></i> Quản Lý Lô Rừng
+        </h2>
+        <a asp-action="Create" class="digioi-btn digioi-btn-success">
+            <i class="bi bi-plus-circle"></i> Thêm Lô Rừng
+        </a>
+    </div>
+
+    @* Thông báo *@
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="digioi-alert digioi-alert-success">
+            <i class="bi bi-check-circle"></i> @TempData["SuccessMessage"]
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="digioi-alert digioi-alert-danger">
+            <i class="bi bi-exclamation-triangle"></i> @TempData["ErrorMessage"]
+        </div>
+    }
+
+    <!-- Bộ lọc -->
+    <div class="digioi-card digioi-filter-card">
+        <form asp-action="Index" method="get" class="digioi-filter-form">
+            <div class="digioi-form-group">
+                <label>
+                    <i class="bi bi-building"></i> Xã
+                </label>
+                <select name="searchXa" id="filterXa">
+                    <option value="">-- Tất cả các xã --</option>
+                    @foreach (var xa in danhMucXa)
+                    {
+                        <option value="@xa.MaXa" selected="@(ViewData["CurrentFilterXa"]?.ToString() == xa.MaXa)">
+                            @xa.TenXa
+                        </option>
+                    }
+                </select>
+            </div>
+
+            <div class="digioi-form-group">
+                <label>
+                    <i class="bi bi-geo-alt"></i> Thôn/Bản
+                </label>
+                <select name="searchThon" id="filterThon">
+                    <option value="">-- Tất cả thôn/bản --</option>
+                </select>
+            </div>
+
+            <div class="digioi-form-group">
+                <label>
+                    <i class="bi bi-tree-fill"></i> Loại Rừng
+                </label>
+                <select name="searchLoai">
+                    <option value="">-- Tất cả loại --</option>
+                    @foreach (var loai in loaiRung)
+                    {
+                        <option value="@loai" selected="@(ViewData["CurrentFilterLoai"]?.ToString() == loai)">
+                            @loai
+                        </option>
+                    }
+                </select>
+            </div>
+
+            <div class="digioi-form-group">
+                <label>
+                    <i class="bi bi-info-circle"></i> Trạng Thái
+                </label>
+                <select name="searchTrangThai">
+                    <option value="">-- Tất cả trạng thái --</option>
+                    @foreach (var tt in trangThai)
+                    {
+                        <option value="@tt" selected="@(ViewData["CurrentFilterTrangThai"]?.ToString() == tt)">
+                            @tt
+                        </option>
+                    }
+                </select>
+            </div>
+
+            <div class="digioi-form-group">
+                <label>&nbsp;</label>
+                <button type="submit" class="digioi-btn digioi-btn-success">
+                    <i class="bi bi-search"></i> Lọc
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Kết quả -->
+    <div class="digioi-info-bar">
+        <span class="digioi-badge digioi-badge-info">
+            Tổng số: @ViewData["TotalRecords"] lô rừng
+        </span>
+        <a asp-action="Index" class="digioi-btn digioi-btn-outline">
+            <i class="bi bi-x-circle"></i> Xóa bộ lọc
+        </a>
+    </div>
+
+    <!-- Bảng -->
+    <div class="digioi-card">
+        <div class="digioi-table-wrap">
+            <table class="digioi-table">
+                <thead>
+                    <tr>
+                        <th>STT</th>
+                        <th>Tiểu khu</th>
+                        <th>Khoảnh</th>
+                        <th>Lô</th>
+                        <th>Thôn/Bản</th>
+                        <th>Xã</th>
+                        <th>Diện tích (ha)</th>
+                        <th>Loại Rừng</th>
+                        <th>Trạng Thái</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Any())
+                    {
+                        int stt = ((int)ViewData["PageNumber"] - 1) * 15 + 1;
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@stt</td>
+                                <td><strong>@item.SoTieuKhu</strong></td>
+                                <td><strong>@item.SoKhoanh</strong></td>
+                                <td><strong>@item.SoLo</strong></td>
+                                <td>@item.DanhMucThon?.TenThon</td>
+                                <td>
+                                    <span class="digioi-badge digioi-badge-success">@item.DanhMucThon?.DanhMucXa?.TenXa</span>
+                                </td>
+                                <td>
+                                    @(item.DienTich?.ToString("N2") ?? "—")
+                                </td>
+                                <td>@item.LoaiRung</td>
+                                <td>
+                                    @{
+                                        var badgeClass = item.TrangThai switch
+                                        {
+                                            "Rừng giàu" => "digioi-badge-success",
+                                            "Rừng trung bình" => "digioi-badge-info",
+                                            "Rừng nghèo" => "digioi-badge-warning",
+                                            "Đất trống" => "digioi-badge-secondary",
+                                            _ => "digioi-badge-secondary"
+                                        };
+                                    }
+                                    <span class="digioi-badge @badgeClass">@item.TrangThai</span>
+                                </td>
+                                <td>
+                                    <div class="digioi-btn-group">
+                                        <a asp-action="Edit" asp-route-id="@item.MaLo" class="digioi-btn digioi-btn-warning">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </a>
+                                        <a asp-action="Delete" asp-route-id="@item.MaLo" class="digioi-btn digioi-btn-danger">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            stt++;
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="10" class="digioi-empty">
+                                <i class="bi bi-inbox"></i>
+                                <p>Không tìm thấy dữ liệu</p>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

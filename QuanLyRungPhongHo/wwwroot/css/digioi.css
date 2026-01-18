@@ -1,0 +1,704 @@
+/* ======================================
+   DIGIOI SAFE CSS (KHÔNG ĐỤNG styles.css)
+   ====================================== */
+
+:root {
+    --green: #198754;
+    --green-dark: #146c43;
+    --green-light: #e8f5e9;
+    --bg: #f4f6f9;
+    --border: #dee2e6;
+    --radius: 12px;
+}
+
+/* ===== PAGE WRAPPER ===== */
+.digioi-page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 24px;
+}
+
+/* ===== PAGE TITLE ===== */
+.digioi-page h1,
+.digioi-page h2 {
+    font-weight: 700;
+    color: var(--green);
+    margin-bottom: 20px;
+}
+
+/* ===== CARD (KHÔNG DÙNG .card) ===== */
+.digioi-card {
+    background: #fff;
+    border-radius: var(--radius);
+    box-shadow: 0 8px 24px rgba(0,0,0,.06);
+    padding: 24px;
+    margin-bottom: 24px;
+}
+
+/* ===== CARD HEADER ===== */
+.digioi-card-header {
+    background: var(--green);
+    color: #fff;
+    padding: 14px 20px;
+    border-radius: var(--radius) var(--radius) 0 0;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+/* ===== FORM ===== */
+.digioi-form {
+    max-width: 520px;
+    margin: 0 auto;
+}
+
+.digioi-form label {
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+.digioi-form input,
+.digioi-form select {
+    border-radius: 8px;
+    padding: 10px 14px;
+}
+
+/* ===== FORM BUTTON ===== */
+.digioi-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+/* ===== SEARCH BAR ===== */
+.digioi-search {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.digioi-search input {
+    flex: 1;
+}
+
+/* ===== TABLE ===== */
+.digioi-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.digioi-table thead {
+    background: var(--green-light);
+}
+
+.digioi-table th,
+.digioi-table td {
+    padding: 12px;
+    border-bottom: 1px solid var(--border);
+    text-align: center;
+}
+
+.digioi-table tbody tr:hover {
+    background: #f9fbfa;
+}
+
+/* ===== EMPTY ===== */
+.digioi-empty {
+    text-align: center;
+    padding: 40px;
+    color: #6c757d;
+}
+
+/* ===== HEADER BAR ===== */
+.digioi-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid var(--green);
+}
+
+.digioi-header h2 {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--green);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* ===== ALERTS ===== */
+.digioi-alert {
+    padding: 14px 18px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 500;
+}
+
+.digioi-alert-success {
+    background: #d1e7dd;
+    color: #0f5132;
+    border-left: 4px solid var(--green);
+}
+
+.digioi-alert-danger {
+    background: #f8d7da;
+    color: #842029;
+    border-left: 4px solid #dc3545;
+}
+
+/* ===== FILTER CARD ===== */
+.digioi-filter-card {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+}
+
+.digioi-filter-form {
+    display: flex;
+    gap: 16px;
+    align-items: flex-end;
+    flex-wrap: wrap;
+}
+
+.digioi-form-group {
+    display: flex;
+    flex-direction: column;
+    min-width: 200px;
+    flex: 1;
+}
+
+.digioi-form-group label {
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 8px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.digioi-form-group input,
+.digioi-form-group select {
+    padding: 10px 14px;
+    border: 2px solid #dee2e6;
+    border-radius: 8px;
+    font-size: 15px;
+    transition: all 0.3s;
+    background: white;
+    width: 100%;
+}
+
+.digioi-form-group input:focus,
+.digioi-form-group select:focus {
+    outline: none;
+    border-color: var(--green);
+    box-shadow: 0 0 0 3px rgba(25, 135, 84, 0.1);
+}
+
+/* ===== INFO BAR ===== */
+.digioi-info-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+/* ===== BADGES ===== */
+.digioi-badge {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 14px;
+    display: inline-block;
+}
+
+.digioi-badge-info {
+    background: var(--green-light);
+    color: var(--green);
+}
+
+.digioi-badge-success {
+    background: #d1e7dd;
+    color: #0f5132;
+}
+
+.digioi-badge-secondary {
+    background: #e2e3e5;
+    color: #41464b;
+}
+
+/* ===== BUTTONS ===== */
+.digioi-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-size: 14px;
+}
+
+.digioi-btn:hover {
+    transform: translateY(-2px);
+    text-decoration: none;
+}
+
+.digioi-btn-success {
+    background: var(--green);
+    color: white;
+}
+
+.digioi-btn-success:hover {
+    background: var(--green-dark);
+    color: white;
+    box-shadow: 0 4px 12px rgba(25, 135, 84, 0.3);
+}
+
+.digioi-btn-outline {
+    background: white;
+    color: var(--green);
+    border: 2px solid var(--green);
+}
+
+.digioi-btn-outline:hover {
+    background: var(--green-light);
+    color: var(--green);
+}
+
+.digioi-btn-warning {
+    background: #ffc107;
+    color: #000;
+}
+
+.digioi-btn-warning:hover {
+    background: #e0a800;
+    color: #000;
+}
+
+.digioi-btn-danger {
+    background: #dc3545;
+    color: white;
+}
+
+.digioi-btn-danger:hover {
+    background: #c82333;
+    color: white;
+}
+
+.digioi-btn-group {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+}
+
+/* ===== TABLE WRAPPER ===== */
+.digioi-table-wrap {
+    overflow-x: auto;
+}
+
+/* ===== TABLE ENHANCED ===== */
+.digioi-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+}
+
+.digioi-table thead {
+    background: linear-gradient(135deg, var(--green) 0%, var(--green-dark) 100%);
+    color: white;
+}
+
+.digioi-table th {
+    padding: 14px 12px;
+    font-weight: 600;
+    text-align: center;
+    font-size: 15px;
+    border: 1px solid rgba(255,255,255,0.2);
+}
+
+.digioi-table td {
+    padding: 12px;
+    border-bottom: 1px solid #e9ecef;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.digioi-table tbody tr {
+    transition: all 0.2s;
+}
+
+.digioi-table tbody tr:hover {
+    background: #f8f9fa;
+    transform: scale(1.005);
+}
+
+.digioi-table tbody tr:nth-child(even) {
+    background: #fafbfc;
+}
+
+.digioi-table tbody tr:nth-child(even):hover {
+    background: #f8f9fa;
+}
+
+/* ===== PAGINATION ===== */
+.digioi-pagination {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 24px;
+}
+
+.digioi-page {
+    padding: 8px 14px;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    background: white;
+    color: var(--green);
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s;
+    min-width: 40px;
+    text-align: center;
+}
+
+.digioi-page:hover:not(.disabled):not(.active) {
+    background: var(--green-light);
+    border-color: var(--green);
+    color: var(--green);
+}
+
+.digioi-page.active {
+    background: var(--green);
+    color: white;
+    border-color: var(--green);
+}
+
+.digioi-page.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.digioi-page-info {
+    text-align: center;
+    margin-top: 12px;
+    color: #6c757d;
+    font-weight: 500;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 992px) {
+    .digioi-page {
+        padding: 16px;
+    }
+
+    .digioi-form {
+        max-width: 100%;
+    }
+
+    .digioi-search {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .digioi-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .digioi-filter-form {
+        flex-direction: column;
+    }
+
+    .digioi-form-group {
+        min-width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .digioi-table {
+        font-size: 14px;
+    }
+
+    .digioi-table th,
+    .digioi-table td {
+        padding: 8px 6px;
+    }
+
+    .digioi-btn {
+        padding: 6px 12px;
+        font-size: 13px;
+    }
+}
+
+/* ======================================
+   FORM PAGES (Create, Edit, Delete)
+   ====================================== */
+
+/* Form Container */
+.digioi-form-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 24px;
+}
+
+/* Card Body */
+.digioi-card-body {
+    padding: 24px;
+}
+
+/* Card Header Variants */
+.digioi-card-header h4 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Form Group Enhanced */
+.digioi-form-group label {
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 8px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.digioi-form-group input[readonly] {
+    background: #e9ecef;
+    cursor: not-allowed;
+}
+
+/* Form Text Helper */
+.digioi-form-text {
+    font-size: 13px;
+    color: #6c757d;
+    margin-top: 4px;
+}
+
+/* Form Actions */
+.digioi-form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid #e9ecef;
+}
+
+/* Back Link */
+.digioi-back-link {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.digioi-back-link a {
+    color: var(--green);
+    text-decoration: none;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.3s;
+}
+
+.digioi-back-link a:hover {
+    color: var(--green-dark);
+    transform: translateX(-4px);
+}
+
+/* Info Rows (for Delete page) */
+.digioi-info-row {
+    display: flex;
+    padding: 12px 0;
+    border-bottom: 1px solid #e9ecef;
+    align-items: center;
+}
+
+.digioi-info-label {
+    font-weight: 600;
+    color: #495057;
+    min-width: 150px;
+}
+
+.digioi-info-value {
+    flex: 1;
+    color: #212529;
+}
+
+/* Alert Warning Variant */
+.digioi-alert-warning {
+    background: #fff3cd;
+    color: #856404;
+    border-left: 4px solid #ffc107;
+}
+
+/* Button Secondary */
+.digioi-btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.digioi-btn-secondary:hover {
+    background: #5a6268;
+    color: white;
+}
+
+/* Disabled Button */
+.digioi-btn[disabled] {
+    opacity: 0.6;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* Text Utilities */
+.digioi-text-success {
+    color: var(--green);
+}
+
+.digioi-text-danger {
+    color: #dc3545;
+}
+
+/* Responsive for Forms */
+@media (max-width: 768px) {
+    .digioi-form-container {
+        padding: 16px;
+    }
+
+    .digioi-form-actions {
+        flex-direction: column-reverse;
+    }
+
+    .digioi-form-actions .digioi-btn {
+        width: 100%;
+    }
+
+    .digioi-info-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+    }
+
+    .digioi-info-label {
+        min-width: auto;
+    }
+}
+
+/* ======================================
+   EXTENDED FORM STYLES (for LoRung)
+   ====================================== */
+
+/* Form Section Title */
+.digioi-section-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--green);
+    margin: 24px 0 16px 0;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--green-light);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Form Row */
+.digioi-form-row {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+}
+
+.digioi-form-col {
+    flex: 1;
+    min-width: 250px;
+}
+
+.digioi-form-col-full {
+    flex: 1 1 100%;
+}
+
+/* Info Box (for Edit/Delete) */
+.digioi-info-box {
+    background: var(--green-light);
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 15px;
+}
+
+/* Info Card Grid (for Delete page) */
+.digioi-info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.digioi-info-card {
+    background: white;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.digioi-info-card-header {
+    background: var(--green-light);
+    color: var(--green);
+    padding: 10px 16px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.digioi-info-card-body {
+    padding: 16px;
+}
+
+/* Badge Warning */
+.digioi-badge-warning {
+    background: #fff3cd;
+    color: #856404;
+}
+
+/* Utility: Large Button */
+.digioi-btn-lg {
+    padding: 12px 24px;
+    font-size: 16px;
+}
+
+@media (max-width: 768px) {
+    .digioi-form-row {
+        flex-direction: column;
+    }
+
+    .digioi-form-col {
+        min-width: 100%;
+    }
+
+    .digioi-info-grid {
+        grid-template-columns: 1fr;
+    }
+}

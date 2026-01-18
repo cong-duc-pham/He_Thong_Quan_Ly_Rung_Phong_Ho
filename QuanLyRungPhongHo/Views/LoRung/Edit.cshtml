@@ -1,0 +1,174 @@
+@model QuanLyRungPhongHo.Models.LoRung
+
+@{
+    ViewData["Title"] = "Sửa Lô Rừng";
+    var danhMucXa = ViewBag.DanhMucXa as List<QuanLyRungPhongHo.Models.DanhMucXa>;
+    var danhMucThon = ViewBag.DanhMucThon as List<QuanLyRungPhongHo.Models.DanhMucThon>;
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/digioi.css" asp-append-version="true" />
+}
+
+<div class="digioi-form-container">
+    <div class="digioi-card">
+        <div class="digioi-card-header">
+            <h4>
+                <i class="bi bi-pencil-square"></i> Sửa Thông Tin Lô Rừng
+            </h4>
+        </div>
+
+        <div class="digioi-card-body">
+            <form asp-action="Edit" method="post">
+                <input type="hidden" asp-for="MaLo" />
+                <div asp-validation-summary="ModelOnly" class="digioi-alert digioi-alert-danger"></div>
+
+                <div class="digioi-info-box">
+                    <i class="bi bi-info-circle"></i>
+                    <strong>Mã Lô:</strong>
+                    <span class="digioi-badge digioi-badge-secondary">@Model.MaLo</span>
+                </div>
+
+                <!-- Thông tin kỹ thuật -->
+                <h5 class="digioi-section-title">
+                    <i class="bi bi-info-circle"></i> Thông Tin Kỹ Thuật
+                </h5>
+
+                <div class="digioi-form-row">
+                    <div class="digioi-form-col">
+                        <div class="digioi-form-group">
+                            <label asp-for="SoTieuKhu">
+                                <i class="bi bi-123"></i> Số Tiểu Khu
+                            </label>
+                            <input asp-for="SoTieuKhu" type="number" min="1" max="999" />
+                            <span asp-validation-for="SoTieuKhu" class="digioi-text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="digioi-form-col">
+                        <div class="digioi-form-group">
+                            <label asp-for="SoKhoanh">
+                                <i class="bi bi-123"></i> Số Khoảnh
+                            </label>
+                            <input asp-for="SoKhoanh" type="number" min="1" max="999" />
+                            <span asp-validation-for="SoKhoanh" class="digioi-text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="digioi-form-col">
+                        <div class="digioi-form-group">
+                            <label asp-for="SoLo">
+                                <i class="bi bi-123"></i> Số Lô
+                            </label>
+                            <input asp-for="SoLo" type="number" min="1" max="999" />
+                            <span asp-validation-for="SoLo" class="digioi-text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Vị trí địa lý -->
+                <h5 class="digioi-section-title">
+                    <i class="bi bi-geo-alt"></i> Vị Trí Địa Lý
+                </h5>
+
+                <div class="digioi-form-row">
+                    <div class="digioi-form-col">
+                        <div class="digioi-form-group">
+                            <label>
+                                <i class="bi bi-building"></i> Xã <span class="text-danger">*</span>
+                            </label>
+                            <select id="selectXa">
+                                <option value="">-- Chọn xã --</option>
+                                @foreach (var xa in danhMucXa)
+                                {
+                                    <option value="@xa.MaXa" selected="@(Model.DanhMucThon?.MaXa == xa.MaXa)">
+                                        @xa.TenXa
+                                    </option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="digioi-form-col">
+                        <div class="digioi-form-group">
+                            <label asp-for="MaThon">
+                                <i class="bi bi-geo-alt"></i> Thôn/Bản
+                            </label>
+                            <select asp-for="MaThon" id="selectThon">
+                                <option value="">-- Chọn thôn/bản --</option>
+                                @foreach (var thon in danhMucThon)
+                                {
+                                    <option value="@thon.MaThon" selected="@(Model.MaThon == thon.MaThon)">
+                                        @thon.TenThon
+                                    </option>
+                                }
+                            </select>
+                            <span asp-validation-for="MaThon" class="digioi-text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Thông tin rừng -->
+                <h5 class="digioi-section-title">
+                    <i class="bi bi-tree-fill"></i> Thông Tin Rừng
+                </h5>
+
+                <div class="digioi-form-row">
+                    <div class="digioi-form-col">
+                        <div class="digioi-form-group">
+                            <label asp-for="DienTich">
+                                <i class="bi bi-rulers"></i> Diện Tích (ha)
+                            </label>
+                            <input asp-for="DienTich" type="number" step="0.01" />
+                            <span asp-validation-for="DienTich" class="digioi-text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="digioi-form-col">
+                        <div class="digioi-form-group">
+                            <label asp-for="LoaiRung">
+                                <i class="bi bi-tree"></i> Loại Rừng
+                            </label>
+                            <select asp-for="LoaiRung" asp-items="ViewBag.LoaiRung">
+                                <option value="">-- Chọn loại --</option>
+                            </select>
+                            <span asp-validation-for="LoaiRung" class="digioi-text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="digioi-form-col">
+                        <div class="digioi-form-group">
+                            <label asp-for="TrangThai">
+                                <i class="bi bi-info-circle"></i> Trạng Thái
+                            </label>
+                            <select asp-for="TrangThai" asp-items="ViewBag.TrangThai">
+                                <option value="">-- Chọn trạng thái --</option>
+                            </select>
+                            <span asp-validation-for="TrangThai" class="digioi-text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="digioi-form-actions">
+                    <a asp-action="Index" class="digioi-btn digioi-btn-secondary digioi-btn-lg">
+                        <i class="bi bi-x-circle"></i> Hủy
+                    </a>
+                    <button type="submit" class="digioi-btn digioi-btn-warning digioi-btn-lg">
+                        <i class="bi bi-check-circle"></i> Cập nhật
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="digioi-back-link">
+        <a asp-action="Index">
+            <i class="bi bi-arrow-left"></i> Quay lại danh sách
+        </a>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/lorung.js"></script>
+}

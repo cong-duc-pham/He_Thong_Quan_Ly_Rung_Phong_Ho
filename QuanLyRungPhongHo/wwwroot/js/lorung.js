@@ -96,13 +96,18 @@ LoRung.CascadeHandler = {
         if (filterXa.length && filterThon.length) {
             // Load Thôn khi page load nếu đã chọn Xã
             if (filterXa.val()) {
-                this.loadThonsForFilter(filterXa.val(), filterThon.val());
+                // SỬA: Lấy giá trị từ data-selected (được gán từ Server) thay vì .val()
+                // Vì lúc page load, dropdown chưa có option nào nên .val() sẽ null
+                const selectedThon = filterThon.data('selected');
+
+                this.loadThonsForFilter(filterXa.val(), selectedThon);
             }
 
             // Bind change event
             filterXa.on('change', () => {
                 const maXa = filterXa.val();
-                this.loadThonsForFilter(maXa);
+                // Khi người dùng tự đổi Xã thì reset Thôn về rỗng
+                this.loadThonsForFilter(maXa, '');
             });
         }
     },
@@ -135,7 +140,8 @@ LoRung.CascadeHandler = {
                             .val(item.maThon)
                             .text(item.tenThon);
 
-                        if (item.maThon === selectedValue) {
+                        // SỬA: Chuyển cả 2 về String để so sánh chính xác tuyệt đối
+                        if (String(item.maThon) === String(selectedValue)) {
                             option.prop('selected', true);
                         }
 

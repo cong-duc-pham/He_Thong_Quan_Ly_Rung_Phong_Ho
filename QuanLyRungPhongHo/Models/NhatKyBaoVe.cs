@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace QuanLyRungPhongHo.Models
 {
@@ -8,7 +9,11 @@ namespace QuanLyRungPhongHo.Models
         public DateTime NgayGhi { get; set; } = DateTime.Now;
         public string? LoaiSuViec { get; set; }
         public string? NoiDung { get; set; }
+
+        [ForeignKey(nameof(LoRung))]
         public int? MaLo { get; set; }
+
+        [ForeignKey(nameof(NhanSu))]
         public int? MaNV_GhiNhan { get; set; }
         public string? ToaDoGPS { get; set; }
 

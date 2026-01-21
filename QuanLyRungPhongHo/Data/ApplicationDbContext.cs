@@ -57,6 +57,18 @@ namespace QuanLyRungPhongHo.Data
                 .WithOne(ns => ns.TaiKhoan)
                 .HasForeignKey<TaiKhoan>(tk => tk.MaNV)
                 .OnDelete(DeleteBehavior.SetNull);
+
+            modelBuilder.Entity<NhatKyBaoVe>()
+                .HasOne(nk => nk.LoRung)
+                .WithMany(l => l.NhatKyBaoVes)
+                .HasForeignKey(nk => nk.MaLo)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            modelBuilder.Entity<NhatKyBaoVe>()
+                .HasOne(nk => nk.NhanSu)
+                .WithMany(ns => ns.NhatKyBaoVes)
+                .HasForeignKey(nk => nk.MaNV_GhiNhan)
+                .OnDelete(DeleteBehavior.SetNull);
         }
     }
 }

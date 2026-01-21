@@ -40,7 +40,7 @@
     <!-- Tìm kiếm -->
     <div class="digioi-card mb-3">
         <div class="card-body">
-            <form asp-action="Index" method="get" class="digioi-search">
+            <form asp-action="Index" method="get" class="digioi-search no-ajax">
                 <div class="input-group">
                     <span class="input-group-text bg-success text-white">
                         <i class="bi bi-search"></i>
@@ -69,7 +69,7 @@
             <span class="badge bg-warning text-dark">
                 Tìm kiếm: "@ViewData["CurrentFilter"]"
             </span>
-            <a asp-action="Index" class="btn btn-sm btn-outline-secondary">
+            <a asp-action="Index" class="btn btn-sm btn-outline-secondary no-ajax">
                 <i class="bi bi-x-circle"></i> Xóa lọc
             </a>
         }

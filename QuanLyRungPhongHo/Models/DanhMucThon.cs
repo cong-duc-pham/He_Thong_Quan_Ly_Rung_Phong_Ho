@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
 namespace QuanLyRungPhongHo.Models
 {
@@ -21,7 +22,10 @@ namespace QuanLyRungPhongHo.Models
         public string MaXa { get; set; } = null!;
 
         // Navigation properties
-        public DanhMucXa DanhMucXa { get; set; } = null!;
+        [ValidateNever]
+        public DanhMucXa? DanhMucXa { get; set; }
+
+        [ValidateNever]
         public ICollection<LoRung> LoRungs { get; set; } = new List<LoRung>();
     }
 }

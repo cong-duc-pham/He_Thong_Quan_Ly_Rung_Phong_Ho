@@ -37,7 +37,7 @@
 
     <!-- FORM TÌM KIẾM -->
     <div class="digioi-card digioi-filter-card">
-        <form asp-action="Index" method="get" class="digioi-filter-form">
+        <form asp-action="Index" method="get" class="digioi-filter-form no-ajax">
 
             <div class="digioi-form-group">
                 <label>
@@ -83,7 +83,7 @@
         @if (!string.IsNullOrEmpty(ViewData["CurrentFilterXa"]?.ToString())
         || !string.IsNullOrEmpty(ViewData["CurrentFilter"]?.ToString()))
         {
-            <a asp-action="Index" class="digioi-btn digioi-btn-outline">
+            <a asp-action="Index" class="digioi-btn digioi-btn-outline no-ajax">
                 <i class="bi bi-x-circle"></i> Xóa bộ lọc
             </a>
         }

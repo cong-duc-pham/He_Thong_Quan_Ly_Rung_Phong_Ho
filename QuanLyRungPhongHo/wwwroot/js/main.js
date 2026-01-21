@@ -45,58 +45,133 @@
         });
     });
 
-    // AJAX Navigation - Ngăn reload trang
-    function setupAjaxNavigation() {
-        document.querySelectorAll('.menu-item a[href], .submenu a[href]').forEach(link => {
-            const href = link.getAttribute('href');
+    // ==========================================
+    // 1. AJAX NAVIGATION (GLOBAL DELEGATION)
+    // Sửa lỗi: Dùng Event Delegation để bắt sự kiện click
+    // cho cả Sidebar lẫn nội dung bên trong Main
+    // ==========================================
+    document.body.addEventListener('click', function (e) {
+        // Tìm thẻ a gần nhất từ vị trí click
+        const link = e.target.closest('a');
 
-            // Bỏ qua các link đặc biệt
-            if (!href ||
-                href === '#' ||
-                href === 'javascript:void(0)' ||
-                href.includes('Logout') ||
-                link.closest('form') ||
-                (link.closest('.has-submenu') && link.parentElement.classList.contains('has-submenu'))) {
-                return;
-            }
+        // Nếu không phải link hoặc không có href, bỏ qua
+        if (!link || !link.getAttribute('href')) return;
 
-            link.addEventListener('click', function (e) {
-                e.preventDefault();
+        const href = link.getAttribute('href');
 
-                // Xóa active từ tất cả menu items
-                document.querySelectorAll('.menu-item').forEach(item => {
-                    item.classList.remove('active');
-                });
-                document.querySelectorAll('.submenu a').forEach(a => {
-                    a.classList.remove('active');
-                });
+        // Bỏ qua các link đặc biệt, link ngoài, hoặc download
+        if (href === '#' ||
+            href.startsWith('javascript:') ||
+            href.startsWith('mailto:') ||
+            href.startsWith('tel:') ||
+            link.getAttribute('target') === '_blank' ||
+            link.hasAttribute('download') ||
+            link.classList.contains('no-ajax')) { // Thêm class no-ajax nếu muốn link hoạt động thường
+            return;
+        }
 
-                // Thêm active vào item được click
-                const menuItem = this.closest('.menu-item');
-                if (menuItem) {
-                    menuItem.classList.add('active');
-                }
+        // Kiểm tra xem link có thuộc về ứng dụng nội bộ không (để tránh load link Google, v.v...)
+        // Ở đây giả sử ứng dụng chạy trên root '/', nếu khác bạn cần check domain
+        const targetUrl = new URL(link.href, window.location.origin);
+        if (targetUrl.origin !== window.location.origin) return;
 
-                if (this.closest('.submenu')) {
-                    this.classList.add('active');
-                    const submenuParent = this.closest('.has-submenu');
-                    if (submenuParent) {
-                        submenuParent.classList.add('open');
-                    }
-                }
+        // Xử lý UI cho Sidebar (Active state)
+        if (link.closest('.sidebar')) {
+            handleSidebarActiveState(link);
+        }
 
-                // Đóng sidebar trên mobile
-                if (isMobile() && sidebar.classList.contains('active')) {
-                    sidebar.classList.remove('active');
-                }
+        // CHẶN RELOAD VÀ GỌI AJAX
+        e.preventDefault();
+        loadPage(href);
+    });
 
-                // Load content bằng AJAX
-                loadPage(href);
-            });
+    // Hàm xử lý active state cho sidebar (tách riêng để gọn code)
+    function handleSidebarActiveState(link) {
+        document.querySelectorAll('.menu-item').forEach(item => item.classList.remove('active'));
+        document.querySelectorAll('.submenu a').forEach(a => a.classList.remove('active'));
+
+        const menuItem = link.closest('.menu-item');
+        if (menuItem) menuItem.classList.add('active');
+
+        if (link.closest('.submenu')) {
+            link.classList.add('active');
+            const submenuParent = link.closest('.has-submenu');
+            if (submenuParent) submenuParent.classList.add('open');
+        }
+
+        if (isMobile() && sidebar.classList.contains('active')) {
+            sidebar.classList.remove('active');
+        }
+    }
+
+    // ==========================================
+    // 2. FORM SUBMISSION HANDLER
+    // Hàm xử lý submit form bằng AJAX thay vì reload
+    // ==========================================
+    function setupAjaxFormSubmission() {
+        const forms = mainContent.querySelectorAll('form:not(.no-ajax)');
+
+        forms.forEach(form => {
+            // Xóa listener cũ để tránh duplicate (nếu có)
+            form.removeEventListener('submit', handleFormSubmit);
+            form.addEventListener('submit', handleFormSubmit);
         });
     }
 
-    // Hàm load trang bằng AJAX
+    async function handleFormSubmit(e) {
+        e.preventDefault();
+        const form = e.target;
+
+        // Validate form nếu có jQuery Validate (từ digioi.js)
+        if (typeof $ !== 'undefined' && $(form).valid && !$(form).valid()) {
+            return; // Dừng nếu form không hợp lệ
+        }
+
+        // Hiển thị loading button
+        const submitBtn = form.querySelector('button[type="submit"]');
+        let originalBtnContent = '';
+        if (submitBtn) {
+            originalBtnContent = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Đang xử lý...';
+        }
+
+        try {
+            const formData = new FormData(form);
+            const response = await fetch(form.action, {
+                method: form.method || 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+
+            if (!response.ok) throw new Error('Network response was not ok');
+
+            // Lấy URL đích (trong trường hợp redirect) hoặc URL hiện tại
+            const responseURL = response.url;
+            const html = await response.text();
+
+            processResponseHtml(html, responseURL);
+
+        } catch (error) {
+            console.error('Error submitting form:', error);
+            if (typeof DiGioi !== 'undefined' && DiGioi.Utils) {
+                DiGioi.Utils.showError('Có lỗi xảy ra khi gửi dữ liệu.');
+            } else {
+                alert('Có lỗi xảy ra!');
+            }
+        } finally {
+            // Reset button
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalBtnContent;
+            }
+        }
+    }
+
+
+    // Hàm load trang bằng AJAX (Core function)
     function loadPage(url) {
         // Hiển thị loading indicator
         mainContent.innerHTML = `
@@ -108,7 +183,6 @@
             </div>
         `;
 
-        // Sử dụng fetch API
         fetch(url, {
             method: 'GET',
             headers: {
@@ -116,37 +190,11 @@
             }
         })
             .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
+                if (!response.ok) throw new Error('Network response was not ok');
                 return response.text();
             })
             .then(html => {
-                // Parse HTML response
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(html, 'text/html');
-
-                // Lấy nội dung main
-                const newMainContent = doc.querySelector('main[role="main"]');
-
-                if (newMainContent) {
-                    mainContent.innerHTML = newMainContent.innerHTML;
-
-                    // Update URL trong browser
-                    window.history.pushState({ url: url }, '', url);
-
-                    // Update title
-                    const newTitle = doc.querySelector('title');
-                    if (newTitle) {
-                        document.title = newTitle.textContent;
-                    }
-
-                    // CRITICAL: Re-initialize scripts cho trang mới
-                    reinitializeScripts();
-                } else {
-                    mainContent.innerHTML = html;
-                    reinitializeScripts();
-                }
+                processResponseHtml(html, url);
             })
             .catch(error => {
                 console.error('Error loading page:', error);
@@ -163,117 +211,101 @@
             });
     }
 
+    // Hàm xử lý HTML trả về và cập nhật giao diện
+    function processResponseHtml(html, url) {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        const newMainContent = doc.querySelector('main[role="main"]');
+
+        if (newMainContent) {
+            mainContent.innerHTML = newMainContent.innerHTML;
+
+            // Chỉ pushState nếu URL khác URL hiện tại (tránh duplicate khi submit form)
+            if (window.location.href !== url) {
+                window.history.pushState({ url: url }, '', url);
+            }
+
+            const newTitle = doc.querySelector('title');
+            if (newTitle) document.title = newTitle.textContent;
+
+            reinitializeScripts();
+        } else {
+            // Trường hợp server trả về partial view hoặc json lỗi
+            mainContent.innerHTML = html;
+            reinitializeScripts();
+        }
+    }
+
     // Re-initialize scripts sau khi load nội dung mới
     function reinitializeScripts() {
-        // 1. Execute inline scripts from loaded content
+        // 1. Kích hoạt xử lý Form AJAX cho các form mới load
+        setupAjaxFormSubmission();
+
+        // 2. Execute inline scripts
         const scripts = mainContent.querySelectorAll('script');
         scripts.forEach(script => {
             if (script.textContent.trim()) {
                 try {
-                    // Create new script element to execute
                     const newScript = document.createElement('script');
                     newScript.textContent = script.textContent;
                     document.body.appendChild(newScript);
-                    document.body.removeChild(newScript);
+                    document.body.removeChild(newScript); // Cleanup
                 } catch (e) {
                     console.error('Error executing inline script:', e);
                 }
             }
         });
 
-        // 2. Re-initialize LoRung cascade handlers
+        // 3. Re-initialize LoRung modules
         if (typeof LoRung !== 'undefined') {
             const currentPath = window.location.pathname.toLowerCase();
-
-            // Đợi một chút để DOM được render hoàn toàn
             setTimeout(() => {
-                // Index page - Filter cascade
+                // Index page
                 if (currentPath.includes('/lorung/index') || currentPath.endsWith('/lorung')) {
-                    if (LoRung.CascadeHandler && LoRung.CascadeHandler.initCascadeFilter) {
-                        LoRung.CascadeHandler.initCascadeFilter();
-                    }
-                    if (LoRung.UIEnhancer && LoRung.UIEnhancer.highlightActiveFilters) {
-                        LoRung.UIEnhancer.highlightActiveFilters();
-                    }
+                    if (LoRung.CascadeHandler?.initCascadeFilter) LoRung.CascadeHandler.initCascadeFilter();
+                    if (LoRung.UIEnhancer?.highlightActiveFilters) LoRung.UIEnhancer.highlightActiveFilters();
                 }
-
-                // Create page
-                if (currentPath.includes('/lorung/create')) {
-                    if (LoRung.CascadeHandler && LoRung.CascadeHandler.initCascadeForm) {
-                        LoRung.CascadeHandler.initCascadeForm();
-                    }
+                // Create/Edit page
+                if (currentPath.includes('/lorung/create') || currentPath.includes('/lorung/edit')) {
+                    if (LoRung.CascadeHandler?.initCascadeForm) LoRung.CascadeHandler.initCascadeForm();
                     if (LoRung.FormValidation) {
                         LoRung.FormValidation.validateTechnicalNumbers();
                         LoRung.FormValidation.validateArea();
+                        // Lưu ý: validateBeforeSubmit của LoRung chỉ check valid, còn việc submit AJAX giờ do handleFormSubmit lo
                         LoRung.FormValidation.validateBeforeSubmit();
                     }
                 }
-
-                // Edit page
-                if (currentPath.includes('/lorung/edit')) {
-                    if (LoRung.CascadeHandler && LoRung.CascadeHandler.initCascadeForm) {
-                        LoRung.CascadeHandler.initCascadeForm();
-                    }
-                    if (LoRung.FormValidation) {
-                        LoRung.FormValidation.validateTechnicalNumbers();
-                        LoRung.FormValidation.validateArea();
-                        LoRung.FormValidation.validateBeforeSubmit();
-                    }
-                }
-
-                // Initialize tooltips
-                if (LoRung.UIEnhancer && LoRung.UIEnhancer.initTooltips) {
-                    LoRung.UIEnhancer.initTooltips();
-                }
+                if (LoRung.UIEnhancer?.initTooltips) LoRung.UIEnhancer.initTooltips();
             }, 100);
         }
 
-        // 3. Re-initialize DiGioi handlers if exists
+        // 4. Re-initialize DiGioi modules
         if (typeof DiGioi !== 'undefined') {
             const currentPath = window.location.pathname.toLowerCase();
-
             setTimeout(() => {
-                // DanhMucXa
-                if (currentPath.includes('/danhmucxa')) {
-                    if (DiGioi.XaHandler && DiGioi.XaHandler.init) {
-                        DiGioi.XaHandler.init();
-                    }
-                }
+                if (currentPath.includes('/danhmucxa') && DiGioi.XaHandler?.init) DiGioi.XaHandler.init();
+                if (currentPath.includes('/danhmucthon') && DiGioi.ThonHandler?.init) DiGioi.ThonHandler.init();
 
-                // DanhMucThon
-                if (currentPath.includes('/danhmucthon')) {
-                    if (DiGioi.ThonHandler && DiGioi.ThonHandler.init) {
-                        DiGioi.ThonHandler.init();
-                    }
-                }
+                // Re-init validation global
+                if (DiGioi.FormHandler?.initValidation) DiGioi.FormHandler.initValidation();
             }, 100);
         }
 
-        // 4. Re-initialize Bootstrap components
+        // 5. Re-initialize Bootstrap components
         if (typeof bootstrap !== 'undefined') {
-            // Tooltips
-            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-            tooltipTriggerList.map(function (tooltipTriggerEl) {
-                return new bootstrap.Tooltip(tooltipTriggerEl);
-            });
-
-            // Popovers
-            const popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
-            popoverTriggerList.map(function (popoverTriggerEl) {
-                return new bootstrap.Popover(popoverTriggerEl);
-            });
+            [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]')).map(el => new bootstrap.Tooltip(el));
+            [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]')).map(el => new bootstrap.Popover(el));
         }
 
-        // 5. Re-bind form submissions if needed
-        const forms = mainContent.querySelectorAll('form');
-        forms.forEach(form => {
-            // Add any form-specific initialization here
+        // 6. Bind Confirm Delete events cho các nút mới load (nếu chưa được bind qua delegation)
+        $('.btn-delete, .delete-button').off('click').on('click', function (e) {
+            if (!confirm('Bạn có chắc chắn muốn xóa không?')) {
+                e.preventDefault();
+                e.stopPropagation();
+                return false;
+            }
+            // Nếu confirm OK, event click sẽ tiếp tục bubble lên document và được handle bởi logic thẻ <a>
         });
-
-        // 6. Dispatch custom event for other modules
-        document.dispatchEvent(new CustomEvent('contentLoaded', {
-            detail: { url: window.location.href }
-        }));
 
         console.log('✅ Scripts re-initialized successfully');
     }
@@ -282,6 +314,9 @@
     window.addEventListener('popstate', function (e) {
         if (e.state && e.state.url) {
             loadPage(e.state.url);
+        } else {
+            // Fallback nếu không có state (lần đầu vào trang)
+            loadPage(window.location.href);
         }
     });
 
@@ -307,32 +342,19 @@
         }, 250);
     });
 
-    // Đánh dấu menu active dựa trên URL hiện tại
-    const currentPath = window.location.pathname;
-    document.querySelectorAll('.menu-item a, .submenu a').forEach(link => {
-        const href = link.getAttribute('href');
-        if (href && currentPath.includes(href) && href !== '#' && href !== 'javascript:void(0)') {
-            const menuItem = link.closest('.menu-item');
-            if (menuItem) {
-                menuItem.classList.add('active');
-            }
-
-            const submenuParent = link.closest('.has-submenu');
-            if (submenuParent) {
-                submenuParent.classList.add('open');
-            }
-
-            if (link.closest('.submenu')) {
-                link.classList.add('active');
-            }
-        }
-    });
-
-    // Initialize AJAX navigation
-    setupAjaxNavigation();
-
     // Save initial state
     window.history.replaceState({ url: window.location.href }, '', window.location.href);
 
-    console.log('✅ Main.js initialized');
+    // Initial Scripts setup for the first load
+    reinitializeScripts();
+
+    // Highlight initial active menu
+    const currentPath = window.location.pathname;
+    document.querySelectorAll('.menu-item a, .submenu a').forEach(link => {
+        if (link.getAttribute('href') && currentPath.includes(link.getAttribute('href'))) {
+            handleSidebarActiveState(link);
+        }
+    });
+
+    console.log('✅ Main.js initialized with Global AJAX Handling');
 });

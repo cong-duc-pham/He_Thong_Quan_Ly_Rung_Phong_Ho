@@ -1,0 +1,89 @@
+@model QuanLyRungPhongHo.Models.NhatKyBaoVe
+@{
+    ViewData["Title"] = "Xóa nhật ký";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/digioi.css" asp-append-version="true" />
+}
+
+<div class="digioi-form-container">
+    <div class="digioi-card">
+        <div class="digioi-card-header">
+            <h4><i class="bi bi-exclamation-triangle"></i> Xác Nhận Xóa Nhật Ký</h4>
+        </div>
+        <div class="digioi-card-body">
+            <div class="digioi-alert digioi-alert-warning">
+                <i class="bi bi-info-circle"></i>
+                Bạn có chắc chắn muốn xóa bản ghi này? Hành động không thể hoàn tác.
+            </div>
+
+            <div class="digioi-info-grid">
+                <div class="digioi-info-card">
+                    <div class="digioi-info-card-header"><i class="bi bi-calendar-event"></i> Thông tin</div>
+                    <div class="digioi-info-card-body">
+                        <div class="digioi-info-row">
+                            <div class="digioi-info-label">Mã NK:</div>
+                            <div class="digioi-info-value"><span class="digioi-badge digioi-badge-secondary">@Model.MaNK</span></div>
+                        </div>
+                        <div class="digioi-info-row">
+                            <div class="digioi-info-label">Ngày ghi:</div>
+                            <div class="digioi-info-value">@Model.NgayGhi.ToString("dd/MM/yyyy HH:mm")</div>
+                        </div>
+                        <div class="digioi-info-row">
+                            <div class="digioi-info-label">Loại sự việc:</div>
+                            <div class="digioi-info-value">@Model.LoaiSuViec</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="digioi-info-card">
+                    <div class="digioi-info-card-header"><i class="bi bi-tree"></i> Lô rừng</div>
+                    <div class="digioi-info-card-body">
+                        <div class="digioi-info-row">
+                            <div class="digioi-info-label">Vị trí:</div>
+                            <div class="digioi-info-value">
+                                @if (Model.LoRung != null)
+                                {
+                                    <div><strong>TK @Model.LoRung.SoTieuKhu</strong> - Khoảnh @Model.LoRung.SoKhoanh - Lô @Model.LoRung.SoLo</div>
+                                    <div>@Model.LoRung.DanhMucThon?.TenThon</div>
+                                    <div><span class="digioi-badge digioi-badge-success">@Model.LoRung.DanhMucThon?.DanhMucXa?.TenXa</span></div>
+                                }
+                                else
+                                {
+                                    <span>—</span>
+                                }
+                            </div>
+                        </div>
+                        <div class="digioi-info-row">
+                            <div class="digioi-info-label">Tọa độ:</div>
+                            <div class="digioi-info-value">@(string.IsNullOrWhiteSpace(Model.ToaDoGPS) ? "—" : Model.ToaDoGPS)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="digioi-info-card">
+                    <div class="digioi-info-card-header"><i class="bi bi-person-badge"></i> Người ghi</div>
+                    <div class="digioi-info-card-body">
+                        <div class="digioi-info-row">
+                            <div class="digioi-info-label">Họ tên:</div>
+                            <div class="digioi-info-value">@(Model.NhanSu?.HoTen ?? "—")</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <form asp-action="Delete" method="post">
+                <input type="hidden" asp-for="MaNK" />
+                <div class="digioi-form-actions">
+                    <a asp-action="Index" class="digioi-btn digioi-btn-secondary digioi-btn-lg"><i class="bi bi-x-circle"></i> Hủy</a>
+                    <button type="submit" class="digioi-btn digioi-btn-danger digioi-btn-lg"><i class="bi bi-trash"></i> Xóa</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="digioi-back-link">
+        <a asp-action="Index"><i class="bi bi-arrow-left"></i> Quay lại danh sách</a>
+    </div>
+</div>

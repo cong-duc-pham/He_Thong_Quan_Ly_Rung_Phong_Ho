@@ -1,0 +1,174 @@
+@model IEnumerable<QuanLyRungPhongHo.Models.NhatKyBaoVe>
+@using QuanLyRungPhongHo.Models
+@using Microsoft.AspNetCore.Mvc.Rendering
+@{
+    ViewData["Title"] = "Nhật ký bảo vệ";
+    var loRungs = ViewBag.LoRungs as List<SelectListItem> ?? new List<SelectListItem>();
+    var nhanSus = ViewBag.NhanSus as List<NhanSu> ?? new List<NhanSu>();
+    var loaiSuViec = ViewBag.LoaiSuViec as List<string> ?? new List<string>();
+    int currentPage = (int)(ViewData["PageNumber"] ?? 1);
+    int totalPages = (int)(ViewData["TotalPages"] ?? 1);
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/digioi.css" asp-append-version="true" />
+}
+
+<div class="digioi-page">
+    <div class="digioi-header">
+        <h2><i class="bi bi-journal-check"></i> Nhật Ký Bảo Vệ</h2>
+        <a asp-action="Create" class="digioi-btn digioi-btn-success">
+            <i class="bi bi-plus-circle"></i> Thêm Nhật Ký
+        </a>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="digioi-alert digioi-alert-success">
+            <i class="bi bi-check-circle"></i> @TempData["SuccessMessage"]
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="digioi-alert digioi-alert-danger">
+            <i class="bi bi-exclamation-triangle"></i> @TempData["ErrorMessage"]
+        </div>
+    }
+
+    <div class="digioi-card digioi-filter-card">
+        <form asp-action="Index" method="get" class="digioi-filter-form">
+            <div class="digioi-form-group">
+                <label><i class="bi bi-calendar-date"></i> Từ ngày</label>
+                <input type="date" name="fromDate" value="@ViewData["FromDate"]" />
+            </div>
+            <div class="digioi-form-group">
+                <label><i class="bi bi-calendar-date"></i> Đến ngày</label>
+                <input type="date" name="toDate" value="@ViewData["ToDate"]" />
+            </div>
+            <div class="digioi-form-group">
+                <label><i class="bi bi-tree"></i> Lô rừng</label>
+                <select name="maLo" id="filterMaLo">
+                    <option value="">-- Tất cả --</option>
+                    @foreach (var lo in loRungs)
+                    {
+                        <option value="@lo.Value" selected="@(ViewData["MaLo"]?.ToString() == lo.Value)">@lo.Text</option>
+                    }
+                </select>
+            </div>
+            <div class="digioi-form-group">
+                <label><i class="bi bi-person-badge"></i> Người ghi</label>
+                <select name="maNV">
+                    <option value="">-- Tất cả --</option>
+                    @foreach (var ns in nhanSus)
+                    {
+                        <option value="@ns.MaNV" selected="@(ViewData["MaNV"]?.ToString() == ns.MaNV.ToString())">@ns.HoTen</option>
+                    }
+                </select>
+            </div>
+            <div class="digioi-form-group">
+                <label><i class="bi bi-flag"></i> Loại sự việc</label>
+                <select name="loaiSuViec">
+                    <option value="">-- Tất cả --</option>
+                    @foreach (var l in loaiSuViec)
+                    {
+                        <option value="@l" selected="@(ViewData["LoaiSuViec"]?.ToString() == l)">@l</option>
+                    }
+                </select>
+            </div>
+            <div class="digioi-form-group">
+                <label><i class="bi bi-search"></i> Từ khóa</label>
+                <input type="text" name="keyword" value="@ViewData["Keyword"]" placeholder="Nội dung, loại sự việc..." />
+            </div>
+            <div class="digioi-form-group">
+                <label>&nbsp;</label>
+                <div class="digioi-btn-group">
+                    <button type="submit" class="digioi-btn digioi-btn-success"><i class="bi bi-filter"></i> Lọc</button>
+                    <a asp-action="Index" class="digioi-btn digioi-btn-outline"><i class="bi bi-x-circle"></i> Xóa lọc</a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="digioi-info-bar">
+        <span class="digioi-badge digioi-badge-info">Tổng: @ViewData["TotalRecords"] bản ghi</span>
+    </div>
+
+    <div class="digioi-card">
+        <div class="digioi-table-wrap">
+            <table class="digioi-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Ngày ghi</th>
+                        <th>Loại sự việc</th>
+                        <th>Nội dung</th>
+                        <th>Lô rừng</th>
+                        <th>Địa bàn</th>
+                        <th>Người ghi</th>
+                        <th>Tọa độ</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Any())
+                    {
+                        int stt = ((int)ViewData["PageNumber"] - 1) * 15 + 1;
+                        foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@stt</td>
+                                <td>@item.NgayGhi.ToString("dd/MM/yyyy HH:mm")</td>
+                                <td><span class="digioi-badge digioi-badge-warning">@item.LoaiSuViec</span></td>
+                                <td class="nk-content">@item.NoiDung</td>
+                                <td>
+                                    @if (item.LoRung != null)
+                                    {
+                                        <div><strong>TK @item.LoRung.SoTieuKhu</strong> - Khoảnh @item.LoRung.SoKhoanh - Lô @item.LoRung.SoLo</div>
+                                    }
+                                </td>
+                                <td>
+                                    @item.LoRung?.DanhMucThon?.TenThon<br />
+                                    <span class="digioi-badge digioi-badge-success">@item.LoRung?.DanhMucThon?.DanhMucXa?.TenXa</span>
+                                </td>
+                                <td>@(item.NhanSu?.HoTen ?? "—")</td>
+                                <td>@(string.IsNullOrWhiteSpace(item.ToaDoGPS) ? "—" : item.ToaDoGPS)</td>
+                                <td>
+                                    <div class="digioi-btn-group">
+                                        <a asp-action="Edit" asp-route-id="@item.MaNK" class="digioi-btn digioi-btn-warning" title="Sửa"><i class="bi bi-pencil-square"></i></a>
+                                        <a asp-action="Delete" asp-route-id="@item.MaNK" class="digioi-btn digioi-btn-danger" title="Xóa"><i class="bi bi-trash"></i></a>
+                                    </div>
+                                </td>
+                            </tr>
+                            stt++;
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="9" class="digioi-empty">
+                                <i class="bi bi-inbox"></i>
+                                <p>Không có dữ liệu.</p>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="digioi-pagination">
+            <ul>
+                <li class="@(currentPage <= 1 ? "disabled" : "")">
+                    <a asp-action="Index" asp-route-pageNumber="@(currentPage - 1)" asp-route-fromDate="@ViewData["FromDate"]" asp-route-toDate="@ViewData["ToDate"]" asp-route-maLo="@ViewData["MaLo"]" asp-route-maNV="@ViewData["MaNV"]" asp-route-loaiSuViec="@ViewData["LoaiSuViec"]" asp-route-keyword="@ViewData["Keyword"]">«</a>
+                </li>
+                <li class="active"><span>Trang @currentPage / @totalPages</span></li>
+                <li class="@(currentPage >= totalPages ? "disabled" : "")">
+                    <a asp-action="Index" asp-route-pageNumber="@(currentPage + 1)" asp-route-fromDate="@ViewData["FromDate"]" asp-route-toDate="@ViewData["ToDate"]" asp-route-maLo="@ViewData["MaLo"]" asp-route-maNV="@ViewData["MaNV"]" asp-route-loaiSuViec="@ViewData["LoaiSuViec"]" asp-route-keyword="@ViewData["Keyword"]">»</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/nhatkybaove.js" asp-append-version="true"></script>
+}

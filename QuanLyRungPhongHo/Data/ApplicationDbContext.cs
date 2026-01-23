@@ -86,6 +86,14 @@ namespace QuanLyRungPhongHo.Data
             modelBuilder.Entity<RolePermission>()
                 .HasIndex(rp => new { rp.RoleName, rp.PermissionId })
                 .IsUnique();
+
+
+            modelBuilder.Entity<SinhVat>()
+                .HasOne(sv => sv.LoRung)
+                .WithMany(l => l.SinhVats)
+                .HasForeignKey(sv => sv.MaLo)
+                .OnDelete(DeleteBehavior.SetNull);
+
         }
     }
 }

@@ -1,0 +1,104 @@
+﻿@section Styles {
+    <link rel="stylesheet" href="~/css/sinhvat.css" />
+}
+@model IEnumerable<SinhVat>
+<div class="page-header">
+    <h2><i class="fas fa-tree"></i> Danh sách sinh vật rừng</h2>
+</div>
+<div class="card-box">
+    <div class="toolbar">
+        <input type="text" id="searchInput" class="form-control"
+               placeholder="Tìm theo tên loài..." />
+        <a asp-action="Create" class="btn btn-success">
+            <i class="fas fa-plus"></i> Thêm sinh vật
+        </a>
+    </div>
+    <table class="table-custom" id="sinhVatTable">
+        <thead>
+            <tr>
+                <th>Tên loài</th>
+                <th>Loại</th>
+                <th>Mức độ quý hiếm</th>
+                <th>Lô rừng</th>
+                <th class="text-center">Tác vụ</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (!Model.Any())
+            {
+                <tr>
+                    <td colspan="5" class="empty">
+                        <i class="fas fa-seedling"></i> Chưa có sinh vật nào được ghi nhận
+                    </td>
+                </tr>
+            }
+            else
+            {
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.TenLoai</td>
+                        <td>
+                            <span class="badge badge-type">
+                                @if (item.LoaiSV == "Thực vật")
+                                {
+                                    <i class="fas fa-leaf"></i>
+                                }
+                                else if (item.LoaiSV == "Động vật")
+                                {
+                                    <i class="fas fa-paw"></i>
+                                }
+                                else
+                                {
+                                    <i class="fas fa-bacteria"></i>
+                                }
+                                @item.LoaiSV
+                            </span>
+                        </td>
+                        <td>
+                            <span class="badge badge-level">
+                                @if (item.MucDoQuyHiem == "Nguy cấp")
+                                {
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                }
+                                else if (item.MucDoQuyHiem == "Rất hiếm")
+                                {
+                                    <i class="fas fa-star"></i>
+                                }
+                                else if (item.MucDoQuyHiem == "Hiếm")
+                                {
+                                    <i class="fas fa-star-half-alt"></i>
+                                }
+                                else
+                                {
+                                    <i class="fas fa-circle"></i>
+                                }
+                                @item.MucDoQuyHiem
+                            </span>
+                        </td>
+                        <td>
+                            <i class="fas fa-map-marker-alt"></i>
+                            TK @item.LoRung?.SoTieuKhu -
+                            K @item.LoRung?.SoKhoanh -
+                            L @item.LoRung?.SoLo
+                        </td>
+                        <td class="text-center">
+                            <a asp-action="Edit" asp-route-id="@item.MaSV"
+                               class="btn-icon edit" title="Sửa">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a asp-action="Delete" asp-route-id="@item.MaSV"
+                               onclick="return confirm('Xóa sinh vật này?')"
+                               class="btn-icon delete" title="Xóa">
+                                <i class="fas fa-trash-alt"></i>
+                            </a>
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+</div>
+@section Scripts {
+    <script src="~/js/sinhvat.js"></script>
+}

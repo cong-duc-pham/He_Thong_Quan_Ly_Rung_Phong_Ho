@@ -17,6 +17,8 @@ namespace QuanLyRungPhongHo.Data
         public DbSet<TaiKhoan> TaiKhoans => Set<TaiKhoan>();
         public DbSet<SinhVat> SinhVats => Set<SinhVat>();
         public DbSet<NhatKyBaoVe> NhatKyBaoVes => Set<NhatKyBaoVe>();
+        public DbSet<Permission> Permissions => Set<Permission>();
+        public DbSet<RolePermission> RolePermissions => Set<RolePermission>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -69,6 +71,21 @@ namespace QuanLyRungPhongHo.Data
                 .WithMany(ns => ns.NhatKyBaoVes)
                 .HasForeignKey(nk => nk.MaNV_GhiNhan)
                 .OnDelete(DeleteBehavior.SetNull);
+
+            // --- 3. Cấu hình Permission & RolePermission ---
+            modelBuilder.Entity<Permission>().HasKey(p => p.PermissionId);
+            modelBuilder.Entity<RolePermission>().HasKey(rp => rp.RolePermissionId);
+
+            modelBuilder.Entity<RolePermission>()
+                .HasOne(rp => rp.Permission)
+                .WithMany(p => p.RolePermissions)
+                .HasForeignKey(rp => rp.PermissionId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Unique constraint: Mỗi role chỉ có 1 bản ghi cho mỗi permission
+            modelBuilder.Entity<RolePermission>()
+                .HasIndex(rp => new { rp.RoleName, rp.PermissionId })
+                .IsUnique();
         }
     }
 }

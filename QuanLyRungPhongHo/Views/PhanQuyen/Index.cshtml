@@ -1,0 +1,198 @@
+@model List<QuanLyRungPhongHo.Models.PhanQuyenViewModel>
+@{
+    ViewData["Title"] = "Quản lý Phân quyền";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/PhanQuyen.css" asp-append-version="true" />
+}
+
+<div class="container-fluid mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">
+                    <i class="fas fa-shield-alt me-2"></i>Quản lý Phân quyền Hệ thống
+                </h4>
+                <small class="badge bg-light text-dark">Admin tỉnh</small>
+            </div>
+        </div>
+
+        <div class="card-body">
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>
+                <strong>Hướng dẫn:</strong> Bật/tắt checkbox để cấp hoặc thu hồi quyền cho từng vai trò. 
+                Thay đổi sẽ được lưu tự động.
+            </div>
+
+            @foreach (var roleVM in Model)
+            {
+                <div class="role-section mb-5">
+                    <div class="role-header">
+                        <h5 class="role-title">
+                            @if (roleVM.RoleName == "Admin_Tinh")
+                            {
+                                <i class="fas fa-crown text-warning me-2"></i>
+                            }
+                            else if (roleVM.RoleName == "QuanLy_Xa")
+                            {
+                                <i class="fas fa-user-tie text-primary me-2"></i>
+                            }
+                            else
+                            {
+                                <i class="fas fa-user-shield text-success me-2"></i>
+                            }
+                            @roleVM.RoleDisplayName
+                            <span class="badge bg-secondary ms-2">@roleVM.RoleName</span>
+                            @if (roleVM.RoleName == "Admin_Tinh")
+                            {
+                                <span class="badge bg-warning text-dark ms-2">Luôn có full quyền - Không thể thay đổi</span>
+                            }
+                        </h5>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-hover table-bordered permission-table">
+                            <thead class="table-light">
+                                <tr>
+                                    <th width="20%">Module</th>
+                                    <th width="70%">Quyền</th>
+                                    <th width="10%" class="text-center">Trạng thái</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @{
+                                    var groupedPermissions = roleVM.Permissions.GroupBy(p => p.ModuleName);
+                                }
+                                @foreach (var moduleGroup in groupedPermissions)
+                                {
+                                    var permissions = moduleGroup.ToList();
+                                    for (int i = 0; i < permissions.Count; i++)
+                                    {
+                                        var permission = permissions[i];
+                                        <tr>
+                                            @if (i == 0)
+                                            {
+                                                <td rowspan="@permissions.Count" class="module-cell align-middle">
+                                                    <strong>@moduleGroup.Key</strong>
+                                                </td>
+                                            }
+                                            <td>
+                                                @permission.PermissionName
+                                            </td>
+                                            <td class="text-center">
+                                                <div class="form-check form-switch d-inline-block">
+                                                    <input class="form-check-input permission-toggle"
+                                                           type="checkbox"
+                                                           data-role="@roleVM.RoleName"
+                                                           data-permission-id="@permission.PermissionId"
+                                                           data-permission-name="@permission.PermissionName"
+                                                           @(permission.IsGranted ? "checked" : "")
+                                                           @(roleVM.RoleName == "Admin_Tinh" ? "disabled" : "")>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            console.log('Permission page loaded');
+            
+            // Xử lý toggle permission
+            $('.permission-toggle').change(function () {
+                const checkbox = $(this);
+                const roleName = checkbox.data('role');
+                const permissionId = checkbox.data('permission-id');
+                const permissionName = checkbox.data('permission-name');
+                const isGranted = checkbox.is(':checked');
+
+                console.log('Toggle permission:', roleName, permissionId, isGranted);
+
+                // Disable checkbox khi đang xử lý
+                checkbox.prop('disabled', true);
+
+                // Lấy anti-forgery token
+                const token = $('input[name="__RequestVerificationToken"]').val();
+                console.log('Token:', token);
+
+                $.ajax({
+                    url: '@Url.Action("UpdatePermission", "PhanQuyen")',
+                    type: 'POST',
+                    data: {
+                        roleName: roleName,
+                        permissionId: permissionId,
+                        isGranted: isGranted,
+                        __RequestVerificationToken: token
+                    },
+                    success: function (response) {
+                        console.log('Response:', response);
+                        if (response.success) {
+                            // Hiển thị thông báo thành công
+                            showToast('success', response.message);
+                        } else {
+                            // Rollback checkbox nếu lỗi
+                            checkbox.prop('checked', !isGranted);
+                            showToast('error', response.message);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Error:', status, error);
+                        // Rollback checkbox nếu lỗi
+                        checkbox.prop('checked', !isGranted);
+                        showToast('error', 'Có lỗi xảy ra khi cập nhật quyền');
+                    },
+                    complete: function () {
+                        // Enable lại checkbox
+                        checkbox.prop('disabled', false);
+                    }
+                });
+            });
+
+            // Hàm hiển thị toast notification
+            function showToast(type, message) {
+                const bgColor = type === 'success' ? 'bg-success' : 'bg-danger';
+                const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
+
+                const toast = $(`
+                    <div class="toast align-items-center text-white ${bgColor} border-0" role="alert" aria-live="assertive" aria-atomic="true">
+                        <div class="d-flex">
+                            <div class="toast-body">
+                                <i class="fas ${icon} me-2"></i>${message}
+                            </div>
+                            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                        </div>
+                    </div>
+                `);
+
+                // Tạo container nếu chưa có
+                if ($('#toast-container').length === 0) {
+                    $('body').append('<div id="toast-container" class="position-fixed top-0 end-0 p-3" style="z-index: 11000;"></div>');
+                }
+
+                $('#toast-container').append(toast);
+                const bsToast = new bootstrap.Toast(toast[0]);
+                bsToast.show();
+
+                // Xóa toast sau khi ẩn
+                toast.on('hidden.bs.toast', function () {
+                    $(this).remove();
+                });
+            }
+        });
+    </script>
+}
+
+@* Anti-forgery token cho AJAX *@
+<form id="hiddenForm">
+    @Html.AntiForgeryToken()
+</form>

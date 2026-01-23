@@ -1,0 +1,157 @@
+/* ============================================
+   Trang Phân Quyền - Permission Management
+   ============================================ */
+
+/* Role Section Styling */
+.role-section {
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #fff;
+}
+
+.role-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 15px 20px;
+    margin-bottom: 0;
+}
+
+.role-title {
+    color: #fff;
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+/* Permission Table */
+.permission-table {
+    margin-bottom: 0;
+}
+
+.permission-table thead th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+    border-bottom: 2px solid #dee2e6;
+    padding: 12px 15px;
+}
+
+.permission-table tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+.permission-table .module-cell {
+    background-color: #f8f9fa;
+    font-weight: 600;
+    border-right: 2px solid #dee2e6;
+    vertical-align: middle;
+}
+
+/* Switch Toggle Styling */
+.form-check-input.permission-toggle {
+    width: 3rem;
+    height: 1.5rem;
+    cursor: pointer;
+}
+
+.form-check-input.permission-toggle:checked {
+    background-color: #28a745;
+    border-color: #28a745;
+}
+
+.form-check-input.permission-toggle:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.form-check-input.permission-toggle:disabled:checked {
+    background-color: #ffc107;
+    border-color: #ffc107;
+}
+
+/* Icon Colors */
+.text-warning {
+    color: #ffc107 !important;
+}
+
+.text-primary {
+    color: #007bff !important;
+}
+
+.text-success {
+    color: #28a745 !important;
+}
+
+/* Badge Styling */
+.badge {
+    font-size: 0.75rem;
+    padding: 0.35em 0.65em;
+}
+
+/* Toast Container */
+#toast-container {
+    z-index: 11000;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .role-title {
+        font-size: 1rem;
+    }
+
+    .permission-table {
+        font-size: 0.875rem;
+    }
+
+    .form-check-input.permission-toggle {
+        width: 2.5rem;
+        height: 1.25rem;
+    }
+}
+
+/* Loading Animation */
+.permission-toggle:disabled {
+    position: relative;
+}
+
+.permission-toggle:disabled::after {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 1rem;
+    background: rgba(255, 255, 255, 0.5);
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+/* Alert Styling */
+.alert-info {
+    background-color: #d1ecf1;
+    border-color: #bee5eb;
+    color: #0c5460;
+}
+
+/* Card Shadow */
+.card.shadow-sm {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.card-header.bg-primary {
+    background-color: #007bff !important;
+}
+
+/* Code Styling */
+code {
+    font-size: 85%;
+    padding: 0.2em 0.4em;
+    background-color: #f8f9fa;
+    border-radius: 3px;
+}

@@ -1,0 +1,87 @@
+@model IEnumerable<QuanLyRungPhongHo.Models.Permission>
+@{
+    ViewData["Title"] = "Quản lý Chức năng (Permissions)";
+}
+
+<div class="container-fluid mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-success text-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">
+                    <i class="fas fa-key me-2"></i>Quản lý Chức năng & Quyền
+                </h4>
+                <a asp-action="Create" class="btn btn-light btn-sm">
+                    <i class="fas fa-plus me-1"></i>Thêm chức năng mới
+                </a>
+            </div>
+        </div>
+
+        <div class="card-body">
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="fas fa-check-circle me-2"></i>@TempData["SuccessMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+
+            <div class="table-responsive">
+                <table class="table table-hover table-bordered">
+                    <thead class="table-light">
+                        <tr>
+                            <th width="20%">Chức năng</th>
+                            <th width="40%">Tên quyền</th>
+                            <th width="25%">Mã quyền</th>
+                            <th width="5%" class="text-center">Trạng thái</th>
+                            <th width="10%" class="text-center">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.GroupBy(p => p.ModuleName))
+                        {
+                            var permissions = item.ToList();
+                            for (int i = 0; i < permissions.Count; i++)
+                            {
+                                var permission = permissions[i];
+                                <tr>
+                                    @if (i == 0)
+                                    {
+                                        <td rowspan="@permissions.Count" class="align-middle bg-light">
+                                            <strong>@item.Key</strong>
+                                        </td>
+                                    }
+                                    <td>@permission.PermissionName</td>
+                                    <td><code>@permission.PermissionCode</code></td>
+                                    <td class="text-center">
+                                        @if (permission.IsActive)
+                                        {
+                                            <span class="badge bg-success">Đang dùng</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">Tắt</span>
+                                        }
+                                    </td>
+                                    <td class="text-center">
+                                        <a asp-action="Edit" asp-route-id="@permission.PermissionId" 
+                                           class="btn btn-sm btn-warning" title="Sửa">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <form asp-action="Delete" asp-route-id="@permission.PermissionId" 
+                                              method="post" style="display:inline;" 
+                                              onsubmit="return confirm('Bạn có chắc muốn xóa quyền này?');">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="btn btn-sm btn-danger" title="Xóa">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

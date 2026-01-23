@@ -1,0 +1,60 @@
+﻿@section Styles {
+    <link rel="stylesheet" href="~/css/sinhvat.css" />
+}
+@model SinhVat
+
+<div class="page-header">
+    <h2><i class="fas fa-trash-alt"></i> Xác nhận xóa sinh vật</h2>
+</div>
+
+<div class="card-box">
+    <div class="alert alert-warning">
+        <i class="fas fa-exclamation-triangle"></i>
+        <strong>Cảnh báo:</strong> Bạn có chắc chắn muốn xóa sinh vật này?
+    </div>
+
+    <div class="detail-info">
+        <div class="info-row">
+            <span class="info-label">
+                <i class="fas fa-tag"></i> Tên loài:
+            </span>
+            <span class="info-value">@Model.TenLoai</span>
+        </div>
+        <div class="info-row">
+            <span class="info-label">
+                <i class="fas fa-list"></i> Loại:
+            </span>
+            <span class="info-value">
+                <span class="badge badge-type">@Model.LoaiSV</span>
+            </span>
+        </div>
+        <div class="info-row">
+            <span class="info-label">
+                <i class="fas fa-star"></i> Mức độ quý hiếm:
+            </span>
+            <span class="info-value">
+                <span class="badge badge-level">@Model.MucDoQuyHiem</span>
+            </span>
+        </div>
+        <div class="info-row">
+            <span class="info-label">
+                <i class="fas fa-map-marker-alt"></i> Lô rừng:
+            </span>
+            <span class="info-value">
+                TK @Model.LoRung?.SoTieuKhu -
+                K @Model.LoRung?.SoKhoanh -
+                L @Model.LoRung?.SoLo
+            </span>
+        </div>
+    </div>
+
+    <form asp-action="Delete" method="post" class="form-actions">
+        <input type="hidden" asp-for="MaSV" />
+        <button type="submit" class="btn btn-danger">
+            <i class="fas fa-trash-alt"></i> Xác nhận xóa
+        </button>
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="fas fa-times"></i> Hủy
+        </a>
+    </form>
+</div>

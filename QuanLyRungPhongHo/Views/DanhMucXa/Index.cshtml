@@ -2,13 +2,22 @@
 
 @{
     ViewData["Title"] = "Danh mục Xã";
+    var currentPage = (int)ViewData["PageNumber"];
+    var totalPages = (int)ViewData["TotalPages"];
+    var totalRecords = (int)ViewData["TotalRecords"];
+    var currentFilter = ViewData["CurrentFilter"]?.ToString() ?? string.Empty;
 }
 
 @section Styles {
     <link rel="stylesheet" href="~/css/digioi.css" asp-append-version="true" />
 }
 
-<div class="digioi-page">
+<div class="digioi-page"
+    id="xa-page"
+    data-endpoint="@Url.Action("GetPaged", "DanhMucXa")"
+    data-pagesize="10"
+    data-initial-page="@currentPage"
+    data-initial-search="@currentFilter">
 
     <!-- Header -->
     <div class="digioi-header">
@@ -40,13 +49,14 @@
     <!-- Tìm kiếm -->
     <div class="digioi-card mb-3">
         <div class="card-body">
-            <form asp-action="Index" method="get" class="digioi-search no-ajax">
+            <form asp-action="Index" method="get" class="digioi-search no-ajax" id="xa-search-form">
                 <div class="input-group">
                     <span class="input-group-text bg-success text-white">
                         <i class="bi bi-search"></i>
                     </span>
                     <input type="text"
                            name="searchString"
+                           id="xa-search"
                            value="@ViewData["CurrentFilter"]"
                            class="form-control"
                            placeholder="Tìm theo Mã xã hoặc Tên xã..." />
@@ -60,7 +70,7 @@
 
     <!-- Thông tin -->
     <div class="mb-3">
-        <span class="badge bg-info text-dark">
+        <span class="badge bg-info text-dark" id="xa-total">
             Tổng số: @ViewData["TotalRecords"] xã
         </span>
 
@@ -89,10 +99,10 @@
                             <th style="width:15%" class="text-center">Thao tác</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="xa-table-body">
                         @if (Model.Any())
                         {
-                            int stt = ((int)ViewData["PageNumber"] - 1) * 10 + 1;
+                            int stt = (currentPage - 1) * 10 + 1;
                             foreach (var item in Model)
                             {
                                 <tr>
@@ -138,18 +148,13 @@
     </div>
 
     <!-- Phân trang -->
-    @if ((int)ViewData["TotalPages"] > 1)
+    @if (totalPages > 1)
     {
-        <nav class="mt-4">
+        <nav class="mt-4" id="xa-pagination">
             <ul class="pagination justify-content-center">
-                @{
-                    int currentPage = (int)ViewData["PageNumber"];
-                    int totalPages = (int)ViewData["TotalPages"];
-                    string currentFilter = ViewData["CurrentFilter"]?.ToString();
-                }
-
                 <li class="page-item @(currentPage == 1 ? "disabled" : "")">
                     <a class="page-link"
+                       data-page="@(currentPage - 1)"
                        asp-action="Index"
                        asp-route-pageNumber="@(currentPage - 1)"
                        asp-route-searchString="@currentFilter">
@@ -169,6 +174,7 @@
                     {
                         <li class="page-item">
                             <a class="page-link"
+                               data-page="@i"
                                asp-action="Index"
                                asp-route-pageNumber="@i"
                                asp-route-searchString="@currentFilter">
@@ -180,6 +186,7 @@
 
                 <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
                     <a class="page-link"
+                       data-page="@(currentPage + 1)"
                        asp-action="Index"
                        asp-route-pageNumber="@(currentPage + 1)"
                        asp-route-searchString="@currentFilter">

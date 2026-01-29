@@ -238,6 +238,55 @@ namespace QuanLyRungPhongHo.Controllers
             return await _context.DanhMucXas.AnyAsync(e => e.MaXa == id);
         }
 
+        // API: Lấy danh sách phân trang phục vụ AJAX
+        [HttpGet]
+        public async Task<JsonResult> GetPaged(string? searchString, int pageNumber = 1, int pageSize = PageSize)
+        {
+            try
+            {
+                pageNumber = pageNumber <= 0 ? 1 : pageNumber;
+                pageSize = pageSize <= 0 ? PageSize : pageSize;
+
+                var query = _context.DanhMucXas.AsQueryable();
+
+                if (!string.IsNullOrWhiteSpace(searchString))
+                {
+                    query = query.Where(x => x.TenXa.Contains(searchString) || x.MaXa.Contains(searchString));
+                }
+
+                var totalRecords = await query.CountAsync();
+                var totalPages = (int)Math.Ceiling(totalRecords / (double)pageSize);
+
+                var items = await query
+                    .OrderBy(x => x.MaXa)
+                    .Skip((pageNumber - 1) * pageSize)
+                    .Take(pageSize)
+                    .Select(x => new
+                    {
+                        x.MaXa,
+                        x.TenXa,
+                        SoThon = x.DanhMucThons.Count()
+                    })
+                    .ToListAsync();
+
+                return Json(new
+                {
+                    items,
+                    pagination = new
+                    {
+                        pageNumber,
+                        pageSize,
+                        totalPages,
+                        totalRecords
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { error = ex.Message });
+            }
+        }
+
         // API: Lấy danh sách xã (dùng cho AJAX)
         [HttpGet]
         public async Task<JsonResult> GetAll()

@@ -342,6 +342,79 @@ namespace QuanLyRungPhongHo.Controllers
             return await _context.LoRungs.AnyAsync(e => e.MaLo == id);
         }
 
+        // API: Lấy danh sách lô rừng phân trang (AJAX)
+        [HttpGet]
+        public async Task<JsonResult> GetPaged(string? searchXa, string? searchThon, string? searchLoai, string? searchTrangThai, int pageNumber = 1, int pageSize = PageSize)
+        {
+            try
+            {
+                pageNumber = pageNumber <= 0 ? 1 : pageNumber;
+                pageSize = pageSize <= 0 ? PageSize : pageSize;
+
+                var query = _context.LoRungs
+                    .Include(l => l.DanhMucThon)
+                    .ThenInclude(t => t.DanhMucXa)
+                    .AsQueryable();
+
+                if (!string.IsNullOrEmpty(searchThon))
+                {
+                    query = query.Where(l => l.MaThon == searchThon);
+                }
+                else if (!string.IsNullOrEmpty(searchXa))
+                {
+                    query = query.Where(l => l.DanhMucThon != null && l.DanhMucThon.MaXa == searchXa);
+                }
+
+                if (!string.IsNullOrEmpty(searchLoai))
+                {
+                    query = query.Where(l => l.LoaiRung == searchLoai);
+                }
+
+                if (!string.IsNullOrEmpty(searchTrangThai))
+                {
+                    query = query.Where(l => l.TrangThai == searchTrangThai);
+                }
+
+                var totalRecords = await query.CountAsync();
+                var totalPages = (int)Math.Ceiling(totalRecords / (double)pageSize);
+
+                var items = await query
+                    .OrderBy(l => l.MaLo)
+                    .Skip((pageNumber - 1) * pageSize)
+                    .Take(pageSize)
+                    .Select(l => new
+                    {
+                        l.MaLo,
+                        l.SoTieuKhu,
+                        l.SoKhoanh,
+                        l.SoLo,
+                        l.MaThon,
+                        TenThon = l.DanhMucThon != null ? l.DanhMucThon.TenThon : string.Empty,
+                        TenXa = l.DanhMucThon != null && l.DanhMucThon.DanhMucXa != null ? l.DanhMucThon.DanhMucXa.TenXa : string.Empty,
+                        l.DienTich,
+                        l.LoaiRung,
+                        l.TrangThai
+                    })
+                    .ToListAsync();
+
+                return Json(new
+                {
+                    items,
+                    pagination = new
+                    {
+                        pageNumber,
+                        pageSize,
+                        totalPages,
+                        totalRecords
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { error = ex.Message });
+            }
+        }
+
         // API: Lấy danh sách lô rừng (dùng cho AJAX)
         [HttpGet]
         public async Task<JsonResult> GetAll(string? maXa, string? maThon, string? loaiRung, string? trangThai)

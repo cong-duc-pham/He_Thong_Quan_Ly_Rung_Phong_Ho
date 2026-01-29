@@ -280,6 +280,65 @@ namespace QuanLyRungPhongHo.Controllers
             return await _context.DanhMucThons.AnyAsync(e => e.MaThon == id);
         }
 
+        // API: Lấy danh sách phân trang phục vụ AJAX
+        [HttpGet]
+        public async Task<JsonResult> GetPaged(string? searchXa, string? searchString, int pageNumber = 1, int pageSize = PageSize)
+        {
+            try
+            {
+                pageNumber = pageNumber <= 0 ? 1 : pageNumber;
+                pageSize = pageSize <= 0 ? PageSize : pageSize;
+
+                var query = _context.DanhMucThons
+                    .Include(t => t.DanhMucXa)
+                    .AsQueryable();
+
+                if (!string.IsNullOrWhiteSpace(searchXa))
+                {
+                    query = query.Where(t => t.MaXa == searchXa);
+                }
+
+                if (!string.IsNullOrWhiteSpace(searchString))
+                {
+                    query = query.Where(t => t.TenThon.Contains(searchString) || t.MaThon.Contains(searchString));
+                }
+
+                var totalRecords = await query.CountAsync();
+                var totalPages = (int)Math.Ceiling(totalRecords / (double)pageSize);
+
+                var items = await query
+                    .OrderBy(t => t.DanhMucXa.TenXa)
+                    .ThenBy(t => t.TenThon)
+                    .Skip((pageNumber - 1) * pageSize)
+                    .Take(pageSize)
+                    .Select(t => new
+                    {
+                        t.MaThon,
+                        t.TenThon,
+                        t.MaXa,
+                        TenXa = t.DanhMucXa.TenXa,
+                        SoLoRung = t.LoRungs.Count()
+                    })
+                    .ToListAsync();
+
+                return Json(new
+                {
+                    items,
+                    pagination = new
+                    {
+                        pageNumber,
+                        pageSize,
+                        totalPages,
+                        totalRecords
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { error = ex.Message });
+            }
+        }
+
         // API: Lấy danh sách thôn (dùng cho AJAX)
         [HttpGet]
         public async Task<JsonResult> GetAll(string? maXa)

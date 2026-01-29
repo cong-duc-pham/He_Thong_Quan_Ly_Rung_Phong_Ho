@@ -333,6 +333,246 @@ LoRung.APIHelper = {
 };
 
 /**
+ * AJAX Handler - tải danh sách Lô rừng với phân trang
+ */
+LoRung.AjaxHandler = {
+    init: function () {
+        this.container = $('#lorung-page');
+        if (!this.container.length) return;
+        if (this.container.data('ajax-bound')) return;
+        this.container.data('ajax-bound', true);
+
+        this.endpoint = this.container.data('endpoint');
+        this.pageSize = parseInt(this.container.attr('data-pagesize'), 10) || 15;
+        this.state = {
+            page: parseInt(this.container.attr('data-initial-page'), 10) || 1,
+            xa: this.container.attr('data-initial-xa') || '',
+            thon: this.container.attr('data-initial-thon') || '',
+            loai: this.container.attr('data-initial-loai') || '',
+            trangThai: this.container.attr('data-initial-trangthai') || ''
+        };
+
+        this.$form = $('#lorung-filter-form');
+        this.$xa = $('#filterXa');
+        this.$thon = $('#filterThon');
+        this.$loai = $('#filterLoai');
+        this.$trangThai = $('#filterTrangThai');
+        this.$tableBody = $('#lorung-table-body');
+        this.$total = $('#lorung-total');
+        this.$pagination = $('#lorung-pagination');
+
+        this.bindEvents();
+        this.loadData();
+    },
+
+    bindEvents: function () {
+        const self = this;
+
+        this.$form.on('submit', function (e) {
+            e.preventDefault();
+            self.updateState();
+            self.state.page = 1;
+            self.loadData();
+        });
+
+        this.$xa.on('change', function () {
+            self.state.xa = $(this).val();
+            self.state.thon = '';
+            self.state.page = 1;
+            self.loadData();
+        });
+
+        this.$thon.on('change', function () {
+            self.state.thon = $(this).val();
+            self.state.page = 1;
+            self.loadData();
+        });
+
+        this.$loai.on('change', function () {
+            self.state.loai = $(this).val();
+            self.state.page = 1;
+            self.loadData();
+        });
+
+        this.$trangThai.on('change', function () {
+            self.state.trangThai = $(this).val();
+            self.state.page = 1;
+            self.loadData();
+        });
+
+        this.$pagination.on('click', 'a[data-page]', function (e) {
+            e.preventDefault();
+            const target = parseInt($(this).data('page'), 10);
+            if (!isNaN(target) && target >= 1) {
+                self.state.page = target;
+                self.loadData();
+            }
+        });
+
+        $('#lorung-reset-filters').on('click', function (e) {
+            e.preventDefault();
+            self.$xa.val('');
+            self.$thon.val('').html('<option value="">-- Tất cả thôn/bản --</option>');
+            self.$loai.val('');
+            self.$trangThai.val('');
+            self.state = { page: 1, xa: '', thon: '', loai: '', trangThai: '' };
+            self.loadData();
+            LoRung.UIEnhancer.highlightActiveFilters();
+        });
+    },
+
+    updateState: function () {
+        this.state.xa = this.$xa.val();
+        this.state.thon = this.$thon.val();
+        this.state.loai = this.$loai.val();
+        this.state.trangThai = this.$trangThai.val();
+    },
+
+    setLoading: function () {
+        this.$tableBody.html(`
+            <tr>
+                <td colspan="10" class="text-center text-muted py-4">
+                    <div class="spinner-border text-success" role="status"></div>
+                    <div class="mt-2">Đang tải dữ liệu...</div>
+                </td>
+            </tr>`);
+    },
+
+    loadData: function () {
+        if (!this.endpoint) return;
+        const self = this;
+        this.setLoading();
+
+        $.getJSON(this.endpoint, {
+            searchXa: self.state.xa,
+            searchThon: self.state.thon,
+            searchLoai: self.state.loai,
+            searchTrangThai: self.state.trangThai,
+            pageNumber: self.state.page,
+            pageSize: self.pageSize
+        })
+            .done(function (res) {
+                if (res.error) {
+                    self.showError(res.error);
+                    return;
+                }
+                self.render(res);
+            })
+            .fail(function () {
+                self.showError('Không thể tải dữ liệu lô rừng.');
+            });
+    },
+
+    render: function (res) {
+        const items = res.items || [];
+        const pagination = res.pagination || {};
+        const start = ((pagination.pageNumber || 1) - 1) * (pagination.pageSize || this.pageSize) + 1;
+
+        if (!items.length) {
+            this.$tableBody.html(`
+                <tr>
+                    <td colspan="10" class="digioi-empty">
+                        <i class="bi bi-inbox"></i>
+                        <p>Không tìm thấy dữ liệu</p>
+                    </td>
+                </tr>`);
+        } else {
+            let rows = '';
+            let stt = start;
+            items.forEach(item => {
+                const badgeClass = this.getTrangThaiBadge(item.trangThai);
+                const dienTichText = item.dienTich ? DiGioi.Utils.formatArea(item.dienTich) : '—';
+
+                rows += `
+                    <tr>
+                        <td>${stt}</td>
+                        <td><strong>${item.soTieuKhu}</strong></td>
+                        <td><strong>${item.soKhoanh}</strong></td>
+                        <td><strong>${item.soLo}</strong></td>
+                        <td>${item.tenThon || ''}</td>
+                        <td><span class="digioi-badge digioi-badge-success">${item.tenXa || ''}</span></td>
+                        <td>${dienTichText}</td>
+                        <td>${item.loaiRung || ''}</td>
+                        <td><span class="digioi-badge ${badgeClass}">${item.trangThai || ''}</span></td>
+                        <td>
+                            <div class="digioi-btn-group">
+                                <a href="/LoRung/Edit/${item.maLo}" class="digioi-btn digioi-btn-warning"><i class="bi bi-pencil-square"></i></a>
+                                <a href="/LoRung/Delete/${item.maLo}" class="digioi-btn digioi-btn-danger"><i class="bi bi-trash"></i></a>
+                            </div>
+                        </td>
+                    </tr>`;
+                stt++;
+            });
+            this.$tableBody.html(rows);
+        }
+
+        if (pagination.totalRecords !== undefined) {
+            this.$total.text(`Tổng số: ${pagination.totalRecords} lô rừng`);
+        }
+
+        this.renderPagination(pagination);
+        LoRung.UIEnhancer.highlightActiveFilters();
+    },
+
+    renderPagination: function (pagination) {
+        const totalPages = pagination.totalPages || 1;
+        const current = pagination.pageNumber || 1;
+
+        if (totalPages <= 1) {
+            this.$pagination.empty();
+            return;
+        }
+
+        const xaParam = encodeURIComponent(this.state.xa || '');
+        const thonParam = encodeURIComponent(this.state.thon || '');
+        const loaiParam = encodeURIComponent(this.state.loai || '');
+        const ttParam = encodeURIComponent(this.state.trangThai || '');
+
+        const buildLink = (page, text, disabled) => {
+            const cls = disabled ? 'disabled' : '';
+            return `
+                <a class="digioi-page ${cls} ${page === current ? 'active' : ''}" data-page="${page}" href="?pageNumber=${page}&searchXa=${xaParam}&searchThon=${thonParam}&searchLoai=${loaiParam}&searchTrangThai=${ttParam}">${text}</a>`;
+        };
+
+        let html = '';
+        html += buildLink(current - 1, '‹', current === 1);
+
+        for (let i = 1; i <= totalPages; i++) {
+            if (Math.abs(i - current) <= 2 || i === 1 || i === totalPages) {
+                html += buildLink(i, i, false);
+            } else if (i === current - 3 || i === current + 3) {
+                html += '<span class="digioi-page disabled">...</span>';
+            }
+        }
+
+        html += buildLink(current + 1, '›', current === totalPages);
+        this.$pagination.html(html);
+    },
+
+    getTrangThaiBadge: function (trangThai) {
+        switch (trangThai) {
+            case 'Rừng giàu':
+                return 'digioi-badge-success';
+            case 'Rừng trung bình':
+                return 'digioi-badge-info';
+            case 'Rừng nghèo':
+                return 'digioi-badge-warning';
+            case 'Đất trống':
+                return 'digioi-badge-secondary';
+            default:
+                return 'digioi-badge-secondary';
+        }
+    },
+
+    showError: function (message) {
+        this.$tableBody.html(`
+            <tr>
+                <td colspan="10" class="text-center text-danger py-4">${message}</td>
+            </tr>`);
+    }
+};
+
+/**
  * Khởi tạo khi document ready
  */
 $(document).ready(function () {
@@ -342,6 +582,7 @@ $(document).ready(function () {
     // Index page - Filter cascade
     if (currentPath.includes('/lorung/index') || currentPath.endsWith('/lorung')) {
         LoRung.CascadeHandler.initCascadeFilter();
+        if (LoRung.AjaxHandler?.init) LoRung.AjaxHandler.init();
         LoRung.UIEnhancer.highlightActiveFilters();
     }
 

@@ -3,13 +3,24 @@
 @{
     ViewData["Title"] = "Danh mục Thôn/Bản";
     var danhMucXa = ViewBag.DanhMucXa as List<QuanLyRungPhongHo.Models.DanhMucXa>;
+    var currentPage = (int)ViewData["PageNumber"];
+    var totalPages = (int)ViewData["TotalPages"];
+    var totalRecords = (int)ViewData["TotalRecords"];
+    var currentFilterXa = ViewData["CurrentFilterXa"]?.ToString() ?? string.Empty;
+    var currentFilter = ViewData["CurrentFilter"]?.ToString() ?? string.Empty;
 }
 
 @section Styles {
     <link rel="stylesheet" href="~/css/digioi.css" asp-append-version="true" />
 }
 
-<div class="digioi-page">
+<div class="digioi-page"
+    id="thon-page"
+    data-endpoint="@Url.Action("GetPaged", "DanhMucThon")"
+    data-pagesize="10"
+    data-initial-page="@currentPage"
+    data-initial-search="@currentFilter"
+    data-initial-xa="@currentFilterXa">
 
     <!-- HEADER -->
     <div class="digioi-header">
@@ -37,13 +48,13 @@
 
     <!-- FORM TÌM KIẾM -->
     <div class="digioi-card digioi-filter-card">
-        <form asp-action="Index" method="get" class="digioi-filter-form no-ajax">
+        <form asp-action="Index" method="get" class="digioi-filter-form no-ajax" id="thon-filter-form">
 
             <div class="digioi-form-group">
                 <label>
                     <i class="bi bi-filter"></i> Lọc theo Xã
                 </label>
-                <select name="searchXa">
+                <select name="searchXa" id="thon-filter-xa">
                     <option value="">-- Tất cả các xã --</option>
                     @foreach (var xa in danhMucXa)
                     {
@@ -61,6 +72,7 @@
                 </label>
                 <input type="text"
                        name="searchString"
+                       id="thon-filter-search"
                        value="@ViewData["CurrentFilter"]"
                        placeholder="Tìm theo Mã hoặc Tên thôn..." />
             </div>
@@ -76,7 +88,7 @@
 
     <!-- THỐNG KÊ -->
     <div class="digioi-info-bar">
-        <span class="digioi-badge digioi-badge-info">
+        <span class="digioi-badge digioi-badge-info" id="thon-total">
             Tổng số: @ViewData["TotalRecords"] thôn/bản
         </span>
 
@@ -103,10 +115,10 @@
                         <th class="text-center">Thao tác</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="thon-table-body">
                     @if (Model.Any())
                     {
-                        int stt = ((int)ViewData["PageNumber"] - 1) * 10 + 1;
+                        int stt = (currentPage - 1) * 10 + 1;
                         @foreach (var item in Model)
                         {
                             <tr>
@@ -156,17 +168,11 @@
     </div>
 
     <!-- PHÂN TRANG -->
-    @if ((int)ViewData["TotalPages"] > 1)
+    @if (totalPages > 1)
     {
-        <div class="digioi-pagination">
-            @{
-                int currentPage = (int)ViewData["PageNumber"];
-                int totalPages = (int)ViewData["TotalPages"];
-                string currentFilterXa = ViewData["CurrentFilterXa"]?.ToString();
-                string currentFilter = ViewData["CurrentFilter"]?.ToString();
-            }
-
+        <div class="digioi-pagination" id="thon-pagination">
             <a class="digioi-page @(currentPage == 1 ? "disabled" : "")"
+               data-page="@(currentPage - 1)"
                asp-action="Index"
                asp-route-pageNumber="@(currentPage - 1)"
                asp-route-searchXa="@currentFilterXa"
@@ -177,6 +183,7 @@
             @for (int i = 1; i <= totalPages; i++)
             {
                 <a class="digioi-page @(i == currentPage ? "active" : "")"
+                   data-page="@i"
                    asp-action="Index"
                    asp-route-pageNumber="@i"
                    asp-route-searchXa="@currentFilterXa"
@@ -186,6 +193,7 @@
             }
 
             <a class="digioi-page @(currentPage == totalPages ? "disabled" : "")"
+               data-page="@(currentPage + 1)"
                asp-action="Index"
                asp-route-pageNumber="@(currentPage + 1)"
                asp-route-searchXa="@currentFilterXa"

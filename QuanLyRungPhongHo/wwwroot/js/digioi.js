@@ -273,6 +273,356 @@ DiGioi.BadgeHelper = {
 };
 
 /**
+ * XaHandler - AJAX cho Danh Muc Xa
+ */
+DiGioi.XaHandler = {
+    init: function () {
+        this.container = $('#xa-page');
+        if (!this.container.length) return;
+
+        if (this.container.data('ajax-bound')) return;
+        this.container.data('ajax-bound', true);
+
+        this.endpoint = this.container.data('endpoint');
+        this.pageSize = parseInt(this.container.attr('data-pagesize'), 10) || 10;
+        this.state = {
+            page: parseInt(this.container.attr('data-initial-page'), 10) || 1,
+            search: this.container.attr('data-initial-search') || ''
+        };
+
+        this.$tableBody = $('#xa-table-body');
+        this.$total = $('#xa-total');
+        this.$pagination = $('#xa-pagination');
+        this.$searchInput = $('#xa-search');
+
+        this.bindEvents();
+        this.loadData();
+    },
+
+    bindEvents: function () {
+        const self = this;
+
+        $('#xa-search-form').on('submit', function (e) {
+            e.preventDefault();
+            self.state.search = self.$searchInput.val();
+            self.state.page = 1;
+            self.loadData();
+        });
+
+        DiGioi.SearchFilter.initLiveSearch('#xa-search', function (value) {
+            self.state.search = value;
+            self.state.page = 1;
+            self.loadData();
+        });
+
+        this.$pagination.on('click', 'a[data-page]', function (e) {
+            e.preventDefault();
+            const target = parseInt($(this).data('page'), 10);
+            if (!isNaN(target) && target >= 1) {
+                self.state.page = target;
+                self.loadData();
+            }
+        });
+    },
+
+    setLoading: function () {
+        this.$tableBody.html(`
+            <tr>
+                <td colspan="5" class="text-center text-muted py-4">
+                    <div class="spinner-border text-success" role="status"></div>
+                    <div class="mt-2">Đang tải dữ liệu...</div>
+                </td>
+            </tr>`);
+    },
+
+    loadData: function () {
+        if (!this.endpoint) return;
+        const self = this;
+        this.setLoading();
+
+        $.getJSON(this.endpoint, {
+            searchString: self.state.search,
+            pageNumber: self.state.page,
+            pageSize: self.pageSize
+        })
+            .done(function (res) {
+                if (res.error) {
+                    self.showError(res.error);
+                    return;
+                }
+                self.render(res);
+            })
+            .fail(function () {
+                self.showError('Không thể tải dữ liệu xã.');
+            });
+    },
+
+    render: function (res) {
+        const items = res.items || [];
+        const pagination = res.pagination || {};
+        const start = ((pagination.pageNumber || 1) - 1) * (pagination.pageSize || this.pageSize) + 1;
+
+        if (!items.length) {
+            this.$tableBody.html(`
+                <tr>
+                    <td colspan="5" class="text-center text-muted py-4">
+                        <i class="bi bi-inbox fs-1"></i>
+                        <div>Không có dữ liệu</div>
+                    </td>
+                </tr>`);
+        } else {
+            let rows = '';
+            let stt = start;
+            items.forEach(item => {
+                rows += `
+                    <tr>
+                        <td>${stt}</td>
+                        <td><strong>${item.maXa}</strong></td>
+                        <td>${item.tenXa}</td>
+                        <td class="text-center"><span class="badge bg-secondary">${item.soThon}</span></td>
+                        <td class="text-center">
+                            <div class="btn-group btn-group-sm">
+                                <a href="/DanhMucXa/Edit/${item.maXa}" class="btn btn-warning"><i class="bi bi-pencil-square"></i></a>
+                                <a href="/DanhMucXa/Delete/${item.maXa}" class="btn btn-danger"><i class="bi bi-trash"></i></a>
+                            </div>
+                        </td>
+                    </tr>`;
+                stt++;
+            });
+            this.$tableBody.html(rows);
+        }
+
+        if (pagination.totalRecords !== undefined) {
+            this.$total.text(`Tổng số: ${pagination.totalRecords} xã`);
+        }
+
+        this.renderPagination(pagination);
+    },
+
+    renderPagination: function (pagination) {
+        const totalPages = pagination.totalPages || 1;
+        const current = pagination.pageNumber || 1;
+
+        if (totalPages <= 1) {
+            this.$pagination.empty();
+            return;
+        }
+
+        let html = '<ul class="pagination justify-content-center">';
+        html += `
+            <li class="page-item ${current === 1 ? 'disabled' : ''}">
+                <a class="page-link" data-page="${current - 1}" href="?pageNumber=${current - 1}&searchString=${encodeURIComponent(this.state.search || '')}">«</a>
+            </li>`;
+
+        for (let i = 1; i <= totalPages; i++) {
+            if (Math.abs(i - current) <= 2 || i === 1 || i === totalPages) {
+                const active = i === current ? 'active' : '';
+                html += `
+                    <li class="page-item ${active}">
+                        <a class="page-link" data-page="${i}" href="?pageNumber=${i}&searchString=${encodeURIComponent(this.state.search || '')}">${i}</a>
+                    </li>`;
+            } else if (i === current - 3 || i === current + 3) {
+                html += '<li class="page-item disabled"><span class="page-link">...</span></li>';
+            }
+        }
+
+        html += `
+            <li class="page-item ${current === totalPages ? 'disabled' : ''}">
+                <a class="page-link" data-page="${current + 1}" href="?pageNumber=${current + 1}&searchString=${encodeURIComponent(this.state.search || '')}">»</a>
+            </li>`;
+        html += '</ul>';
+
+        this.$pagination.html(html);
+    },
+
+    showError: function (message) {
+        this.$tableBody.html(`
+            <tr>
+                <td colspan="5" class="text-center text-danger py-4">${message}</td>
+            </tr>`);
+    }
+};
+
+/**
+ * ThonHandler - AJAX cho Danh Muc Thon
+ */
+DiGioi.ThonHandler = {
+    init: function () {
+        this.container = $('#thon-page');
+        if (!this.container.length) return;
+
+        if (this.container.data('ajax-bound')) return;
+        this.container.data('ajax-bound', true);
+
+        this.endpoint = this.container.data('endpoint');
+        this.pageSize = parseInt(this.container.attr('data-pagesize'), 10) || 10;
+        this.state = {
+            page: parseInt(this.container.attr('data-initial-page'), 10) || 1,
+            search: this.container.attr('data-initial-search') || '',
+            xa: this.container.attr('data-initial-xa') || ''
+        };
+
+        this.$tableBody = $('#thon-table-body');
+        this.$total = $('#thon-total');
+        this.$pagination = $('#thon-pagination');
+        this.$searchInput = $('#thon-filter-search');
+        this.$xaSelect = $('#thon-filter-xa');
+
+        this.bindEvents();
+        this.loadData();
+    },
+
+    bindEvents: function () {
+        const self = this;
+
+        $('#thon-filter-form').on('submit', function (e) {
+            e.preventDefault();
+            self.state.search = self.$searchInput.val();
+            self.state.xa = self.$xaSelect.val();
+            self.state.page = 1;
+            self.loadData();
+        });
+
+        this.$xaSelect.on('change', function () {
+            self.state.xa = $(this).val();
+            self.state.page = 1;
+            self.loadData();
+        });
+
+        DiGioi.SearchFilter.initLiveSearch('#thon-filter-search', function (value) {
+            self.state.search = value;
+            self.state.page = 1;
+            self.loadData();
+        });
+
+        this.$pagination.on('click', 'a[data-page]', function (e) {
+            e.preventDefault();
+            const target = parseInt($(this).data('page'), 10);
+            if (!isNaN(target) && target >= 1) {
+                self.state.page = target;
+                self.loadData();
+            }
+        });
+    },
+
+    setLoading: function () {
+        this.$tableBody.html(`
+            <tr>
+                <td colspan="6" class="text-center text-muted py-4">
+                    <div class="spinner-border text-success" role="status"></div>
+                    <div class="mt-2">Đang tải dữ liệu...</div>
+                </td>
+            </tr>`);
+    },
+
+    loadData: function () {
+        if (!this.endpoint) return;
+        const self = this;
+        this.setLoading();
+
+        $.getJSON(this.endpoint, {
+            searchXa: self.state.xa,
+            searchString: self.state.search,
+            pageNumber: self.state.page,
+            pageSize: self.pageSize
+        })
+            .done(function (res) {
+                if (res.error) {
+                    self.showError(res.error);
+                    return;
+                }
+                self.render(res);
+            })
+            .fail(function () {
+                self.showError('Không thể tải dữ liệu thôn.');
+            });
+    },
+
+    render: function (res) {
+        const items = res.items || [];
+        const pagination = res.pagination || {};
+        const start = ((pagination.pageNumber || 1) - 1) * (pagination.pageSize || this.pageSize) + 1;
+
+        if (!items.length) {
+            this.$tableBody.html(`
+                <tr>
+                    <td colspan="6" class="digioi-empty">
+                        <i class="bi bi-inbox"></i>
+                        <p>Không tìm thấy dữ liệu</p>
+                    </td>
+                </tr>`);
+        } else {
+            let rows = '';
+            let stt = start;
+            items.forEach(item => {
+                rows += `
+                    <tr>
+                        <td>${stt}</td>
+                        <td><strong>${item.maThon}</strong></td>
+                        <td>${item.tenThon}</td>
+                        <td><span class="digioi-badge digioi-badge-success">${item.tenXa}</span></td>
+                        <td class="text-center"><span class="digioi-badge digioi-badge-secondary">${item.soLoRung}</span></td>
+                        <td class="text-center">
+                            <div class="digioi-btn-group">
+                                <a href="/DanhMucThon/Edit/${item.maThon}" class="digioi-btn digioi-btn-warning"><i class="bi bi-pencil-square"></i></a>
+                                <a href="/DanhMucThon/Delete/${item.maThon}" class="digioi-btn digioi-btn-danger"><i class="bi bi-trash"></i></a>
+                            </div>
+                        </td>
+                    </tr>`;
+                stt++;
+            });
+            this.$tableBody.html(rows);
+        }
+
+        if (pagination.totalRecords !== undefined) {
+            this.$total.text(`Tổng số: ${pagination.totalRecords} thôn/bản`);
+        }
+
+        this.renderPagination(pagination);
+    },
+
+    renderPagination: function (pagination) {
+        const totalPages = pagination.totalPages || 1;
+        const current = pagination.pageNumber || 1;
+
+        if (totalPages <= 1) {
+            this.$pagination.empty();
+            return;
+        }
+
+        let html = '';
+        const searchParam = encodeURIComponent(this.state.search || '');
+        const xaParam = encodeURIComponent(this.state.xa || '');
+
+        const buildLink = (page, text, disabled) => {
+            const cls = disabled ? 'disabled' : '';
+            return `
+                <a class="digioi-page ${cls} ${page === current ? 'active' : ''}" data-page="${page}" href="?pageNumber=${page}&searchXa=${xaParam}&searchString=${searchParam}">${text}</a>`;
+        };
+
+        html += buildLink(current - 1, '‹', current === 1);
+
+        for (let i = 1; i <= totalPages; i++) {
+            if (Math.abs(i - current) <= 2 || i === 1 || i === totalPages) {
+                html += buildLink(i, i, false);
+            } else if (i === current - 3 || i === current + 3) {
+                html += '<span class="digioi-page disabled">...</span>';
+            }
+        }
+
+        html += buildLink(current + 1, '›', current === totalPages);
+        this.$pagination.html(html);
+    },
+
+    showError: function (message) {
+        this.$tableBody.html(`
+            <tr>
+                <td colspan="6" class="text-center text-danger py-4">${message}</td>
+            </tr>`);
+    }
+};
+
+/**
  * Khởi tạo khi document ready
  */
 $(document).ready(function () {
@@ -280,6 +630,10 @@ $(document).ready(function () {
     if (typeof $.fn.validate !== 'undefined') {
         DiGioi.FormHandler.initValidation();
     }
+
+    // Khởi tạo AJAX cho trang Địa Giới
+    if (DiGioi.XaHandler?.init) DiGioi.XaHandler.init();
+    if (DiGioi.ThonHandler?.init) DiGioi.ThonHandler.init();
 
     // Auto dismiss alerts sau 5 giây
     setTimeout(function () {

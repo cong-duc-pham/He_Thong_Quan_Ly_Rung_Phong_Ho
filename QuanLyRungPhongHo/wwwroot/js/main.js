@@ -262,6 +262,7 @@
             setTimeout(() => {
                 // Index page
                 if (currentPath.includes('/lorung/index') || currentPath.endsWith('/lorung')) {
+                    if (LoRung.AjaxHandler?.init) LoRung.AjaxHandler.init();
                     if (LoRung.CascadeHandler?.initCascadeFilter) LoRung.CascadeHandler.initCascadeFilter();
                     if (LoRung.UIEnhancer?.highlightActiveFilters) LoRung.UIEnhancer.highlightActiveFilters();
                 }

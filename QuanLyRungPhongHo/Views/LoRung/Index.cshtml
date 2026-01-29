@@ -5,13 +5,28 @@
     var danhMucXa = ViewBag.DanhMucXa as List<QuanLyRungPhongHo.Models.DanhMucXa>;
     var loaiRung = ViewBag.LoaiRung as List<string>;
     var trangThai = ViewBag.TrangThai as List<string>;
+    var currentPage = (int)ViewData["PageNumber"];
+    var totalPages = (int)ViewData["TotalPages"];
+    var totalRecords = (int)ViewData["TotalRecords"];
+    var currentXa = ViewData["CurrentFilterXa"]?.ToString() ?? string.Empty;
+    var currentThon = ViewData["CurrentFilterThon"]?.ToString() ?? string.Empty;
+    var currentLoai = ViewData["CurrentFilterLoai"]?.ToString() ?? string.Empty;
+    var currentTrangThai = ViewData["CurrentFilterTrangThai"]?.ToString() ?? string.Empty;
 }
 
 @section Styles {
     <link rel="stylesheet" href="~/css/digioi.css" asp-append-version="true" />
 }
 
-<div class="digioi-page">
+<div class="digioi-page"
+    id="lorung-page"
+    data-endpoint="@Url.Action("GetPaged", "LoRung")"
+    data-pagesize="15"
+    data-initial-page="@currentPage"
+    data-initial-xa="@currentXa"
+    data-initial-thon="@currentThon"
+    data-initial-loai="@currentLoai"
+    data-initial-trangthai="@currentTrangThai">
 
     <!-- Header -->
     <div class="digioi-header">
@@ -39,7 +54,7 @@
 
     <!-- Bộ lọc -->
     <div class="digioi-card digioi-filter-card">
-        <form asp-action="Index" method="get" class="digioi-filter-form no-ajax">
+        <form asp-action="Index" method="get" class="digioi-filter-form no-ajax" id="lorung-filter-form">
             <div class="digioi-form-group">
                 <label>
                     <i class="bi bi-building"></i> Xã
@@ -68,7 +83,7 @@
                 <label>
                     <i class="bi bi-tree-fill"></i> Loại Rừng
                 </label>
-                <select name="searchLoai">
+                <select name="searchLoai" id="filterLoai">
                     <option value="">-- Tất cả loại --</option>
                     @foreach (var loai in loaiRung)
                     {
@@ -83,7 +98,7 @@
                 <label>
                     <i class="bi bi-info-circle"></i> Trạng Thái
                 </label>
-                <select name="searchTrangThai">
+                <select name="searchTrangThai" id="filterTrangThai">
                     <option value="">-- Tất cả trạng thái --</option>
                     @foreach (var tt in trangThai)
                     {
@@ -105,10 +120,10 @@
 
     <!-- Kết quả -->
     <div class="digioi-info-bar">
-        <span class="digioi-badge digioi-badge-info">
+        <span class="digioi-badge digioi-badge-info" id="lorung-total">
             Tổng số: @ViewData["TotalRecords"] lô rừng
         </span>
-        <a asp-action="Index" class="digioi-btn digioi-btn-outline no-ajax">
+        <a asp-action="Index" id="lorung-reset-filters" class="digioi-btn digioi-btn-outline">
             <i class="bi bi-x-circle"></i> Xóa bộ lọc
         </a>
     </div>
@@ -131,10 +146,10 @@
                         <th>Thao tác</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="lorung-table-body">
                     @if (Model.Any())
                     {
-                        int stt = ((int)ViewData["PageNumber"] - 1) * 15 + 1;
+                        int stt = (currentPage - 1) * 15 + 1;
                         @foreach (var item in Model)
                         {
                             <tr>
@@ -146,7 +161,7 @@
                                 <td>
                                     <span class="digioi-badge digioi-badge-success">@item.DanhMucThon?.DanhMucXa?.TenXa</span>
                                 </td>
-                                <td>
+                                <td data-type="area">
                                     @(item.DienTich?.ToString("N2") ?? "—")
                                 </td>
                                 <td>@item.LoaiRung</td>
@@ -190,4 +205,49 @@
             </table>
         </div>
     </div>
+
+    @if (totalPages > 1)
+    {
+        <div class="digioi-pagination" id="lorung-pagination">
+            <a class="digioi-page @(currentPage == 1 ? "disabled" : "")"
+               data-page="@(currentPage - 1)"
+               asp-action="Index"
+               asp-route-pageNumber="@(currentPage - 1)"
+               asp-route-searchXa="@currentXa"
+               asp-route-searchThon="@currentThon"
+               asp-route-searchLoai="@currentLoai"
+               asp-route-searchTrangThai="@currentTrangThai">
+                ‹
+            </a>
+
+            @for (int i = 1; i <= totalPages; i++)
+            {
+                <a class="digioi-page @(i == currentPage ? "active" : "")"
+                   data-page="@i"
+                   asp-action="Index"
+                   asp-route-pageNumber="@i"
+                   asp-route-searchXa="@currentXa"
+                   asp-route-searchThon="@currentThon"
+                   asp-route-searchLoai="@currentLoai"
+                   asp-route-searchTrangThai="@currentTrangThai">
+                    @i
+                </a>
+            }
+
+            <a class="digioi-page @(currentPage == totalPages ? "disabled" : "")"
+               data-page="@(currentPage + 1)"
+               asp-action="Index"
+               asp-route-pageNumber="@(currentPage + 1)"
+               asp-route-searchXa="@currentXa"
+               asp-route-searchThon="@currentThon"
+               asp-route-searchLoai="@currentLoai"
+               asp-route-searchTrangThai="@currentTrangThai">
+                ›
+            </a>
+        </div>
+
+        <div class="digioi-page-info">
+            Trang @currentPage / @totalPages
+        </div>
+    }
 </div>

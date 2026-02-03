@@ -15,10 +15,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // ===== SETTINGS KEYS =====
 const SETTINGS_KEYS = {
     THEME: 'user-settings-theme',
-    DENSITY: 'user-settings-density',
-    COMPACT_SIDEBAR: 'user-settings-compact-sidebar',
-    AUTO_REFRESH: 'user-settings-auto-refresh',
-    HIGHLIGHT_ALERT: 'user-settings-highlight-alert',
+    LANGUAGE: 'user-settings-language',
     NOTIFY_EMAIL: 'user-settings-notify-email',
     NOTIFY_SMS: 'user-settings-notify-sms',
     NOTIFY_INAPP: 'user-settings-notify-inapp',
@@ -59,31 +56,13 @@ function initializeSettings() {
     applyTheme(theme);
     persistLayoutState({ theme });
     
-    // Density
-    const density = layoutState.density || localStorage.getItem(SETTINGS_KEYS.DENSITY) || 'comfortable';
-    document.getElementById('setting-density').value = density;
-    applyDensity(density);
-    persistLayoutState({ density });
-    
-    // Compact Sidebar
-    const compactSidebar = layoutState.compactSidebar ?? (localStorage.getItem(SETTINGS_KEYS.COMPACT_SIDEBAR) === 'true');
-    document.getElementById('setting-compact-sidebar').checked = compactSidebar;
-    if (compactSidebar) {
-        document.body.classList.add('compact-sidebar');
+    // Language
+    const language = layoutState.language || localStorage.getItem(SETTINGS_KEYS.LANGUAGE) || 'vi';
+    const languageSelect = document.getElementById('setting-language');
+    if (languageSelect) {
+        languageSelect.value = language;
     }
-    persistLayoutState({ compactSidebar });
-    
-    // Auto Refresh
-    const autoRefresh = localStorage.getItem(SETTINGS_KEYS.AUTO_REFRESH) === 'true';
-    document.getElementById('setting-auto-refresh').checked = autoRefresh;
-    
-    // Highlight Alert
-    const highlightAlert = localStorage.getItem(SETTINGS_KEYS.HIGHLIGHT_ALERT) === 'true';
-    document.getElementById('setting-highlight-alert').checked = highlightAlert;
-    if (highlightAlert) {
-        document.body.classList.add('highlight-alert');
-    }
-    persistLayoutState({ highlightAlert });
+    persistLayoutState({ language });
     
     // Notifications
     const notifyEmail = localStorage.getItem(SETTINGS_KEYS.NOTIFY_EMAIL) !== 'false';
@@ -117,52 +96,16 @@ function setupEventListeners() {
         showSuccessAlert('Đã thay đổi chủ đề giao diện');
     });
     
-    // Density change
-    document.getElementById('setting-density').addEventListener('change', function(e) {
-        const density = e.target.value;
-        localStorage.setItem(SETTINGS_KEYS.DENSITY, density);
-        applyDensity(density);
-        persistLayoutState({ density });
-        showSuccessAlert('Đã thay đổi mật độ hiển thị');
-    });
-    
-    // Compact Sidebar toggle
-    document.getElementById('setting-compact-sidebar').addEventListener('change', function(e) {
-        const isCompact = e.target.checked;
-        localStorage.setItem(SETTINGS_KEYS.COMPACT_SIDEBAR, isCompact);
-        if (isCompact) {
-            document.body.classList.add('compact-sidebar');
-        } else {
-            document.body.classList.remove('compact-sidebar');
-        }
-        persistLayoutState({ compactSidebar: isCompact });
-        showSuccessAlert('Đã ' + (isCompact ? 'thu gọn' : 'mở rộng') + ' thanh điều hướng');
-    });
-    
-    // Auto Refresh toggle
-    document.getElementById('setting-auto-refresh').addEventListener('change', function(e) {
-        const isEnabled = e.target.checked;
-        localStorage.setItem(SETTINGS_KEYS.AUTO_REFRESH, isEnabled);
-        if (isEnabled) {
-            startAutoRefresh();
-        } else {
-            stopAutoRefresh();
-        }
-        showSuccessAlert('Đã ' + (isEnabled ? 'bật' : 'tắt') + ' tự động làm mới');
-    });
-    
-    // Highlight Alert toggle
-    document.getElementById('setting-highlight-alert').addEventListener('change', function(e) {
-        const isEnabled = e.target.checked;
-        localStorage.setItem(SETTINGS_KEYS.HIGHLIGHT_ALERT, isEnabled);
-        if (isEnabled) {
-            document.body.classList.add('highlight-alert');
-        } else {
-            document.body.classList.remove('highlight-alert');
-        }
-        persistLayoutState({ highlightAlert: isEnabled });
-        showSuccessAlert('Đã ' + (isEnabled ? 'bật' : 'tắt') + ' làm nổi bật cảnh báo');
-    });
+    // Language change
+    const langEl = document.getElementById('setting-language');
+    if (langEl) {
+        langEl.addEventListener('change', function(e) {
+            const language = e.target.value;
+            localStorage.setItem(SETTINGS_KEYS.LANGUAGE, language);
+            persistLayoutState({ language });
+            showSuccessAlert('Đã đổi ngôn ngữ giao diện');
+        });
+    }
     
     // Notification preferences
     document.getElementById('setting-notify-email').addEventListener('change', function(e) {
@@ -213,13 +156,6 @@ function applyTheme(theme) {
     }
 
     root.classList.toggle('dark', isDark);
-}
-
-// ===== APPLY DENSITY =====
-function applyDensity(density) {
-    // Remove existing density classes
-    document.body.classList.remove('density-comfortable', 'density-compact', 'density-spacious');
-    document.body.classList.add('density-' + density);
 }
 
 // ===== SAVE CONTACT INFORMATION =====

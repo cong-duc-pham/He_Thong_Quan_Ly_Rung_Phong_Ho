@@ -11,10 +11,6 @@ using System.Drawing;
 
 namespace QuanLyRungPhongHo.Controllers
 {
-    /// <summary>
-    /// Controller quản lý Báo cáo Thống kê
-    /// Chuẩn nghiệp vụ quản lý rừng phòng hộ
-    /// </summary>
     [Authorize]
     public class BaoCaoThongKeController : Controller
     {
@@ -27,21 +23,17 @@ namespace QuanLyRungPhongHo.Controllers
         {
             _context = context;
             _logger = logger;
-            
-            // Set EPPlus License Context
+
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
         }
 
-        /// <summary>
-        /// Trang Báo cáo Thống kê chính
-        /// GET: BaoCaoThongKe/Index
-        /// </summary>
+        // Trang chính báo cáo thống kê
         [HttpGet]
         public async Task<IActionResult> Index(string? maXaFilter, DateTime? tuNgay, DateTime? denNgay)
         {
             try
             {
-                // Validation ngày tháng
+                // Validate ngày tháng
                 if (tuNgay.HasValue && denNgay.HasValue && tuNgay > denNgay)
                 {
                     TempData["ErrorMessage"] = "Từ ngày không được lớn hơn Đến ngày";
@@ -49,7 +41,7 @@ namespace QuanLyRungPhongHo.Controllers
                     denNgay = null;
                 }
 
-                // Nếu không có filter ngày, mặc định lấy 30 ngày gần nhất cho sự kiện
+                // Mặc định 30 ngày gần nhất nếu không chọn
                 DateTime defaultTuNgay = tuNgay ?? DateTime.Now.AddDays(-30);
                 DateTime defaultDenNgay = denNgay ?? DateTime.Now;
 
@@ -63,7 +55,7 @@ namespace QuanLyRungPhongHo.Controllers
                         .ToListAsync()
                 };
 
-                // Query cơ bản với filter
+                // Setup query lô rừng + include thôn
                 var queryLoRung = _context.LoRungs
                     .Include(l => l.DanhMucThon)
                     .AsQueryable();
@@ -74,6 +66,7 @@ namespace QuanLyRungPhongHo.Controllers
                     .ThenInclude(l => l!.DanhMucThon)
                     .Where(nk => nk.NgayGhi >= defaultTuNgay && nk.NgayGhi <= defaultDenNgay);
 
+                // Áp dụng filter xã nếu có
                 if (!string.IsNullOrEmpty(maXaFilter))
                 {
                     queryLoRung = queryLoRung.Where(l => l.DanhMucThon!.MaXa == maXaFilter);
@@ -81,7 +74,7 @@ namespace QuanLyRungPhongHo.Controllers
                     querySuKien = querySuKien.Where(nk => nk.LoRung!.DanhMucThon!.MaXa == maXaFilter);
                 }
 
-                // ===== 1. THỐNG KÊ TỔNG QUAN =====
+                // Thống kê tổng quan
                 viewModel.TongSoXa = string.IsNullOrEmpty(maXaFilter)
                     ? await _context.DanhMucXas.CountAsync()
                     : 1;
@@ -93,7 +86,8 @@ namespace QuanLyRungPhongHo.Controllers
                 viewModel.TongSoLoRung = await queryLoRung.CountAsync();
                 viewModel.TongDienTichRung = await queryLoRung.SumAsync(l => l.DienTich ?? 0);
                 viewModel.TongSoNhanSu = await queryNhanSu.CountAsync();
-                
+
+                // Lấy danh sách mã lô để query sinh vật
                 var maLoRungList = await queryLoRung.Select(l => l.MaLo).ToListAsync();
                 viewModel.TongSoSinhVat = await _context.SinhVats
                     .Where(sv => maLoRungList.Contains(sv.MaLo))
@@ -101,7 +95,7 @@ namespace QuanLyRungPhongHo.Controllers
 
                 viewModel.TongSoSuKien = await querySuKien.CountAsync();
 
-                // ===== 2. THỐNG KÊ THEO LOẠI RỪNG =====
+                // Thống kê theo loại rừng
                 var thongKeLoaiRung = await queryLoRung
                     .Where(l => !string.IsNullOrEmpty(l.LoaiRung))
                     .GroupBy(l => l.LoaiRung)
@@ -114,7 +108,7 @@ namespace QuanLyRungPhongHo.Controllers
                     .OrderByDescending(x => x.TongDienTich)
                     .ToListAsync();
 
-                // Tính tỷ lệ %
+                // Tính tỷ lệ % theo diện tích
                 decimal tongDienTich = thongKeLoaiRung.Sum(x => x.TongDienTich);
                 if (tongDienTich > 0)
                 {
@@ -125,7 +119,7 @@ namespace QuanLyRungPhongHo.Controllers
                 }
                 viewModel.ThongKeTheoLoaiRung = thongKeLoaiRung;
 
-                // ===== 3. THỐNG KÊ THEO TRẠNG THÁI =====
+                // Thống kê theo trạng thái rừng
                 var thongKeTrangThai = await queryLoRung
                     .Where(l => !string.IsNullOrEmpty(l.TrangThai))
                     .GroupBy(l => l.TrangThai)
@@ -147,7 +141,7 @@ namespace QuanLyRungPhongHo.Controllers
                 }
                 viewModel.ThongKeTheoTrangThai = thongKeTrangThai;
 
-                // ===== 4. THỐNG KÊ THEO XÃ =====
+                // Thống kê theo xã
                 var thongKeXa = await _context.DanhMucXas
                     .Where(x => string.IsNullOrEmpty(maXaFilter) || x.MaXa == maXaFilter)
                     .Select(x => new ThongKeTheoXa
@@ -168,7 +162,7 @@ namespace QuanLyRungPhongHo.Controllers
 
                 viewModel.ThongKeTheoXa = thongKeXa;
 
-                // ===== 5. THỐNG KÊ SỰ KIỆN BẢO VỆ =====
+                // Thống kê sự kiện bảo vệ rừng
                 var thongKeSuKien = await querySuKien
                     .Where(nk => !string.IsNullOrEmpty(nk.LoaiSuViec))
                     .GroupBy(nk => nk.LoaiSuViec)
@@ -190,20 +184,21 @@ namespace QuanLyRungPhongHo.Controllers
                 }
                 viewModel.ThongKeSuKienBaoVe = thongKeSuKien;
 
-                // ===== 6. THỐNG KÊ SINH VẬT =====
+                // Thống kê sinh vật (động vật, thực vật, quý hiếm)
                 var querySinhVat = _context.SinhVats
                     .Where(sv => maLoRungList.Contains(sv.MaLo));
 
                 viewModel.TongDongVat = await querySinhVat.CountAsync(sv => sv.LoaiSV == "Động vật");
                 viewModel.TongThucVat = await querySinhVat.CountAsync(sv => sv.LoaiSV == "Thực vật");
-                viewModel.SoLoaiQuyHiem = await querySinhVat.CountAsync(sv => 
-                    sv.MucDoQuyHiem == "Cực kỳ nguy cấp" || 
+                viewModel.SoLoaiQuyHiem = await querySinhVat.CountAsync(sv =>
+                    sv.MucDoQuyHiem == "Cực kỳ nguy cấp" ||
                     sv.MucDoQuyHiem == "Nguy cấp" ||
                     sv.MucDoQuyHiem == "Sắp nguy cấp");
-                viewModel.SoLoaiNguyCap = await querySinhVat.CountAsync(sv => 
-                    sv.MucDoQuyHiem == "Cực kỳ nguy cấp" || 
+                viewModel.SoLoaiNguyCap = await querySinhVat.CountAsync(sv =>
+                    sv.MucDoQuyHiem == "Cực kỳ nguy cấp" ||
                     sv.MucDoQuyHiem == "Nguy cấp");
 
+                // Top 10 loài sinh vật có số lượng ghi nhận nhiều nhất
                 viewModel.Top10SinhVat = await querySinhVat
                     .GroupBy(sv => new { sv.TenLoai, sv.LoaiSV, sv.MucDoQuyHiem })
                     .Select(g => new ThongKeSinhVat
@@ -227,10 +222,7 @@ namespace QuanLyRungPhongHo.Controllers
             }
         }
 
-        /// <summary>
-        /// Export báo cáo ra Excel (.xlsx) với format đẹp và tiếng Việt chính xác
-        /// GET: BaoCaoThongKe/ExportCsv
-        /// </summary>
+        // Export báo cáo ra Excel với định dạng đẹp
         [HttpGet]
         public async Task<IActionResult> ExportCsv(string? maXaFilter, DateTime? tuNgay, DateTime? denNgay)
         {
@@ -241,7 +233,7 @@ namespace QuanLyRungPhongHo.Controllers
                 DateTime defaultTuNgay = tuNgay ?? DateTime.Now.AddDays(-30);
                 DateTime defaultDenNgay = denNgay ?? DateTime.Now;
 
-                // Query data
+                // Query dữ liệu
                 var queryLoRung = _context.LoRungs
                     .Include(l => l.DanhMucThon)
                     .AsQueryable();
@@ -251,8 +243,9 @@ namespace QuanLyRungPhongHo.Controllers
                     queryLoRung = queryLoRung.Where(l => l.DanhMucThon!.MaXa == maXaFilter);
                 }
 
-                var tongSoXa = string.IsNullOrEmpty(maXaFilter) 
-                    ? await _context.DanhMucXas.CountAsync() 
+                // Aggregate dữ liệu
+                var tongSoXa = string.IsNullOrEmpty(maXaFilter)
+                    ? await _context.DanhMucXas.CountAsync()
                     : 1;
                 var tongSoThon = string.IsNullOrEmpty(maXaFilter)
                     ? await _context.DanhMucThons.CountAsync()
@@ -263,6 +256,7 @@ namespace QuanLyRungPhongHo.Controllers
                     ? await _context.NhanSus.CountAsync()
                     : await _context.NhanSus.CountAsync(n => n.MaXa == maXaFilter);
 
+                // Thống kê loại rừng
                 var thongKeLoaiRung = await queryLoRung
                     .Where(l => !string.IsNullOrEmpty(l.LoaiRung))
                     .GroupBy(l => l.LoaiRung)
@@ -270,6 +264,7 @@ namespace QuanLyRungPhongHo.Controllers
                     .OrderByDescending(x => x.DienTich)
                     .ToListAsync();
 
+                // Thống kê trạng thái
                 var thongKeTrangThai = await queryLoRung
                     .Where(l => !string.IsNullOrEmpty(l.TrangThai))
                     .GroupBy(l => l.TrangThai)
@@ -277,12 +272,14 @@ namespace QuanLyRungPhongHo.Controllers
                     .OrderByDescending(x => x.DienTich)
                     .ToListAsync();
 
+                // Thống kê xã
                 var thongKeXa = await _context.DanhMucXas
                     .Where(x => string.IsNullOrEmpty(maXaFilter) || x.MaXa == maXaFilter)
                     .Include(x => x.DanhMucThons).ThenInclude(t => t.LoRungs)
                     .Include(x => x.NhanSus)
                     .ToListAsync();
 
+                // Thống kê sự kiện
                 var querySuKien = _context.NhatKyBaoVes
                     .Include(nk => nk.LoRung)
                     .ThenInclude(l => l!.DanhMucThon)
@@ -305,13 +302,13 @@ namespace QuanLyRungPhongHo.Controllers
                 {
                     var worksheet = package.Workbook.Worksheets.Add("Báo cáo thống kê");
 
-                    // Set default font cho toàn bộ worksheet
+                    // Set font mặc định cho sheet
                     worksheet.Cells.Style.Font.Name = "Times New Roman";
                     worksheet.Cells.Style.Font.Size = 11;
 
                     int row = 1;
 
-                    // ===== HEADER =====
+                    // Tiêu đề báo cáo
                     worksheet.Cells[row, 1].Value = "BÁO CÁO THỐNG KÊ QUẢN LÝ RỪNG PHÒNG HỘ";
                     worksheet.Cells[row, 1, row, 6].Merge = true;
                     worksheet.Cells[row, 1].Style.Font.Size = 16;
@@ -321,7 +318,7 @@ namespace QuanLyRungPhongHo.Controllers
                     worksheet.Row(row).Height = 30;
                     row += 2;
 
-                    // Thông tin báo cáo
+                    // Thông tin báo cáo (phạm vi + thời gian)
                     if (!string.IsNullOrEmpty(maXaFilter))
                     {
                         var tenXa = await _context.DanhMucXas
@@ -338,13 +335,13 @@ namespace QuanLyRungPhongHo.Controllers
                         worksheet.Cells[row, 1].Style.Font.Bold = true;
                         row++;
                     }
-                    
+
                     worksheet.Cells[row, 1].Value = $"Thời gian: {defaultTuNgay:dd/MM/yyyy} - {defaultDenNgay:dd/MM/yyyy}";
                     row++;
                     worksheet.Cells[row, 1].Value = $"Ngày xuất: {DateTime.Now:dd/MM/yyyy HH:mm:ss}";
                     row += 2;
 
-                    // ===== I. THỐNG KÊ TỔNG QUAN =====
+                    // I. Thống kê tổng quan
                     worksheet.Cells[row, 1].Value = "I. THỐNG KÊ TỔNG QUAN";
                     worksheet.Cells[row, 1].Style.Font.Bold = true;
                     worksheet.Cells[row, 1].Style.Font.Size = 12;
@@ -381,11 +378,11 @@ namespace QuanLyRungPhongHo.Controllers
                         worksheet.Cells[row, 2].Value = dataRow.ChiTieu;
                         worksheet.Cells[row, 3].Value = dataRow.DonVi;
                         worksheet.Cells[row, 4].Value = dataRow.SoLuong;
-                        
-                        // Center align STT
+
+                        // Căn chỉnh
                         worksheet.Cells[row, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                         worksheet.Cells[row, 4].Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
-                        
+
                         // Border
                         for (int i = 1; i <= 4; i++)
                         {
@@ -395,7 +392,7 @@ namespace QuanLyRungPhongHo.Controllers
                     }
                     row++;
 
-                    // ===== II. THỐNG KÊ THEO LOẠI RỪNG =====
+                    // II. Thống kê theo loại rừng
                     worksheet.Cells[row, 1].Value = "II. THỐNG KÊ THEO LOẠI RỪNG";
                     worksheet.Cells[row, 1].Style.Font.Bold = true;
                     worksheet.Cells[row, 1].Style.Font.Size = 12;
@@ -420,18 +417,18 @@ namespace QuanLyRungPhongHo.Controllers
                     {
                         var item = thongKeLoaiRung[i];
                         var tyLe = tongDT > 0 ? Math.Round((double)(item.DienTich / tongDT * 100), 2) : 0;
-                        
+
                         worksheet.Cells[row, 1].Value = i + 1;
                         worksheet.Cells[row, 2].Value = item.LoaiRung;
                         worksheet.Cells[row, 3].Value = item.SoLuong;
                         worksheet.Cells[row, 4].Value = item.DienTich.ToString("N2");
                         worksheet.Cells[row, 5].Value = tyLe.ToString("N2");
-                        
+
                         worksheet.Cells[row, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                         worksheet.Cells[row, 3].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                         worksheet.Cells[row, 4].Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
                         worksheet.Cells[row, 5].Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
-                        
+
                         for (int j = 1; j <= 5; j++)
                         {
                             worksheet.Cells[row, j].Style.Border.BorderAround(ExcelBorderStyle.Thin);
@@ -450,14 +447,14 @@ namespace QuanLyRungPhongHo.Controllers
                     worksheet.Cells[row, 3].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                     worksheet.Cells[row, 4].Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
                     worksheet.Cells[row, 5].Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
-                    
+
                     for (int j = 1; j <= 5; j++)
                     {
                         worksheet.Cells[row, j].Style.Border.BorderAround(ExcelBorderStyle.Thin);
                     }
                     row += 2;
 
-                    // ===== III. THỐNG KÊ THEO TRẠNG THÁI =====
+                    // III. Thống kê theo trạng thái
                     worksheet.Cells[row, 1].Value = "III. THỐNG KÊ THEO CHẤT LƯỢNG RỪNG";
                     worksheet.Cells[row, 1].Style.Font.Bold = true;
                     worksheet.Cells[row, 1].Style.Font.Size = 12;
@@ -481,18 +478,18 @@ namespace QuanLyRungPhongHo.Controllers
                     {
                         var item = thongKeTrangThai[i];
                         var tyLe = tongDT > 0 ? Math.Round((double)(item.DienTich / tongDT * 100), 2) : 0;
-                        
+
                         worksheet.Cells[row, 1].Value = i + 1;
                         worksheet.Cells[row, 2].Value = item.TrangThai;
                         worksheet.Cells[row, 3].Value = item.SoLuong;
                         worksheet.Cells[row, 4].Value = item.DienTich.ToString("N2");
                         worksheet.Cells[row, 5].Value = tyLe.ToString("N2");
-                        
+
                         worksheet.Cells[row, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                         worksheet.Cells[row, 3].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                         worksheet.Cells[row, 4].Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
                         worksheet.Cells[row, 5].Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
-                        
+
                         for (int j = 1; j <= 5; j++)
                         {
                             worksheet.Cells[row, j].Style.Border.BorderAround(ExcelBorderStyle.Thin);
@@ -511,14 +508,14 @@ namespace QuanLyRungPhongHo.Controllers
                     worksheet.Cells[row, 3].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                     worksheet.Cells[row, 4].Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
                     worksheet.Cells[row, 5].Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
-                    
+
                     for (int j = 1; j <= 5; j++)
                     {
                         worksheet.Cells[row, j].Style.Border.BorderAround(ExcelBorderStyle.Thin);
                     }
                     row += 2;
 
-                    // ===== IV. THỐNG KÊ THEO XÃ =====
+                    // IV. Thống kê theo xã
                     worksheet.Cells[row, 1].Value = "IV. THỐNG KÊ THEO ĐƠN VỊ HÀNH CHÍNH";
                     worksheet.Cells[row, 1].Style.Font.Bold = true;
                     worksheet.Cells[row, 1].Style.Font.Size = 12;
@@ -545,33 +542,33 @@ namespace QuanLyRungPhongHo.Controllers
                         var soLoRung = xa.DanhMucThons.SelectMany(t => t.LoRungs).Count();
                         var dienTich = xa.DanhMucThons.SelectMany(t => t.LoRungs).Sum(l => l.DienTich ?? 0);
                         var soNhanSu = xa.NhanSus.Count;
-                        
+
                         worksheet.Cells[row, 1].Value = i + 1;
                         worksheet.Cells[row, 2].Value = xa.TenXa;
                         worksheet.Cells[row, 3].Value = soThon;
                         worksheet.Cells[row, 4].Value = soLoRung;
                         worksheet.Cells[row, 5].Value = dienTich.ToString("N2");
                         worksheet.Cells[row, 6].Value = soNhanSu;
-                        
+
                         worksheet.Cells[row, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                         worksheet.Cells[row, 3].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                         worksheet.Cells[row, 4].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                         worksheet.Cells[row, 5].Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
                         worksheet.Cells[row, 6].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-                        
+
                         for (int j = 1; j <= 6; j++)
                         {
                             worksheet.Cells[row, j].Style.Border.BorderAround(ExcelBorderStyle.Thin);
                         }
                         row++;
                     }
-                    
+
                     // Tổng cộng
                     var tongSoThonSum = thongKeXa.Sum(x => x.DanhMucThons.Count);
                     var tongSoLoSum = thongKeXa.SelectMany(x => x.DanhMucThons).SelectMany(t => t.LoRungs).Count();
                     var tongDienTichSum = thongKeXa.SelectMany(x => x.DanhMucThons).SelectMany(t => t.LoRungs).Sum(l => l.DienTich ?? 0);
                     var tongNhanSuSum = thongKeXa.Sum(x => x.NhanSus.Count);
-                    
+
                     worksheet.Cells[row, 1].Value = "TỔNG CỘNG";
                     worksheet.Cells[row, 1, row, 2].Merge = true;
                     worksheet.Cells[row, 3].Value = tongSoThonSum;
@@ -584,14 +581,14 @@ namespace QuanLyRungPhongHo.Controllers
                     worksheet.Cells[row, 4].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                     worksheet.Cells[row, 5].Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
                     worksheet.Cells[row, 6].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-                    
+
                     for (int j = 1; j <= 6; j++)
                     {
                         worksheet.Cells[row, j].Style.Border.BorderAround(ExcelBorderStyle.Thin);
                     }
                     row += 2;
 
-                    // ===== V. SỰ KIỆN BẢO VỆ =====
+                    // V. Sự kiện bảo vệ
                     worksheet.Cells[row, 1].Value = "V. THỐNG KÊ SỰ KIỆN BẢO VỆ RỪNG";
                     worksheet.Cells[row, 1].Style.Font.Bold = true;
                     worksheet.Cells[row, 1].Style.Font.Size = 12;
@@ -616,16 +613,16 @@ namespace QuanLyRungPhongHo.Controllers
                     {
                         var item = thongKeSuKien[i];
                         var tyLe = tongSuKien > 0 ? Math.Round((double)item.SoLuong / tongSuKien * 100, 2) : 0;
-                        
+
                         worksheet.Cells[row, 1].Value = i + 1;
                         worksheet.Cells[row, 2].Value = item.LoaiSuViec;
                         worksheet.Cells[row, 3].Value = item.SoLuong;
                         worksheet.Cells[row, 4].Value = tyLe.ToString("N2");
-                        
+
                         worksheet.Cells[row, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                         worksheet.Cells[row, 3].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                         worksheet.Cells[row, 4].Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
-                        
+
                         for (int j = 1; j <= 4; j++)
                         {
                             worksheet.Cells[row, j].Style.Border.BorderAround(ExcelBorderStyle.Thin);
@@ -642,14 +639,14 @@ namespace QuanLyRungPhongHo.Controllers
                     worksheet.Cells[row, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                     worksheet.Cells[row, 3].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                     worksheet.Cells[row, 4].Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
-                    
+
                     for (int j = 1; j <= 4; j++)
                     {
                         worksheet.Cells[row, j].Style.Border.BorderAround(ExcelBorderStyle.Thin);
                     }
                     row += 2;
 
-                    // ===== FOOTER =====
+                    // Footer
                     worksheet.Cells[row, 1].Value = "CHÚ THÍCH:";
                     worksheet.Cells[row, 1].Style.Font.Bold = true;
                     row++;
@@ -662,7 +659,7 @@ namespace QuanLyRungPhongHo.Controllers
                     // Auto-fit columns
                     worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
 
-                    // Set minimum column widths
+                    // Set cột tối thiểu
                     worksheet.Column(1).Width = Math.Max(worksheet.Column(1).Width, 8);
                     worksheet.Column(2).Width = Math.Max(worksheet.Column(2).Width, 25);
                     worksheet.Column(3).Width = Math.Max(worksheet.Column(3).Width, 12);
@@ -670,11 +667,11 @@ namespace QuanLyRungPhongHo.Controllers
                     worksheet.Column(5).Width = Math.Max(worksheet.Column(5).Width, 12);
                     worksheet.Column(6).Width = Math.Max(worksheet.Column(6).Width, 12);
 
-                    // Generate filename
-                    var tenXaSlug = string.IsNullOrEmpty(maXaFilter) 
-                        ? "ToanTinh" 
+                    // Tạo filename
+                    var tenXaSlug = string.IsNullOrEmpty(maXaFilter)
+                        ? "ToanTinh"
                         : thongKeXa.FirstOrDefault()?.TenXa.Replace(" ", "") ?? "KhongXacDinh";
-                    
+
                     var fileName = $"BaoCao_{tenXaSlug}_{defaultTuNgay:yyyyMMdd}_{defaultDenNgay:yyyyMMdd}_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx";
 
                     _logger.LogInformation($"Xuất Excel thành công: {fileName}");
@@ -691,10 +688,7 @@ namespace QuanLyRungPhongHo.Controllers
             }
         }
 
-        /// <summary>
-        /// Export báo cáo ra PDF - Tải xuống file HTML với tên tự động
-        /// GET: BaoCaoThongKe/ExportPdf
-        /// </summary>
+        // Export PDF (thực chất là HTML + In)
         [HttpGet]
         public async Task<IActionResult> ExportPdf(string? maXaFilter, DateTime? tuNgay, DateTime? denNgay)
         {
@@ -702,10 +696,7 @@ namespace QuanLyRungPhongHo.Controllers
             {
                 _logger.LogInformation("Bắt đầu xuất báo cáo PDF");
 
-                // Lấy dữ liệu thống kê
                 var viewModel = await GetBaoCaoData(maXaFilter, tuNgay, denNgay);
-
-                // Trả về View template - browser sẽ tự động mở Print dialog
                 return View("PdfTemplate", viewModel);
             }
             catch (Exception ex)
@@ -716,10 +707,7 @@ namespace QuanLyRungPhongHo.Controllers
             }
         }
 
-        /// <summary>
-        /// API: Lấy dữ liệu thống kê theo thời gian (cho biểu đồ)
-        /// GET: BaoCaoThongKe/GetChartData
-        /// </summary>
+        // API: Lấy dữ liệu biểu đồ theo thời gian
         [HttpGet]
         public async Task<JsonResult> GetChartData(string? maXaFilter, DateTime? tuNgay, DateTime? denNgay)
         {
@@ -738,6 +726,7 @@ namespace QuanLyRungPhongHo.Controllers
                     querySuKien = querySuKien.Where(nk => nk.LoRung!.DanhMucThon!.MaXa == maXaFilter);
                 }
 
+                // Group theo tháng/năm
                 var thongKeTheoThang = await querySuKien
                     .GroupBy(nk => new { nk.NgayGhi.Year, nk.NgayGhi.Month })
                     .Select(g => new
@@ -767,17 +756,15 @@ namespace QuanLyRungPhongHo.Controllers
             }
         }
 
-        /// <summary>
-        /// API: Kiểm tra trạng thái hệ thống
-        /// GET: BaoCaoThongKe/HealthCheck
-        /// </summary>
+        // API: Health check hệ thống
         [HttpGet]
         public JsonResult HealthCheck()
         {
             try
             {
-                return Json(new { 
-                    success = true, 
+                return Json(new
+                {
+                    success = true,
                     message = "Hệ thống hoạt động bình thường",
                     timestamp = DateTime.Now
                 });
@@ -785,8 +772,9 @@ namespace QuanLyRungPhongHo.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Lỗi health check");
-                return Json(new { 
-                    success = false, 
+                return Json(new
+                {
+                    success = false,
                     message = $"Lỗi hệ thống: {ex.Message}",
                     timestamp = DateTime.Now
                 });
@@ -795,9 +783,7 @@ namespace QuanLyRungPhongHo.Controllers
 
         #region Private Methods
 
-        /// <summary>
-        /// Lấy dữ liệu báo cáo đầy đủ (tái sử dụng cho cả Index và Export)
-        /// </summary>
+        // Lấy dữ liệu báo cáo (tái sử dụng cho Index và Export PDF)
         private async Task<BaoCaoThongKeViewModel> GetBaoCaoData(string? maXaFilter, DateTime? tuNgay, DateTime? denNgay)
         {
             DateTime defaultTuNgay = tuNgay ?? DateTime.Now.AddDays(-30);
@@ -811,10 +797,10 @@ namespace QuanLyRungPhongHo.Controllers
                 DanhSachXa = await _context.DanhMucXas.OrderBy(x => x.TenXa).ToListAsync()
             };
 
-            // Query cơ bản với filter
             var queryLoRung = _context.LoRungs
                 .Include(l => l.DanhMucThon)
                 .AsQueryable();
+
             if (!string.IsNullOrEmpty(maXaFilter))
             {
                 queryLoRung = queryLoRung.Where(l => l.DanhMucThon!.MaXa == maXaFilter);
@@ -822,12 +808,12 @@ namespace QuanLyRungPhongHo.Controllers
 
             // Thống kê tổng quan
             viewModel.TongSoXa = string.IsNullOrEmpty(maXaFilter) ? await _context.DanhMucXas.CountAsync() : 1;
-            viewModel.TongSoThon = string.IsNullOrEmpty(maXaFilter) 
+            viewModel.TongSoThon = string.IsNullOrEmpty(maXaFilter)
                 ? await _context.DanhMucThons.CountAsync()
                 : await _context.DanhMucThons.CountAsync(t => t.MaXa == maXaFilter);
             viewModel.TongSoLoRung = await queryLoRung.CountAsync();
             viewModel.TongDienTichRung = await queryLoRung.SumAsync(l => l.DienTich ?? 0);
-            
+
             var queryNhanSu = _context.NhanSus.AsQueryable();
             if (!string.IsNullOrEmpty(maXaFilter))
             {
@@ -863,7 +849,6 @@ namespace QuanLyRungPhongHo.Controllers
                 .OrderByDescending(x => x.TongDienTich)
                 .ToListAsync();
 
-            // Tính tỷ lệ %
             decimal tongDienTich = thongKeLoaiRung.Sum(x => x.TongDienTich);
             if (tongDienTich > 0)
             {
@@ -937,18 +922,18 @@ namespace QuanLyRungPhongHo.Controllers
             }
             viewModel.ThongKeSuKienBaoVe = thongKeSuKien;
 
-            // Thống kê sinh vật (không cần thiết cho PDF nhưng giữ lại cho consistency)
+            // Thống kê sinh vật
             var querySinhVat = _context.SinhVats
                 .Where(sv => maLoRungList.Contains(sv.MaLo));
 
             viewModel.TongDongVat = await querySinhVat.CountAsync(sv => sv.LoaiSV == "Động vật");
             viewModel.TongThucVat = await querySinhVat.CountAsync(sv => sv.LoaiSV == "Thực vật");
-            viewModel.SoLoaiQuyHiem = await querySinhVat.CountAsync(sv => 
-                sv.MucDoQuyHiem == "Cực kỳ nguy cấp" || 
+            viewModel.SoLoaiQuyHiem = await querySinhVat.CountAsync(sv =>
+                sv.MucDoQuyHiem == "Cực kỳ nguy cấp" ||
                 sv.MucDoQuyHiem == "Nguy cấp" ||
                 sv.MucDoQuyHiem == "Sắp nguy cấp");
-            viewModel.SoLoaiNguyCap = await querySinhVat.CountAsync(sv => 
-                sv.MucDoQuyHiem == "Cực kỳ nguy cấp" || 
+            viewModel.SoLoaiNguyCap = await querySinhVat.CountAsync(sv =>
+                sv.MucDoQuyHiem == "Cực kỳ nguy cấp" ||
                 sv.MucDoQuyHiem == "Nguy cấp");
 
             viewModel.Top10SinhVat = await querySinhVat

@@ -439,12 +439,18 @@
                                 <i class="bi bi-calendar"></i> Từ ngày
                             </label>
                             <input type="date" class="form-control" id="exportTuNgay" name="tuNgay" value="@Model.TuNgay?.ToString("yyyy-MM-dd")">
+                            <small class="text-danger d-none" id="exportTuNgayError">
+                                <i class="bi bi-exclamation-circle"></i> <span id="exportTuNgayErrorMsg"></span>
+                            </small>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-bold">
                                 <i class="bi bi-calendar-check"></i> Đến ngày
                             </label>
                             <input type="date" class="form-control" id="exportDenNgay" name="denNgay" value="@Model.DenNgay?.ToString("yyyy-MM-dd")">
+                            <small class="text-danger d-none" id="exportDenNgayError">
+                                <i class="bi bi-exclamation-circle"></i> <span id="exportDenNgayErrorMsg"></span>
+                            </small>
                         </div>
                     </div>
 
@@ -541,12 +547,18 @@
                                 <i class="bi bi-calendar"></i> Từ ngày
                             </label>
                             <input type="date" class="form-control" id="pdfTuNgay" name="tuNgay" value="@Model.TuNgay?.ToString("yyyy-MM-dd")">
+                            <small class="text-danger d-none" id="pdfTuNgayError">
+                                <i class="bi bi-exclamation-circle"></i> <span id="pdfTuNgayErrorMsg"></span>
+                            </small>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-bold">
                                 <i class="bi bi-calendar-check"></i> Đến ngày
                             </label>
                             <input type="date" class="form-control" id="pdfDenNgay" name="denNgay" value="@Model.DenNgay?.ToString("yyyy-MM-dd")">
+                            <small class="text-danger d-none" id="pdfDenNgayError">
+                                <i class="bi bi-exclamation-circle"></i> <span id="pdfDenNgayErrorMsg"></span>
+                            </small>
                         </div>
                     </div>
 

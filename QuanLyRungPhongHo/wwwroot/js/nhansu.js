@@ -4,7 +4,7 @@
 (function() {
     'use strict';
 
-    // Simple debounce
+    // Debounce search để tránh gọi API quá nhiều lần
     function debounce(func, wait) {
         let timeout;
         return function(...args) {
@@ -13,7 +13,7 @@
         };
     }
 
-    // Perform search
+    // Gọi API tìm kiếm
     function performSearch() {
         const searchInput = document.getElementById('nhansuSearchInput');
         const xaFilter = document.getElementById('nhansuXaFilter');
@@ -30,10 +30,10 @@
             .then(data => {
                 if (data.success) renderResults(data.items, data.totalRecords, data.message);
             })
-            .catch(e => console.error(e));
+            .catch(e => console.error('Lỗi tìm kiếm:', e));                         
     }
 
-    // Render results
+    // Render kết quả tìm kiếm
     function renderResults(items, totalRecords, message) {
         const tableBody = document.getElementById('nhansuTableBody');
         const mobileView = document.getElementById('nhansuMobileView');
@@ -42,9 +42,9 @@
 
         if (!tableBody || !mobileView || !searchStatus) return;
 
-        // Desktop table
+        // Render table desktop
         if (items.length === 0) {
-            tableBody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-3"><i class="bi bi-inbox"></i> Không có dữ liệu</td></tr>';
+            tableBody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-3">Không có dữ liệu</td></tr>';
             mobileView.innerHTML = '';
         } else {
             let tableRows = '';
@@ -58,21 +58,21 @@
                         <td><span class="badge bg-primary">${item.chucVu}</span></td>
                         <td>${item.tenXa}</td>
                         <td>
-                            ${item.tenDangNhap ? `<span>${item.tenDangNhap}</span> <span class="text-muted">(${item.quyen})</span>` : '<span class="text-danger"><i class="bi bi-exclamation-circle"></i> Chưa có TK</span>'}
+                            ${item.tenDangNhap ? `<span>${item.tenDangNhap}</span> <span class="text-muted">(${item.quyen})</span>` : '<span class="text-danger">Chưa có TK</span>'}
                         </td>
                         <td class="text-center">
                             <button class="btn btn-sm btn-outline-primary" onclick="editData(${item.maNV}, event)">
-                                <i class="bi bi-pencil"></i>
+                                Sửa
                             </button>
                             <button class="btn btn-sm btn-outline-danger" onclick="deleteData(${item.maNV})">
-                                <i class="bi bi-trash"></i>
+                                Xóa
                             </button>
                         </td>
                     </tr>`;
             });
             tableBody.innerHTML = tableRows;
 
-            // Mobile view
+            // Render mobile view
             let mobileCards = '';
             items.forEach(item => {
                 mobileCards += `
@@ -82,9 +82,9 @@
                                 <h6 class="fw-bold text-success mb-0">${item.hoTen}</h6>
                                 <span class="badge bg-primary">${item.chucVu}</span>
                             </div>
-                            <p class="mb-1 small"><i class="bi bi-geo-alt"></i> ${item.tenXa}</p>
-                            <p class="mb-1 small"><i class="bi bi-telephone"></i> ${item.sdt}</p>
-                            <p class="mb-2 small"><i class="bi bi-person"></i> TK: ${item.tenDangNhap || 'Chưa có'}</p>
+                            <p class="mb-1 small">${item.tenXa}</p>
+                            <p class="mb-1 small">${item.sdt}</p>
+                            <p class="mb-2 small">TK: ${item.tenDangNhap || 'Chưa có'}</p>
                             <div class="d-flex gap-2">
                                 <button class="btn btn-outline-primary btn-sm flex-fill" onclick="editData(${item.maNV}, event)">Sửa</button>
                                 <button class="btn btn-outline-danger btn-sm flex-fill" onclick="deleteData(${item.maNV})">Xóa</button>
@@ -95,10 +95,11 @@
             mobileView.innerHTML = mobileCards;
         }
 
-        // Update badges
+        // Cập nhật status message
         searchStatus.textContent = message;
         searchStatus.style.display = 'inline-block';
 
+        // Cập nhật badge
         if (totalBadge) {
             totalBadge.textContent = totalRecords === 0 ? 'Không tìm thấy' : 
                                     totalRecords === 1 ? '1 nhân sự' : 
@@ -107,7 +108,7 @@
         }
     }
 
-    // Initialize when DOM ready
+    // Khởi tạo search form
     function init() {
         const searchInput = document.getElementById('nhansuSearchInput');
         const xaFilter = document.getElementById('nhansuXaFilter');
@@ -117,12 +118,12 @@
 
         const debouncedSearch = debounce(performSearch, 300);
 
-        // Bind events
+        // Bind event listeners
         searchInput.addEventListener('input', debouncedSearch);
         xaFilter.addEventListener('change', performSearch);
         roleFilter.addEventListener('change', performSearch);
 
-        // Enter key
+        // Xử lý Enter key
         [searchInput, xaFilter, roleFilter].forEach(el => {
             el.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') {
@@ -132,7 +133,7 @@
             });
         });
 
-        // Auto-dismiss alerts
+        // Auto-close alert sau 5s
         document.querySelectorAll('.alert').forEach(alert => {
             setTimeout(() => {
                 try {
@@ -140,22 +141,18 @@
                 } catch(e) {}
             }, 5000);
         });
-
-        console.log('✅ NhanSu search initialized');
     }
 
-    // Run on DOMContentLoaded
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init);
     } else {
         init();
     }
 
-    // Also expose to global for main.js to call
     window.NhanSuSearchInit = init;
 })();
 
-// === MODAL FUNCTIONS (global) ===
+// Mở modal thêm nhân sự mới
 function openModal() {
     const form = document.getElementById('frmNhanSu');
     const modalElement = document.getElementById('nhanSuModal');
@@ -180,6 +177,7 @@ function openModal() {
     modal.show();
 }
 
+// Mở modal sửa nhân sự
 function editData(id, event) {
     if (!id || id === 0) return;
     
@@ -187,15 +185,16 @@ function editData(id, event) {
     if (btn) {
         btn.disabled = true;
         btn.dataset.originalHTML = btn.innerHTML;
-        btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+        btn.innerHTML = 'Đang tải...';
     }
 
     fetch('/NhanSu/GetById?id=' + id)
         .then(r => r.json())
         .then(res => {
+            // Khôi phục nút
             if (btn) {
                 btn.disabled = false;
-                btn.innerHTML = btn.dataset.originalHTML || '<i class="bi bi-pencil"></i>';
+                btn.innerHTML = btn.dataset.originalHTML || 'Sửa';
             }
             
             if (!res.success) return;
@@ -213,6 +212,7 @@ function editData(id, event) {
             document.getElementById('TenDangNhap').value = res.tenDangNhap || '';
             document.getElementById('Quyen').value = res.quyen || 'NhanVien_Thon';
             
+            // Mật khẩu không bắt buộc khi sửa
             const matKhauField = document.getElementById('MatKhau');
             matKhauField.value = '';
             matKhauField.required = false;
@@ -231,12 +231,13 @@ function editData(id, event) {
         .catch(e => {
             if (btn) {
                 btn.disabled = false;
-                btn.innerHTML = btn.dataset.originalHTML || '<i class="bi bi-pencil"></i>';
+                btn.innerHTML = btn.dataset.originalHTML || 'Sửa';
             }
-            console.error(e);
+            console.error('Lỗi:', e);
         });
 }
 
+// Lưu nhân sự
 function saveData() {
     const form = document.getElementById('frmNhanSu');
     if (!form.checkValidity()) {
@@ -246,18 +247,19 @@ function saveData() {
 
     const btnSave = document.getElementById('btnSave');
     btnSave.disabled = true;
-    btnSave.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Đang lưu...';
+    btnSave.innerHTML = 'Đang lưu...';
 
     const formData = new FormData(form);
     const maNV = parseInt(formData.get('MaNV')) || 0;
     const matKhau = formData.get('MatKhau');
 
+    // Nếu sửa mà không nhập mật khẩu thì bỏ field này
     if (maNV > 0 && !matKhau) formData.delete('MatKhau');
 
     const tokenInput = form.querySelector('input[name="__RequestVerificationToken"]');
     if (!tokenInput) {
         btnSave.disabled = false;
-        btnSave.innerHTML = '<i class="bi bi-save"></i> Lưu dữ liệu';
+        btnSave.innerHTML = 'Lưu dữ liệu';
         return;
     }
 
@@ -272,7 +274,7 @@ function saveData() {
     .then(r => r.json())
     .then(res => {
         btnSave.disabled = false;
-        btnSave.innerHTML = '<i class="bi bi-save"></i> Lưu dữ liệu';
+        btnSave.innerHTML = 'Lưu dữ liệu';
         
         if (res.success) {
             bootstrap.Modal.getInstance(document.getElementById('nhanSuModal'))?.hide();
@@ -281,10 +283,11 @@ function saveData() {
     })
     .catch(() => {
         btnSave.disabled = false;
-        btnSave.innerHTML = '<i class="bi bi-save"></i> Lưu dữ liệu';
+        btnSave.innerHTML = 'Lưu dữ liệu';
     });
 }
 
+// Xóa nhân sự
 function deleteData(id) {
     if (!confirm('Bạn có chắc chắn muốn xóa nhân sự này và tài khoản liên quan?')) return;
 
@@ -304,5 +307,5 @@ function deleteData(id) {
     .then(res => {
         if (res.success) setTimeout(() => location.reload(), 500);
     })
-    .catch(e => console.error(e));
+    .catch(e => console.error('Lỗi:', e));
 }

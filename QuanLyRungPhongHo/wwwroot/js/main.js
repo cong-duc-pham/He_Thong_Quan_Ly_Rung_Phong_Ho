@@ -1,4 +1,4 @@
-﻿    document.addEventListener('DOMContentLoaded', function () {
+﻿document.addEventListener('DOMContentLoaded', function () {
     const menuToggle = document.getElementById('menuToggle');
     const sidebar = document.getElementById('sidebar');
     const mainContent = document.querySelector('main[role="main"]');
@@ -7,6 +7,7 @@
         return window.innerWidth <= 992;
     }
 
+    // Toggle menu và sidebar
     if (menuToggle && sidebar) {
         menuToggle.addEventListener('click', function (e) {
             e.stopPropagation();
@@ -25,7 +26,7 @@
         });
     }
 
-    // Xử lý submenu toggle
+    // Xử lý click submenu
     document.querySelectorAll('.has-submenu > a').forEach(item => {
         item.addEventListener('click', function (e) {
             e.preventDefault();
@@ -45,47 +46,37 @@
         });
     });
 
-    // ==========================================
-    // 1. AJAX NAVIGATION (GLOBAL DELEGATION)
-    // Sửa lỗi: Dùng Event Delegation để bắt sự kiện click
-    // cho cả Sidebar lẫn nội dung bên trong Main
-    // ==========================================
+    // AJAX navigation - bắt click link và load AJAX thay vì reload
     document.body.addEventListener('click', function (e) {
-        // Tìm thẻ a gần nhất từ vị trí click
         const link = e.target.closest('a');
 
-        // Nếu không phải link hoặc không có href, bỏ qua
         if (!link || !link.getAttribute('href')) return;
 
         const href = link.getAttribute('href');
 
-        // Bỏ qua các link đặc biệt, link ngoài, hoặc download
+        // Bỏ qua các link đặc biệt
         if (href === '#' ||
             href.startsWith('javascript:') ||
             href.startsWith('mailto:') ||
             href.startsWith('tel:') ||
             link.getAttribute('target') === '_blank' ||
             link.hasAttribute('download') ||
-            link.classList.contains('no-ajax')) { // Thêm class no-ajax nếu muốn link hoạt động thường
+            link.classList.contains('no-ajax')) {
             return;
         }
 
-        // Kiểm tra xem link có thuộc về ứng dụng nội bộ không (để tránh load link Google, v.v...)
-        // Ở đây giả sử ứng dụng chạy trên root '/', nếu khác bạn cần check domain
+        // Kiểm tra link nội bộ
         const targetUrl = new URL(link.href, window.location.origin);
         if (targetUrl.origin !== window.location.origin) return;
 
-        // Xử lý UI cho Sidebar (Active state)
         if (link.closest('.sidebar')) {
             handleSidebarActiveState(link);
         }
 
-        // CHẶN RELOAD VÀ GỌI AJAX
         e.preventDefault();
         loadPage(href);
     });
 
-    // Hàm xử lý active state cho sidebar (tách riêng để gọn code)
     function handleSidebarActiveState(link) {
         document.querySelectorAll('.menu-item').forEach(item => item.classList.remove('active'));
         document.querySelectorAll('.submenu a').forEach(a => a.classList.remove('active'));
@@ -104,15 +95,11 @@
         }
     }
 
-    // ==========================================
-    // 2. FORM SUBMISSION HANDLER
-    // Hàm xử lý submit form bằng AJAX thay vì reload
-    // ==========================================
+    // Setup AJAX form submission
     function setupAjaxFormSubmission() {
         const forms = mainContent.querySelectorAll('form:not(.no-ajax)');
 
         forms.forEach(form => {
-            // Xóa listener cũ để tránh duplicate (nếu có)
             form.removeEventListener('submit', handleFormSubmit);
             form.addEventListener('submit', handleFormSubmit);
         });
@@ -124,12 +111,11 @@
         const method = (form.method || 'GET').toUpperCase();
         const action = form.action || window.location.href;
 
-        // Validate form nếu có jQuery Validate (từ digioi.js)
+        // Kiểm tra validation
         if (typeof $ !== 'undefined' && $(form).valid && !$(form).valid()) {
-            return; // Dừng nếu form không hợp lệ
+            return;
         }
 
-        // Hiển thị loading button
         const submitBtn = form.querySelector('button[type="submit"]');
         let originalBtnContent = '';
         if (submitBtn) {
@@ -160,23 +146,21 @@
 
             const response = await fetch(requestUrl, fetchOptions);
 
-            if (!response.ok) throw new Error('Network response was not ok');
+            if (!response.ok) throw new Error('Không thể kết nối tới server');
 
-            // Lấy URL đích (trong trường hợp redirect) hoặc URL hiện tại
             const responseURL = response.url;
             const html = await response.text();
 
             processResponseHtml(html, responseURL);
 
         } catch (error) {
-            console.error('Error submitting form:', error);
+            console.error('Lỗi:', error);
             if (typeof DiGioi !== 'undefined' && DiGioi.Utils) {
                 DiGioi.Utils.showError('Có lỗi xảy ra khi gửi dữ liệu.');
             } else {
                 alert('Có lỗi xảy ra!');
             }
         } finally {
-            // Reset button
             if (submitBtn) {
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = originalBtnContent;
@@ -184,14 +168,12 @@
         }
     }
 
-
-    // Hàm load trang bằng AJAX (Core function)
+    // Load trang AJAX
     function loadPage(url) {
-        // Hiển thị loading indicator
         mainContent.innerHTML = `
             <div class="text-center mt-5">
                 <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
-                    <span class="visually-hidden">Loading...</span>
+                    <span class="visually-hidden">Đang tải...</span>
                 </div>
                 <p class="mt-3">Đang tải...</p>
             </div>
@@ -204,28 +186,28 @@
             }
         })
             .then(response => {
-                if (!response.ok) throw new Error('Network response was not ok');
+                if (!response.ok) throw new Error('Không thể tải trang');
                 return response.text();
             })
             .then(html => {
                 processResponseHtml(html, url);
             })
             .catch(error => {
-                console.error('Error loading page:', error);
+                console.error('Lỗi tải trang:', error);
                 mainContent.innerHTML = `
                 <div class="alert alert-danger mt-5" role="alert">
-                    <h4 class="alert-heading">Lỗi tải trang!</h4>
+                    <h4 class="alert-heading">Lỗi!</h4>
                     <p>Không thể tải nội dung. Vui lòng thử lại.</p>
                     <hr>
                     <button class="btn btn-primary" onclick="location.reload()">
-                        <i class="fas fa-sync-alt"></i> Tải lại trang
+                        Tải lại trang
                     </button>
                 </div>
             `;
             });
     }
 
-    // Hàm xử lý HTML trả về và cập nhật giao diện
+    // Xử lý HTML trả về từ server
     function processResponseHtml(html, url) {
         const parser = new DOMParser();
         const doc = parser.parseFromString(html, 'text/html');
@@ -234,7 +216,6 @@
         if (newMainContent) {
             mainContent.innerHTML = newMainContent.innerHTML;
 
-            // Chỉ pushState nếu URL khác URL hiện tại (tránh duplicate khi submit form)
             if (window.location.href !== url) {
                 window.history.pushState({ url: url }, '', url);
             }
@@ -244,18 +225,16 @@
 
             reinitializeScripts();
         } else {
-            // Trường hợp server trả về partial view hoặc json lỗi
             mainContent.innerHTML = html;
             reinitializeScripts();
         }
     }
 
-    // Re-initialize scripts sau khi load nội dung mới
+    // Re-init scripts sau khi load nội dung mới (AJAX)
     function reinitializeScripts() {
-        // 1. Kích hoạt xử lý Form AJAX cho các form mới load
         setupAjaxFormSubmission();
 
-        // 2. Execute inline scripts
+        // Chạy inline scripts có trong nội dung mới
         const scripts = mainContent.querySelectorAll('script');
         scripts.forEach(script => {
             if (script.textContent.trim()) {
@@ -265,23 +244,27 @@
                     document.body.appendChild(newScript);
                     document.body.removeChild(newScript);
                 } catch (e) {
-                    console.error('Error executing inline script:', e);
+                    console.error('Lỗi:', e);
                 }
             }
         });
 
-        // 3. Re-initialize NhanSu module
-        if (typeof window.NhanSuSearchInit === 'function') {
-            const currentPath = window.location.pathname.toLowerCase();
-            if (currentPath.includes('/nhansu')) {
-                setTimeout(() => {
-                    window.NhanSuSearchInit();
-                    console.log('✅ NhanSu module re-initialized');
-                }, 100);
+        // Re-init BaoCaoThongKe nếu đang ở trang báo cáo thống kê
+        const currentPath = window.location.pathname.toLowerCase();
+        if (currentPath.includes('/baocaothongke')) {
+            if (typeof BaoCaoThongKe !== 'undefined' && BaoCaoThongKe.init) {
+                BaoCaoThongKe.init();
             }
         }
 
-        // 4. Re-initialize LoRung modules
+        // Re-init NhanSu search nếu đang ở trang quản lý nhân sự
+        if (typeof window.NhanSuSearchInit === 'function') {
+            const currentPath = window.location.pathname.toLowerCase();
+            if (currentPath.includes('/nhansu')) {
+                window.NhanSuSearchInit();
+            }
+        }
+
         if (typeof LoRung !== 'undefined') {
             const currentPath = window.location.pathname.toLowerCase();
             setTimeout(() => {
@@ -302,7 +285,6 @@
             }, 100);
         }
 
-        // 5. Re-initialize DiGioi modules
         if (typeof DiGioi !== 'undefined') {
             const currentPath = window.location.pathname.toLowerCase();
             setTimeout(() => {
@@ -313,13 +295,11 @@
             }, 100);
         }
 
-        // 6. Re-initialize Bootstrap components
         if (typeof bootstrap !== 'undefined') {
             [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]')).map(el => new bootstrap.Tooltip(el));
             [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]')).map(el => new bootstrap.Popover(el));
         }
 
-        // 7. Bind Confirm Delete events
         $('.btn-delete, .delete-button').off('click').on('click', function (e) {
             if (!confirm('Bạn có chắc chắn muốn xóa không?')) {
                 e.preventDefault();
@@ -327,21 +307,18 @@
                 return false;
             }
         });
-
-        console.log('✅ Scripts re-initialized successfully');
     }
 
-    // Xử lý nút back/forward của browser
+    // Xử lý back/forward button
     window.addEventListener('popstate', function (e) {
         if (e.state && e.state.url) {
             loadPage(e.state.url);
         } else {
-            // Fallback nếu không có state (lần đầu vào trang)
             loadPage(window.location.href);
         }
     });
 
-    // Click outside sidebar trên mobile
+    // Đóng sidebar khi click ngoài (mobile)
     document.addEventListener('click', function (e) {
         if (isMobile() && sidebar.classList.contains('active')) {
             if (!sidebar.contains(e.target) && !menuToggle.contains(e.target)) {
@@ -350,7 +327,7 @@
         }
     });
 
-    // Xử lý resize
+    // Xử lý resize window
     let resizeTimer;
     window.addEventListener('resize', function () {
         clearTimeout(resizeTimer);
@@ -363,19 +340,13 @@
         }, 250);
     });
 
-    // Save initial state
     window.history.replaceState({ url: window.location.href }, '', window.location.href);
-
-    // Initial Scripts setup for the first load
     reinitializeScripts();
 
-    // Highlight initial active menu
     const currentPath = window.location.pathname;
     document.querySelectorAll('.menu-item a, .submenu a').forEach(link => {
         if (link.getAttribute('href') && currentPath.includes(link.getAttribute('href'))) {
             handleSidebarActiveState(link);
         }
     });
-
-    console.log('✅ Main.js initialized with Global AJAX Handling');
 });

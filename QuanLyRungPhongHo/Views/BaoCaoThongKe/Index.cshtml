@@ -1,0 +1,597 @@
+﻿@model QuanLyRungPhongHo.Models.ViewModels.BaoCaoThongKeViewModel
+
+@{
+    ViewData["Title"] = "Báo cáo Thống kê";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/baocao-thongke.css" asp-append-version="true" />
+}
+
+<div class="digioi-page">
+    <!-- HEADER -->
+    <div class="digioi-header">
+        <h2>
+            <i class="bi bi-graph-up-arrow"></i> Báo Cáo Thống Kê
+        </h2>
+        <div style="display: flex; gap: 12px;">
+            <button type="button" class="digioi-btn digioi-btn-success" data-bs-toggle="modal" data-bs-target="#exportExcelModal" title="Xuất dữ liệu ra file Excel">
+                <i class="bi bi-file-earmark-spreadsheet"></i> Xuất Excel
+            </button>
+            <button type="button" class="digioi-btn digioi-btn-danger" data-bs-toggle="modal" data-bs-target="#exportPdfModal" title="Xuất báo cáo PDF">
+                <i class="bi bi-file-earmark-pdf"></i> Xuất PDF
+            </button>
+        </div>
+    </div>
+
+    @* THÔNG BÁO từ Controller *@
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="digioi-alert digioi-alert-success">
+            <i class="bi bi-check-circle"></i> @TempData["SuccessMessage"]
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="digioi-alert digioi-alert-danger">
+            <i class="bi bi-exclamation-triangle"></i> @TempData["ErrorMessage"]
+        </div>
+    }
+
+    <!-- BỘ LỌC -->
+    <div class="digioi-card digioi-filter-card">
+        <form asp-action="Index" method="get" class="digioi-filter-form">
+            <div class="digioi-form-group">
+                <label>
+                    <i class="bi bi-building"></i> Xã
+                </label>
+                <select name="maXaFilter" class="form-select">
+                    <option value="">-- Tất cả các xã --</option>
+                    @foreach (var xa in Model.DanhSachXa)
+                    {
+                        <option value="@xa.MaXa" selected="@(Model.MaXaFilter == xa.MaXa)">
+                            @xa.TenXa
+                        </option>
+                    }
+                </select>
+            </div>
+
+            <div class="digioi-form-group">
+                <label>
+                    <i class="bi bi-calendar"></i> Từ ngày
+                </label>
+                <input type="date"
+                       name="tuNgay"
+                       value="@Model.TuNgay?.ToString("yyyy-MM-dd")"
+                       class="form-control"
+                       title="Chọn ngày bắt đầu thống kê" />
+            </div>
+
+            <div class="digioi-form-group">
+                <label>
+                    <i class="bi bi-calendar-check"></i> Đến ngày
+                </label>
+                <input type="date"
+                       name="denNgay"
+                       value="@Model.DenNgay?.ToString("yyyy-MM-dd")"
+                       class="form-control"
+                       title="Chọn ngày kết thúc thống kê" />
+            </div>
+
+            <div class="digioi-form-group">
+                <label>&nbsp;</label>
+                <button type="submit" class="digioi-btn digioi-btn-success">
+                    <i class="bi bi-search"></i> Lọc
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- THỐNG KÊ TỔNG QUAN -->
+    <div class="stats-grid">
+        <div class="stat-card" title="Tổng số xã được quản lý">
+            <div class="stat-icon">
+                <i class="bi bi-building"></i>
+            </div>
+            <div class="stat-label">Tổng số Xã</div>
+            <div class="stat-value">@Model.TongSoXa</div>
+        </div>
+
+        <div class="stat-card" title="Tổng số thôn/bản trong các xã">
+            <div class="stat-icon">
+                <i class="bi bi-geo-alt"></i>
+            </div>
+            <div class="stat-label">Tổng số Thôn/Bản</div>
+            <div class="stat-value">@Model.TongSoThon</div>
+        </div>
+
+        <div class="stat-card" title="Tổng số lô rừng được quản lý">
+            <div class="stat-icon">
+                <i class="bi bi-tree"></i>
+            </div>
+            <div class="stat-label">Tổng số Lô rừng</div>
+            <div class="stat-value">@Model.TongSoLoRung</div>
+        </div>
+
+        <div class="stat-card" title="Tổng diện tích rừng (hecta)">
+            <div class="stat-icon">
+                <i class="bi bi-badge-3d"></i>
+            </div>
+            <div class="stat-label">Tổng diện tích</div>
+            <div class="stat-value">
+                @Model.TongDienTichRung.ToString("N2")
+                <span class="stat-unit">ha</span>
+            </div>
+        </div>
+
+        <div class="stat-card" title="Tổng số nhân sự tham gia quản lý">
+            <div class="stat-icon">
+                <i class="bi bi-people"></i>
+            </div>
+            <div class="stat-label">Tổng nhân sự</div>
+            <div class="stat-value">@Model.TongSoNhanSu</div>
+        </div>
+
+        <div class="stat-card" title="Tổng số sinh vật được ghi nhận">
+            <div class="stat-icon">
+                <i class="bi bi-bug"></i>
+            </div>
+            <div class="stat-label">Sinh vật ghi nhận</div>
+            <div class="stat-value">@Model.TongSoSinhVat</div>
+        </div>
+
+        <div class="stat-card" title="Tổng số sự kiện bảo vệ rừng">
+            <div class="stat-icon">
+                <i class="bi bi-exclamation-triangle"></i>
+            </div>
+            <div class="stat-label">Sự kiện bảo vệ</div>
+            <div class="stat-value">@Model.TongSoSuKien</div>
+        </div>
+    </div>
+
+    <!-- THỐNG KÊ THEO LOẠI RỪNG -->
+    @if (Model.ThongKeTheoLoaiRung.Any())
+    {
+        <div class="chart-container">
+            <div class="chart-title">
+                <i class="bi bi-bar-chart-fill"></i>
+                Thống kê theo Loại Rừng
+            </div>
+
+            @foreach (var item in Model.ThongKeTheoLoaiRung)
+            {
+                <div class="mb-3">
+                    <div class="progress-label">
+                        <span class="progress-label-name">
+                            <i class="bi bi-tree-fill text-success"></i> @item.LoaiRung
+                        </span>
+                        <span class="progress-label-value">
+                            @item.SoLuongLo lô | @item.TongDienTich.ToString("N2") ha | @item.TyLe%
+                        </span>
+                    </div>
+                    <div class="progress-bar-custom">
+                        <div class="progress-fill" style="width: @item.TyLe%">
+                            @item.TyLe%
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+    <!-- THỐNG KÊ THEO TRẠNG THÁI -->
+    @if (Model.ThongKeTheoTrangThai.Any())
+    {
+        <div class="chart-container">
+            <div class="chart-title">
+                <i class="bi bi-pie-chart-fill"></i>
+                Thống kê theo Trạng thái Rừng
+            </div>
+
+            @foreach (var item in Model.ThongKeTheoTrangThai)
+            {
+                var badgeClass = item.TrangThai switch
+                {
+                    "Rừng giàu" => "badge-success-custom",
+                    "Rừng trung bình" => "badge-info-custom",
+                    "Rừng nghèo" => "badge-warning-custom",
+                    "Đất trống" => "badge-danger-custom",
+                    _ => "badge-secondary"
+                };
+
+                <div class="mb-3">
+                    <div class="progress-label">
+                        <span class="progress-label-name">
+                            <span class="badge-custom @badgeClass">@item.TrangThai</span>
+                        </span>
+                        <span class="progress-label-value">
+                            @item.SoLuongLo lô | @item.TongDienTich.ToString("N2") ha | @item.TyLe%
+                        </span>
+                    </div>
+                    <div class="progress-bar-custom">
+                        <div class="progress-fill" style="width: @item.TyLe%">
+                            @item.TyLe%
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+    <!-- THỐNG KÊ THEO XÃ -->
+    @if (Model.ThongKeTheoXa.Any())
+    {
+        <div class="chart-container">
+            <div class="chart-title">
+                <i class="bi bi-table"></i>
+                Thống kê theo Xã
+            </div>
+
+            <div class="digioi-table-wrap">
+                <table class="digioi-table table-compact">
+                    <thead>
+                        <tr>
+                            <th>STT</th>
+                            <th>Tên Xã</th>
+                            <th>Số Thôn</th>
+                            <th>Số Lô Rừng</th>
+                            <th>Tổng Diện Tích (ha)</th>
+                            <th>Nhân Sự</th>
+                            <th>Sự Kiện</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            int stt = 1;
+                        }
+                        @foreach (var item in Model.ThongKeTheoXa)
+                        {
+                            <tr title="Nhấn để chọn dòng @item.TenXa">
+                                <td>@stt</td>
+                                <td><strong>@item.TenXa</strong></td>
+                                <td>@item.SoThon</td>
+                                <td>@item.SoLoRung</td>
+                                <td>@item.TongDienTich.ToString("N2")</td>
+                                <td>@item.SoNhanSu</td>
+                                <td>@item.SoSuKien</td>
+                            </tr>
+                            stt++;
+                        }
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="2">TỔNG CỘNG</td>
+                            <td>@Model.ThongKeTheoXa.Sum(x => x.SoThon)</td>
+                            <td>@Model.ThongKeTheoXa.Sum(x => x.SoLoRung)</td>
+                            <td>@Model.ThongKeTheoXa.Sum(x => x.TongDienTich).ToString("N2")</td>
+                            <td>@Model.ThongKeTheoXa.Sum(x => x.SoNhanSu)</td>
+                            <td>@Model.ThongKeTheoXa.Sum(x => x.SoSuKien)</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    }
+
+    <!-- THỐNG KÊ SỰ KIỆN BẢO VỆ -->
+    @if (Model.ThongKeSuKienBaoVe.Any())
+    {
+        <div class="chart-container">
+            <div class="chart-title">
+                <i class="bi bi-shield-check"></i>
+                Thống kê Sự kiện Bảo vệ
+                @if (Model.TuNgay.HasValue || Model.DenNgay.HasValue)
+                {
+                    <span style="font-size: 14px; color: #6c757d; font-weight: normal;">
+                        (@(Model.TuNgay?.ToString("dd/MM/yyyy") ?? "...") - @(Model.DenNgay?.ToString("dd/MM/yyyy") ?? "..."))
+                    </span>
+                }
+            </div>
+
+            <div class="digioi-table-wrap">
+                <table class="digioi-table table-compact">
+                    <thead>
+                        <tr>
+                            <th>Loại Sự Việc</th>
+                            <th>Số Lượng</th>
+                            <th>Tỷ Lệ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.ThongKeSuKienBaoVe)
+                        {
+                            <tr>
+                                <td><strong>@item.LoaiSuViec</strong></td>
+                                <td>@item.SoLuong</td>
+                                <td>
+                                    <span class="badge-custom badge-info-custom">@item.TyLe%</span>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+
+    <!-- THỐNG KÊ SINH VẬT -->
+    <div class="chart-container">
+        <div class="chart-title">
+            <i class="bi bi-bug-fill"></i>
+            Thống kê Sinh vật
+        </div>
+
+        <div class="stats-grid sinh-vat" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-bottom: 20px;">
+            <div class="stat-card" style="border-left-color: #0dcaf0;">
+                <div class="stat-label">Tổng Động vật</div>
+                <div class="stat-value" style="color: #0dcaf0;">@Model.TongDongVat</div>
+            </div>
+            <div class="stat-card" style="border-left-color: #198754;">
+                <div class="stat-label">Tổng Thực vật</div>
+                <div class="stat-value" style="color: #198754;">@Model.TongThucVat</div>
+            </div>
+            <div class="stat-card" style="border-left-color: #ffc107;">
+                <div class="stat-label">Loài Quý hiếm</div>
+                <div class="stat-value" style="color: #ffc107;">@Model.SoLoaiQuyHiem</div>
+            </div>
+            <div class="stat-card" style="border-left-color: #dc3545;">
+                <div class="stat-label">Loài Nguy cấp</div>
+                <div class="stat-value" style="color: #dc3545;">@Model.SoLoaiNguyCap</div>
+            </div>
+        </div>
+
+        @if (Model.Top10SinhVat.Any())
+        {
+            <h6 style="font-weight: 600; color: var(--green); margin-bottom: 16px;">
+                <i class="bi bi-trophy"></i> Top 10 Sinh vật được ghi nhận nhiều nhất
+            </h6>
+
+            <div class="digioi-table-wrap">
+                <table class="digioi-table table-compact">
+                    <thead>
+                        <tr>
+                            <th>Hạng</th>
+                            <th>Tên Loài</th>
+                            <th>Loại</th>
+                            <th>Mức Độ Quý Hiếm</th>
+                            <th>Số Lần Ghi Nhận</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            int rank = 1;
+                        }
+                        @foreach (var item in Model.Top10SinhVat)
+                        {
+                            var badgeClass = item.MucDoQuyHiem switch
+                            {
+                                "Cực kỳ nguy cấp" => "badge-danger-custom",
+                                "Nguy cấp" => "badge-warning-custom",
+                                "Sắp nguy cấp" => "badge-info-custom",
+                                _ => "badge-secondary"
+                            };
+
+                            <tr title="Loài @item.TenLoai - Ghi nhận @item.SoLuongGhiNhan lần">
+                                <td>
+                                    @if (rank <= 3)
+                                    {
+                                        <i class="bi bi-trophy-fill text-warning"></i>
+                                    }
+                                    <strong>@rank</strong>
+                                </td>
+                                <td><strong>@item.TenLoai</strong></td>
+                                <td>@item.LoaiSV</td>
+                                <td>
+                                    <span class="badge-custom @badgeClass">@item.MucDoQuyHiem</span>
+                                </td>
+                                <td><strong>@item.SoLuongGhiNhan</strong></td>
+                            </tr>
+                            rank++;
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+
+    <!-- FOOTER -->
+    <div class="report-footer">
+        <p>
+            <i class="bi bi-info-circle"></i>
+            Báo cáo được tạo tự động bởi Hệ thống Quản lý Rừng Phòng Hộ
+        </p>
+        <p>
+            Thời gian: @DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss")
+        </p>
+    </div>
+</div>
+
+<!-- MODAL XUẤT EXCEL -->
+<div class="modal fade" id="exportExcelModal" tabindex="-1" aria-labelledby="exportExcelModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exportExcelModalLabel">
+                    <i class="bi bi-file-earmark-spreadsheet"></i> Xuất Báo Cáo Excel
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="exportExcelForm">
+                    <!-- Chọn phạm vi xuất -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">
+                            <i class="bi bi-geo-alt"></i> Phạm vi báo cáo
+                        </label>
+                        <select class="form-select" id="exportMaXaFilter" name="maXaFilter">
+                            <option value="">Toàn tỉnh</option>
+                            @foreach (var xa in Model.DanhSachXa)
+                            {
+                                <option value="@xa.MaXa" selected="@(Model.MaXaFilter == xa.MaXa)">@xa.TenXa</option>
+                            }
+                        </select>
+                    </div>
+
+                    <!-- Chọn khoảng thời gian -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">
+                                <i class="bi bi-calendar"></i> Từ ngày
+                            </label>
+                            <input type="date" class="form-control" id="exportTuNgay" name="tuNgay" value="@Model.TuNgay?.ToString("yyyy-MM-dd")">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">
+                                <i class="bi bi-calendar-check"></i> Đến ngày
+                            </label>
+                            <input type="date" class="form-control" id="exportDenNgay" name="denNgay" value="@Model.DenNgay?.ToString("yyyy-MM-dd")">
+                        </div>
+                    </div>
+
+                    <!-- Chọn nội dung xuất -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">
+                            <i class="bi bi-list-check"></i> Nội dung xuất
+                        </label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="exportTongQuan" checked>
+                            <label class="form-check-label" for="exportTongQuan">
+                                Thống kê tổng quan
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="exportLoaiRung" checked>
+                            <label class="form-check-label" for="exportLoaiRung">
+                                Thống kê theo loại rừng
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="exportTrangThai" checked>
+                            <label class="form-check-label" for="exportTrangThai">
+                                Thống kê theo trạng thái rừng
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="exportTheoXa" checked>
+                            <label class="form-check-label" for="exportTheoXa">
+                                Thống kê theo đơn vị hành chính
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="exportSuKien" checked>
+                            <label class="form-check-label" for="exportSuKien">
+                                Thống kê sự kiện bảo vệ rừng
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Tên file tự động -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">
+                            <i class="bi bi-file-text"></i> Tên file (tự động)
+                        </label>
+                        <input type="text" class="form-control" id="exportFileName" readonly 
+                               placeholder="BaoCao_ToanTinh_20250203_084530.xlsx">
+                        <small class="text-muted">Tên file sẽ được tự động tạo theo quy tắc: BaoCao_{TenXa}_{TuNgay}_{DenNgay}_{ThoiGian}.xlsx</small>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle"></i> Hủy
+                </button>
+                <button type="button" class="btn btn-success" id="btnConfirmExportExcel">
+                    <i class="bi bi-download"></i> Xuất Excel
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL XUẤT PDF -->
+<div class="modal fade" id="exportPdfModal" tabindex="-1" aria-labelledby="exportPdfModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exportPdfModalLabel">
+                    <i class="bi bi-file-earmark-pdf"></i> Xuất Báo Cáo PDF
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="exportPdfForm">
+                    <!-- Chọn phạm vi xuất -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">
+                            <i class="bi bi-geo-alt"></i> Phạm vi báo cáo
+                        </label>
+                        <select class="form-select" id="pdfMaXaFilter" name="maXaFilter">
+                            <option value="">Toàn tỉnh</option>
+                            @foreach (var xa in Model.DanhSachXa)
+                            {
+                                <option value="@xa.MaXa" selected="@(Model.MaXaFilter == xa.MaXa)">@xa.TenXa</option>
+                            }
+                        </select>
+                    </div>
+
+                    <!-- Chọn khoảng thời gian -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">
+                                <i class="bi bi-calendar"></i> Từ ngày
+                            </label>
+                            <input type="date" class="form-control" id="pdfTuNgay" name="tuNgay" value="@Model.TuNgay?.ToString("yyyy-MM-dd")">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">
+                                <i class="bi bi-calendar-check"></i> Đến ngày
+                            </label>
+                            <input type="date" class="form-control" id="pdfDenNgay" name="denNgay" value="@Model.DenNgay?.ToString("yyyy-MM-dd")">
+                        </div>
+                    </div>
+
+                    <!-- Tên file tự động -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">
+                            <i class="bi bi-file-text"></i> Tên file (tự động)
+                        </label>
+                        <input type="text" class="form-control" id="pdfFileName" readonly 
+                               placeholder="BaoCao_ToanTinh_20250203_084530.pdf">
+                        <small class="text-muted">Browser sẽ tự động mở dialog Print để bạn chọn nơi lưu file PDF</small>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle"></i> Hủy
+                </button>
+                <button type="button" class="btn btn-danger" id="btnConfirmExportPdf">
+                    <i class="bi bi-file-pdf"></i> Xuất PDF
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/baocao-thongke.js" asp-append-version="true"></script>                    
+    <script>
+        // Hiển thị thông báo nếu có lỗi từ TempData
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <text>
+            setTimeout(function() {
+                BaoCaoThongKe.showToast('@TempData["ErrorMessage"]', 'error');
+            }, 500);
+            </text>
+        }
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <text>
+            setTimeout(function() {
+                BaoCaoThongKe.showToast('@TempData["SuccessMessage"]', 'success');
+            }, 500);
+            </text>
+        }
+    </script>
+}

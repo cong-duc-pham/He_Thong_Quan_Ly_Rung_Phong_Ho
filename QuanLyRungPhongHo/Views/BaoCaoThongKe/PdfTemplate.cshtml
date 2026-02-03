@@ -1,0 +1,321 @@
+﻿@using QuanLyRungPhongHo.Models.ViewModels
+@model BaoCaoThongKeViewModel
+@{
+    Layout = null;
+    
+    // Tạo tên file PDF tự động
+    var tenXaSlug = string.IsNullOrEmpty(Model.MaXaFilter) 
+        ? "ToanTinh" 
+        : Model.DanhSachXa.FirstOrDefault(x => x.MaXa == Model.MaXaFilter)?.TenXa.Replace(" ", "") ?? "KhongXacDinh";
+    
+    var tenXa = string.IsNullOrEmpty(Model.MaXaFilter) 
+        ? "Toàn tỉnh" 
+        : Model.DanhSachXa.FirstOrDefault(x => x.MaXa == Model.MaXaFilter)?.TenXa ?? "Không xác định";
+    
+    var tuNgayStr = Model.TuNgay?.ToString("ddMMyyyy") ?? DateTime.Now.AddDays(-30).ToString("ddMMyyyy");
+    var denNgayStr = Model.DenNgay?.ToString("ddMMyyyy") ?? DateTime.Now.ToString("ddMMyyyy");
+    var ngayXuatStr = DateTime.Now.ToString("ddMMyyyy_HHmmss");
+    
+    // Tên file: BaoCao_ToanTinh_01012025_03022025_03022025_084351
+    var pdfFileName = $"BaoCao_{tenXaSlug}_{tuNgayStr}_{denNgayStr}_{ngayXuatStr}";
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@pdfFileName</title>
+    <style>
+        body { 
+            font-family: 'Times New Roman', serif; 
+            font-size: 12px; 
+            margin: 20px;
+            line-height: 1.4;
+        }
+        .header { 
+            text-align: center; 
+            margin-bottom: 30px; 
+            border-bottom: 2px solid #000;
+            padding-bottom: 15px;
+        }
+        .header h1 { 
+            font-size: 18px; 
+            margin: 5px 0; 
+            text-transform: uppercase;
+        }
+        .section-title { 
+            font-weight: bold; 
+            font-size: 14px; 
+            margin: 20px 0 10px 0; 
+            text-transform: uppercase;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 5px;
+        }
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin: 15px 0;
+        }
+        th, td { 
+            border: 1px solid #000; 
+            padding: 8px; 
+            text-align: center;
+        }
+        th { 
+            background-color: #f0f0f0; 
+            font-weight: bold;
+        }
+        .text-left { text-align: left; }
+        .text-right { text-align: right; }
+        .stats-summary { 
+            display: grid; 
+            grid-template-columns: repeat(4, 1fr); 
+            gap: 15px; 
+            margin: 20px 0;
+        }
+        .stat-box { 
+            border: 1px solid #ccc; 
+            padding: 15px; 
+            text-align: center;
+        }
+        .stat-number { 
+            font-size: 24px; 
+            font-weight: bold; 
+            color: #2c5530;
+        }
+        .footer { 
+            margin-top: 40px; 
+            text-align: center; 
+            font-size: 10px;
+            border-top: 1px solid #ccc;
+            padding-top: 15px;
+        }
+        @@media print {
+            body { margin: 10px; font-size: 11px; }
+            .header { page-break-after: avoid; }
+            table { page-break-inside: avoid; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>BÁO CÁO THỐNG KÊ QUẢN LÝ RỪNG PHÒNG HỘ</h1>
+        <p><strong>Phạm vi:</strong> @tenXa</p>
+        <p><strong>Thời gian:</strong> @(Model.TuNgay?.ToString("dd/MM/yyyy") ?? "N/A") - @(Model.DenNgay?.ToString("dd/MM/yyyy") ?? "N/A")</p>
+        <p><strong>Ngày lập:</strong> @DateTime.Now.ToString("dd/MM/yyyy HH:mm")</p>
+    </div>
+
+    <div class="section-title">I. THỐNG KÊ TỔNG QUAN</div>
+    <div class="stats-summary">
+        <div class="stat-box">
+            <div class="stat-number">@Model.TongSoXa</div>
+            <div>Tổng số Xã</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-number">@Model.TongSoThon</div>
+            <div>Số Thôn/Bản</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-number">@Model.TongSoLoRung</div>
+            <div>Số Lô rừng</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-number">@Model.TongDienTichRung.ToString("N1")</div>
+            <div>Diện tích (ha)</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-number">@Model.TongSoNhanSu</div>
+            <div>Số Nhân sự</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-number">@Model.TongSoSinhVat</div>
+            <div>Số Sinh vật</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-number">@Model.TongSoSuKien</div>
+            <div>Sự kiện bảo vệ</div>
+        </div>
+    </div>
+
+    @if (Model.ThongKeTheoLoaiRung.Any())
+    {
+        <div class="section-title">II. THỐNG KÊ THEO LOẠI RỪNG</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>STT</th>
+                    <th>Loại rừng</th>
+                    <th>Số lô</th>
+                    <th>Diện tích (ha)</th>
+                    <th>Tỷ lệ (%)</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (int i = 0; i < Model.ThongKeTheoLoaiRung.Count; i++)
+                {
+                    var item = Model.ThongKeTheoLoaiRung[i];
+                    <tr>
+                        <td>@(i + 1)</td>
+                        <td class="text-left">@item.LoaiRung</td>
+                        <td>@item.SoLuongLo.ToString("N0")</td>
+                        <td class="text-right">@item.TongDienTich.ToString("N2")</td>
+                        <td>@item.TyLe.ToString("N1")%</td>
+                    </tr>
+                }
+                <tr style="font-weight: bold; background-color: #f5f5f5;">
+                    <td colspan="2">TỔNG CỘNG</td>  
+                    <td>@Model.ThongKeTheoLoaiRung.Sum(x => x.SoLuongLo).ToString("N0")</td>
+                    <td class="text-right">@Model.ThongKeTheoLoaiRung.Sum(x => x.TongDienTich).ToString("N2")</td>
+                    <td>100.0%</td>
+                </tr>
+            </tbody>
+        </table>
+    }
+
+    @if (Model.ThongKeTheoTrangThai.Any())
+    {
+        <div class="section-title">III. THỐNG KÊ THEO TRẠNG THÁI RỪNG</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>STT</th>
+                    <th>Trạng thái</th>
+                    <th>Số lô</th>
+                    <th>Diện tích (ha)</th>
+                    <th>Tỷ lệ (%)</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (int i = 0; i < Model.ThongKeTheoTrangThai.Count; i++)
+                {
+                    var item = Model.ThongKeTheoTrangThai[i];
+                    <tr>
+                        <td>@(i + 1)</td>
+                        <td class="text-left">@item.TrangThai</td>
+                        <td>@item.SoLuongLo.ToString("N0")</td>
+                        <td class="text-right">@item.TongDienTich.ToString("N2")</td>
+                        <td>@item.TyLe.ToString("N1")%</td>
+                    </tr>
+                }
+                <tr style="font-weight: bold; background-color: #f5f5f5;">
+                    <td colspan="2">TỔNG CỘNG</td>
+                    <td>@Model.ThongKeTheoTrangThai.Sum(x => x.SoLuongLo).ToString("N0")</td>
+                    <td class="text-right">@Model.ThongKeTheoTrangThai.Sum(x => x.TongDienTich).ToString("N2")</td>
+                    <td>100.0%</td>
+                </tr>
+            </tbody>
+        </table>
+    }
+
+    @if (Model.ThongKeTheoXa.Any())
+    {
+        <div class="section-title">IV. THỐNG KÊ THEO ĐƠN VỊ HÀNH CHÍNH</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>STT</th>
+                    <th>Tên xã</th>
+                    <th>Số thôn</th>
+                    <th>Số lô rừng</th>
+                    <th>Diện tích (ha)</th>
+                    <th>Nhân sự</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (int i = 0; i < Model.ThongKeTheoXa.Count; i++)
+                {
+                    var xa = Model.ThongKeTheoXa[i];
+                    <tr>
+                        <td>@(i + 1)</td>
+                        <td class="text-left">@xa.TenXa</td>
+                        <td>@xa.SoThon</td>
+                        <td>@xa.SoLoRung</td>
+                        <td class="text-right">@xa.TongDienTich.ToString("N2")</td>
+                        <td>@xa.SoNhanSu</td>
+                    </tr>
+                }
+                <tr style="font-weight: bold; background-color: #f5f5f5;">
+                    <td colspan="2">TỔNG CỘNG</td>
+                    <td>@Model.ThongKeTheoXa.Sum(x => x.SoThon)</td>
+                    <td>@Model.ThongKeTheoXa.Sum(x => x.SoLoRung)</td>
+                    <td class="text-right">@Model.ThongKeTheoXa.Sum(x => x.TongDienTich).ToString("N2")</td>
+                    <td>@Model.ThongKeTheoXa.Sum(x => x.SoNhanSu)</td>
+                </tr>
+            </tbody>
+        </table>
+    }
+
+    @if (Model.ThongKeSuKienBaoVe.Any())
+    {
+        <div class="section-title">V. THỐNG KÊ SỰ KIỆN BẢO VỆ RỪNG</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>STT</th>
+                    <th>Loại sự việc</th>
+                    <th>Số vụ</th>
+                    <th>Tỷ lệ (%)</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (int i = 0; i < Model.ThongKeSuKienBaoVe.Count; i++)
+                {
+                    var item = Model.ThongKeSuKienBaoVe[i];
+                    <tr>
+                        <td>@(i + 1)</td>
+                        <td class="text-left">@item.LoaiSuViec</td>
+                        <td>@item.SoLuong</td>
+                        <td>@item.TyLe.ToString("N1")%</td>
+                    </tr>
+                }
+                <tr style="font-weight: bold; background-color: #f5f5f5;">
+                    <td colspan="2">TỔNG CỘNG</td>
+                    <td>@Model.ThongKeSuKienBaoVe.Sum(x => x.SoLuong)</td>
+                    <td>100.0%</td>
+                </tr>
+            </tbody>
+        </table>
+    }
+
+    <div class="footer">
+        <p><strong>CHÚ THÍCH:</strong></p>
+        <p>- Báo cáo được tạo tự động từ Hệ thống Quản lý Rừng Phòng Hộ</p>
+        <p>- Dữ liệu được cập nhật đến: @DateTime.Now.ToString("dd/MM/yyyy HH:mm")</p>
+        <p>- Đơn vị: Chi cục Kiểm lâm tỉnh</p>
+        <br>
+        <div style="display: flex; justify-content: space-between; margin-top: 30px;">
+            <div style="text-align: center; width: 30%;">
+                <strong>NGƯỜI LẬP</strong><br>
+                <em>(Ký, họ tên)</em>
+                <br><br><br><br>
+                <strong>Hệ thống tự động</strong>
+            </div>
+            <div style="text-align: center; width: 30%;">
+                <strong>TRƯỞNG PHÒNG</strong><br>
+                <em>(Ký, họ tên)</em>
+                <br><br><br><br>
+                <strong>........................</strong>
+            </div>
+            <div style="text-align: center; width: 30%;">
+                <strong>CHI CỤC TRƯỞNG</strong><br>
+                <em>(Ký, họ tên, đóng dấu)</em>
+                <br><br><br><br>
+                <strong>........................</strong>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tự động đặt tên file PDF khi Save as PDF
+        document.title = '@pdfFileName';
+        
+        // Tự động mở dialog Print sau 500ms
+        window.onload = function() { 
+            setTimeout(function() { 
+                window.print(); 
+            }, 500); 
+        }
+    </script>
+</body>
+</html>

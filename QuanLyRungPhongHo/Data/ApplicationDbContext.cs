@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using QLRungPhongHo.Models;
 using QuanLyRungPhongHo.Models;
 
 namespace QuanLyRungPhongHo.Data
@@ -19,6 +20,12 @@ namespace QuanLyRungPhongHo.Data
         public DbSet<NhatKyBaoVe> NhatKyBaoVes => Set<NhatKyBaoVe>();
         public DbSet<Permission> Permissions => Set<Permission>();
         public DbSet<RolePermission> RolePermissions => Set<RolePermission>();
+
+        public DbSet<CaLamViec> CaLamViecs { get; set; }
+        public DbSet<LichLamViec> LichLamViecs { get; set; }
+        public DbSet<DonXinNghi> DonXinNghis { get; set; }
+        public DbSet<NgayNghiLe> NgayNghiLes { get; set; }
+        public DbSet<ChamCong> ChamCongs { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -93,6 +100,60 @@ namespace QuanLyRungPhongHo.Data
                 .WithMany(l => l.SinhVats)
                 .HasForeignKey(sv => sv.MaLo)
                 .OnDelete(DeleteBehavior.SetNull);
+
+
+            // Cấu hình quan hệ cho LichLamViec (2 FK đến cùng bảng NhanSus)
+            modelBuilder.Entity<LichLamViec>()
+                .HasOne(l => l.NhanVien)
+                .WithMany()
+                .HasForeignKey(l => l.MaNV)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<LichLamViec>()
+                .HasOne(l => l.NguoiTaoLich)
+                .WithMany()
+                .HasForeignKey(l => l.NguoiTao)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            // Cấu hình quan hệ cho DonXinNghi (2 FK đến cùng bảng NhanSus)
+            modelBuilder.Entity<DonXinNghi>()
+                .HasOne(d => d.NhanVien)
+                .WithMany()
+                .HasForeignKey(d => d.MaNV)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<DonXinNghi>()
+                .HasOne(d => d.NguoiDuyetDon)
+                .WithMany()
+                .HasForeignKey(d => d.NguoiDuyet)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            // Cấu hình unique constraint
+            modelBuilder.Entity<LichLamViec>()
+                .HasIndex(l => new { l.MaNV, l.NgayLamViec })
+                .IsUnique();
+
+            // Cấu hình quan hệ 1:1 giữa LichLamViec và ChamCong
+            modelBuilder.Entity<ChamCong>()
+                .HasIndex(c => c.MaLich)
+                .IsUnique();
+
+            // Seed data cho CaLamViecs
+            modelBuilder.Entity<CaLamViec>().HasData(
+                new CaLamViec { MaCa = 1, TenCa = "Ca Sáng", GioBatDau = new TimeSpan(7, 0, 0), GioKetThuc = new TimeSpan(11, 0, 0), MoTa = "Ca làm việc buổi sáng", TrangThai = true },
+                new CaLamViec { MaCa = 2, TenCa = "Ca Chiều", GioBatDau = new TimeSpan(13, 0, 0), GioKetThuc = new TimeSpan(17, 0, 0), MoTa = "Ca làm việc buổi chiều", TrangThai = true },
+                new CaLamViec { MaCa = 3, TenCa = "Ca Tối", GioBatDau = new TimeSpan(18, 0, 0), GioKetThuc = new TimeSpan(22, 0, 0), MoTa = "Ca làm việc buổi tối", TrangThai = true },
+                new CaLamViec { MaCa = 4, TenCa = "Ca Hành Chính", GioBatDau = new TimeSpan(8, 0, 0), GioKetThuc = new TimeSpan(17, 0, 0), MoTa = "Ca hành chính cả ngày", TrangThai = true }
+            );
+
+            // Seed data cho NgayNghiLes
+            modelBuilder.Entity<NgayNghiLe>().HasData(
+                new NgayNghiLe { MaNgayNghi = 1, TenNgayNghi = "Tết Nguyên Đán 2026", NgayBatDau = new DateTime(2026, 1, 28), NgayKetThuc = new DateTime(2026, 2, 3), LoaiNgayNghi = "Tết" },
+                new NgayNghiLe { MaNgayNghi = 2, TenNgayNghi = "Giỗ Tổ Hùng Vương", NgayBatDau = new DateTime(2026, 4, 10), NgayKetThuc = new DateTime(2026, 4, 10), LoaiNgayNghi = "Lễ" },
+                new NgayNghiLe { MaNgayNghi = 3, TenNgayNghi = "Ngày Giải phóng miền Nam", NgayBatDau = new DateTime(2026, 4, 30), NgayKetThuc = new DateTime(2026, 4, 30), LoaiNgayNghi = "Lễ" },
+                new NgayNghiLe { MaNgayNghi = 4, TenNgayNghi = "Ngày Quốc tế Lao động", NgayBatDau = new DateTime(2026, 5, 1), NgayKetThuc = new DateTime(2026, 5, 1), LoaiNgayNghi = "Lễ" },
+                new NgayNghiLe { MaNgayNghi = 5, TenNgayNghi = "Quốc Khánh", NgayBatDau = new DateTime(2026, 9, 2), NgayKetThuc = new DateTime(2026, 9, 2), LoaiNgayNghi = "Lễ" }
+            );
 
         }
     }

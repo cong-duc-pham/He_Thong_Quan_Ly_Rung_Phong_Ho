@@ -120,6 +120,9 @@
   <data name="AppName" xml:space="preserve">
     <value>Quản lý Rừng Phòng Hộ</value>
   </data>
+  <data name="Attendance" xml:space="preserve">
+    <value>Chấm công</value>
+  </data>
   <data name="BoundaryManagement" xml:space="preserve">
     <value>Quản lý địa giới</value>
   </data>
@@ -135,11 +138,17 @@
   <data name="Hello" xml:space="preserve">
     <value>Xin chào</value>
   </data>
+  <data name="Holidays" xml:space="preserve">
+    <value>Ngày nghỉ lễ</value>
+  </data>
   <data name="Home" xml:space="preserve">
     <value>Trang chủ</value>
   </data>
   <data name="HumanResource" xml:space="preserve">
     <value>Quản lý nhân sự</value>
+  </data>
+  <data name="LeaveRequest" xml:space="preserve">
+    <value>Đơn xin nghỉ</value>
   </data>
   <data name="Login" xml:space="preserve">
     <value>Đăng nhập</value>
@@ -150,8 +159,14 @@
   <data name="ProtectionLog" xml:space="preserve">
     <value>Nhật ký bảo vệ</value>
   </data>
+  <data name="ScheduleManagement" xml:space="preserve">
+    <value>Phân lịch làm việc</value>
+  </data>
   <data name="Settings" xml:space="preserve">
     <value>Cài đặt</value>
+  </data>
+  <data name="ShiftManagement" xml:space="preserve">
+    <value>Quản lý ca</value>
   </data>
   <data name="Staff" xml:space="preserve">
     <value>Nhân viên</value>
@@ -167,5 +182,8 @@
   </data>
   <data name="VillageCategory" xml:space="preserve">
     <value>Danh mục Thôn/Bản</value>
+  </data>
+  <data name="WorkSchedule" xml:space="preserve">
+    <value>Quản lý ca làm việc</value>
   </data>
 </root>

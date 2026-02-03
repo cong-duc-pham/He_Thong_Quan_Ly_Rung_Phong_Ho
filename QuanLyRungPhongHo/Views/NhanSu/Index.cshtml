@@ -26,35 +26,49 @@
 
     <div class="card mb-3 shadow-sm">
         <div class="card-body">
-            @using (Html.BeginForm("Index", "NhanSu", FormMethod.Get, new { @class = "row g-3 align-items-center" }))
-            {
+            <!-- Form không submit, chỉ nhập dữ liệu -->
+            <div id="nhansuSearchForm" class="row g-3 align-items-center">
                 <div class="col-md-4">
-                    <input type="text" name="searchString" class="form-control" 
-                           placeholder="Tìm theo tên hoặc SĐT..." value="@ViewBag.CurrentSearch">
+                    <input type="text" id="nhansuSearchInput" name="searchString" class="form-control" 
+                           placeholder="Tìm theo tên hoặc SĐT..." value="">
                 </div>
                 <div class="col-md-3">
-                    @Html.DropDownList("maXaFilter", (SelectList)ViewBag.DsXa, "--- Tất cả địa bàn ---", 
-                        new { @class = "form-select", @onchange = "this.form.submit();" })
+                    <select id="nhansuXaFilter" name="maXaFilter" class="form-select">
+                        <option value="">--- Tất cả địa bàn ---</option>
+                        @foreach (var xa in (SelectList)ViewBag.DsXa)
+                        {
+                            <option value="@xa.Value">@xa.Text</option>
+                        }
+                    </select>
                 </div>
                 <div class="col-md-3">
-                    <select name="roleFilter" class="form-select" onchange="this.form.submit();">
+                    <select id="nhansuRoleFilter" name="roleFilter" class="form-select">
                         <option value="">-- Tất cả chức vụ --</option>
-                        <option value="Trạm trưởng" selected="@(ViewBag.CurrentRole != null && ViewBag.CurrentRole.ToString() == "Trạm trưởng")">Trạm trưởng</option>
-                        <option value="Kiểm lâm viên" selected="@(ViewBag.CurrentRole != null && ViewBag.CurrentRole.ToString() == "Kiểm lâm viên")">Kiểm lâm viên</option>
-                        <option value="Bảo vệ rừng" selected="@(ViewBag.CurrentRole != null && ViewBag.CurrentRole.ToString() == "Bảo vệ rừng")">Bảo vệ rừng</option>
+                        <option value="Trạm trưởng">Trạm trưởng</option>
+                        <option value="Kiểm lâm viên">Kiểm lâm viên</option>
+                        <option value="Bảo vệ rừng">Bảo vệ rừng</option>
                     </select>
                 </div>
                 <div class="col-md-2">
                     <button type="button" class="btn btn-success w-100" onclick="openModal()" style="height: 38px;">
-					Thêm mới
-				</button>
+                        Thêm mới
+                    </button>
                 </div>
-            }
+            </div>
         </div>
     </div>
 
+    <!-- Thống kê kết quả tìm kiếm -->
+    <div class="mb-3">
+        <span class="badge bg-info text-dark" id="nhansuTotal">
+            Tổng số: @Model.Count() nhân sự
+        </span>
+        <span class="badge bg-primary" id="nhansuSearchStatus" style="display: none;"></span>
+    </div>
+
+    <!-- Bảng Desktop -->
     <div class="table-responsive d-none d-md-block bg-white shadow-sm rounded">
-        <table class="table table-hover align-middle mb-0">
+        <table class="table table-hover align-middle mb-0" id="nhansuTable">
             <thead class="bg-success text-white">
                 <tr>
                     <th>Họ tên</th>
@@ -64,7 +78,7 @@
                     <th class="text-center">Tác vụ</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody id="nhansuTableBody">
                 @if (Model.Any())
                 {   
                     foreach (var item in Model)
@@ -106,10 +120,11 @@
         </table>
     </div>
 
-    <div class="d-md-none">
+    <!-- Mobile View -->
+    <div class="d-md-none" id="nhansuMobileView">
         @foreach (var item in Model)
         {
-            <div class="card mb-3 shadow-sm border-start border-4 border-success">
+            <div class="card mb-3 shadow-sm border-start border-4 border-success" data-nhansu-id="@item.MaNV">
                 <div class="card-body">
                     <div class="d-flex justify-content-between mb-2">
                         <h6 class="fw-bold text-success mb-0">@item.HoTen</h6>

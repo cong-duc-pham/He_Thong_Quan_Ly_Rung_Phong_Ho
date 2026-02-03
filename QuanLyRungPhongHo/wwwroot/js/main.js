@@ -1,4 +1,4 @@
-﻿document.addEventListener('DOMContentLoaded', function () {
+﻿    document.addEventListener('DOMContentLoaded', function () {
     const menuToggle = document.getElementById('menuToggle');
     const sidebar = document.getElementById('sidebar');
     const mainContent = document.querySelector('main[role="main"]');
@@ -249,30 +249,38 @@
                     const newScript = document.createElement('script');
                     newScript.textContent = script.textContent;
                     document.body.appendChild(newScript);
-                    document.body.removeChild(newScript); // Cleanup
+                    document.body.removeChild(newScript);
                 } catch (e) {
                     console.error('Error executing inline script:', e);
                 }
             }
         });
 
-        // 3. Re-initialize LoRung modules
+        // 3. Re-initialize NhanSu module
+        if (typeof window.NhanSuSearchInit === 'function') {
+            const currentPath = window.location.pathname.toLowerCase();
+            if (currentPath.includes('/nhansu')) {
+                setTimeout(() => {
+                    window.NhanSuSearchInit();
+                    console.log('✅ NhanSu module re-initialized');
+                }, 100);
+            }
+        }
+
+        // 4. Re-initialize LoRung modules
         if (typeof LoRung !== 'undefined') {
             const currentPath = window.location.pathname.toLowerCase();
             setTimeout(() => {
-                // Index page
                 if (currentPath.includes('/lorung/index') || currentPath.endsWith('/lorung')) {
                     if (LoRung.AjaxHandler?.init) LoRung.AjaxHandler.init();
                     if (LoRung.CascadeHandler?.initCascadeFilter) LoRung.CascadeHandler.initCascadeFilter();
                     if (LoRung.UIEnhancer?.highlightActiveFilters) LoRung.UIEnhancer.highlightActiveFilters();
                 }
-                // Create/Edit page
                 if (currentPath.includes('/lorung/create') || currentPath.includes('/lorung/edit')) {
                     if (LoRung.CascadeHandler?.initCascadeForm) LoRung.CascadeHandler.initCascadeForm();
                     if (LoRung.FormValidation) {
                         LoRung.FormValidation.validateTechnicalNumbers();
                         LoRung.FormValidation.validateArea();
-                        // Lưu ý: validateBeforeSubmit của LoRung chỉ check valid, còn việc submit AJAX giờ do handleFormSubmit lo
                         LoRung.FormValidation.validateBeforeSubmit();
                     }
                 }
@@ -280,32 +288,30 @@
             }, 100);
         }
 
-        // 4. Re-initialize DiGioi modules
+        // 5. Re-initialize DiGioi modules
         if (typeof DiGioi !== 'undefined') {
             const currentPath = window.location.pathname.toLowerCase();
             setTimeout(() => {
                 if (currentPath.includes('/danhmucxa') && DiGioi.XaHandler?.init) DiGioi.XaHandler.init();
                 if (currentPath.includes('/danhmucthon') && DiGioi.ThonHandler?.init) DiGioi.ThonHandler.init();
 
-                // Re-init validation global
                 if (DiGioi.FormHandler?.initValidation) DiGioi.FormHandler.initValidation();
             }, 100);
         }
 
-        // 5. Re-initialize Bootstrap components
+        // 6. Re-initialize Bootstrap components
         if (typeof bootstrap !== 'undefined') {
             [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]')).map(el => new bootstrap.Tooltip(el));
             [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]')).map(el => new bootstrap.Popover(el));
         }
 
-        // 6. Bind Confirm Delete events cho các nút mới load (nếu chưa được bind qua delegation)
+        // 7. Bind Confirm Delete events
         $('.btn-delete, .delete-button').off('click').on('click', function (e) {
             if (!confirm('Bạn có chắc chắn muốn xóa không?')) {
                 e.preventDefault();
                 e.stopPropagation();
                 return false;
             }
-            // Nếu confirm OK, event click sẽ tiếp tục bubble lên document và được handle bởi logic thẻ <a>
         });
 
         console.log('✅ Scripts re-initialized successfully');

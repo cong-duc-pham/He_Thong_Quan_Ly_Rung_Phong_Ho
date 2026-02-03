@@ -1,29 +1,174 @@
-﻿// Mở popup thêm nhân sự mới
+﻿// Đơn giản hóa - không dùng namespace, chỉ dùng inline handlers
+// Load script này trực tiếp khi document ready
+
+(function() {
+    'use strict';
+
+    // Simple debounce
+    function debounce(func, wait) {
+        let timeout;
+        return function(...args) {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func(...args), wait);
+        };
+    }
+
+    // Perform search
+    function performSearch() {
+        const searchInput = document.getElementById('nhansuSearchInput');
+        const xaFilter = document.getElementById('nhansuXaFilter');
+        const roleFilter = document.getElementById('nhansuRoleFilter');
+
+        if (!searchInput || !xaFilter || !roleFilter) return;
+
+        const searchString = searchInput.value.trim();
+        const maXa = xaFilter.value;
+        const role = roleFilter.value;
+
+        fetch(`/NhanSu/SearchRealtime?searchString=${encodeURIComponent(searchString)}&maXaFilter=${encodeURIComponent(maXa)}&roleFilter=${encodeURIComponent(role)}`)
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) renderResults(data.items, data.totalRecords, data.message);
+            })
+            .catch(e => console.error(e));
+    }
+
+    // Render results
+    function renderResults(items, totalRecords, message) {
+        const tableBody = document.getElementById('nhansuTableBody');
+        const mobileView = document.getElementById('nhansuMobileView');
+        const searchStatus = document.getElementById('nhansuSearchStatus');
+        const totalBadge = document.getElementById('nhansuTotal');
+
+        if (!tableBody || !mobileView || !searchStatus) return;
+
+        // Desktop table
+        if (items.length === 0) {
+            tableBody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-3"><i class="bi bi-inbox"></i> Không có dữ liệu</td></tr>';
+            mobileView.innerHTML = '';
+        } else {
+            let tableRows = '';
+            items.forEach(item => {
+                tableRows += `
+                    <tr>
+                        <td>
+                            <div class="fw-bold">${item.hoTen}</div>
+                            <small class="text-muted">${item.sdt}</small>
+                        </td>
+                        <td><span class="badge bg-primary">${item.chucVu}</span></td>
+                        <td>${item.tenXa}</td>
+                        <td>
+                            ${item.tenDangNhap ? `<span>${item.tenDangNhap}</span> <span class="text-muted">(${item.quyen})</span>` : '<span class="text-danger"><i class="bi bi-exclamation-circle"></i> Chưa có TK</span>'}
+                        </td>
+                        <td class="text-center">
+                            <button class="btn btn-sm btn-outline-primary" onclick="editData(${item.maNV}, event)">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteData(${item.maNV})">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>`;
+            });
+            tableBody.innerHTML = tableRows;
+
+            // Mobile view
+            let mobileCards = '';
+            items.forEach(item => {
+                mobileCards += `
+                    <div class="card mb-3 shadow-sm border-start border-4 border-success">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between mb-2">
+                                <h6 class="fw-bold text-success mb-0">${item.hoTen}</h6>
+                                <span class="badge bg-primary">${item.chucVu}</span>
+                            </div>
+                            <p class="mb-1 small"><i class="bi bi-geo-alt"></i> ${item.tenXa}</p>
+                            <p class="mb-1 small"><i class="bi bi-telephone"></i> ${item.sdt}</p>
+                            <p class="mb-2 small"><i class="bi bi-person"></i> TK: ${item.tenDangNhap || 'Chưa có'}</p>
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-outline-primary btn-sm flex-fill" onclick="editData(${item.maNV}, event)">Sửa</button>
+                                <button class="btn btn-outline-danger btn-sm flex-fill" onclick="deleteData(${item.maNV})">Xóa</button>
+                            </div>
+                        </div>
+                    </div>`;
+            });
+            mobileView.innerHTML = mobileCards;
+        }
+
+        // Update badges
+        searchStatus.textContent = message;
+        searchStatus.style.display = 'inline-block';
+
+        if (totalBadge) {
+            totalBadge.textContent = totalRecords === 0 ? 'Không tìm thấy' : 
+                                    totalRecords === 1 ? '1 nhân sự' : 
+                                    `${totalRecords} nhân sự`;
+            totalBadge.className = totalRecords === 0 ? 'badge bg-danger text-white' : 'badge bg-info text-dark';
+        }
+    }
+
+    // Initialize when DOM ready
+    function init() {
+        const searchInput = document.getElementById('nhansuSearchInput');
+        const xaFilter = document.getElementById('nhansuXaFilter');
+        const roleFilter = document.getElementById('nhansuRoleFilter');
+
+        if (!searchInput || !xaFilter || !roleFilter) return;
+
+        const debouncedSearch = debounce(performSearch, 300);
+
+        // Bind events
+        searchInput.addEventListener('input', debouncedSearch);
+        xaFilter.addEventListener('change', performSearch);
+        roleFilter.addEventListener('change', performSearch);
+
+        // Enter key
+        [searchInput, xaFilter, roleFilter].forEach(el => {
+            el.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    performSearch();
+                }
+            });
+        });
+
+        // Auto-dismiss alerts
+        document.querySelectorAll('.alert').forEach(alert => {
+            setTimeout(() => {
+                try {
+                    new bootstrap.Alert(alert).close();
+                } catch(e) {}
+            }, 5000);
+        });
+
+        console.log('✅ NhanSu search initialized');
+    }
+
+    // Run on DOMContentLoaded
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
+
+    // Also expose to global for main.js to call
+    window.NhanSuSearchInit = init;
+})();
+
+// === MODAL FUNCTIONS (global) ===
 function openModal() {
-    console.log('=== Mở modal thêm mới ===');
-    
     const form = document.getElementById('frmNhanSu');
     const modalElement = document.getElementById('nhanSuModal');
+    if (!form || !modalElement) return;
+
+    const modal = bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement, { backdrop: 'static', keyboard: false });
     
-    // Đóng modal cũ nếu có
-    const existingModal = bootstrap.Modal.getInstance(modalElement);
-    if (existingModal) {
-        existingModal.hide();
-        existingModal.dispose();
-    }
-    
-    // Reset form về trạng thái ban đầu
     form.reset();
     form.classList.remove('was-validated');
-    
-    // Chế độ thêm mới: MaNV = 0
     document.getElementById('MaNV').value = '0';
-    document.getElementById('modalTitle').textContent = "Thêm Nhân sự mới";
-    document.getElementById('TenDangNhap').readOnly = false;
+    document.getElementById('modalTitle').textContent = 'Thêm Nhân sự mới';
     
-    // Khi thêm mới thì mật khẩu bắt buộc nhập
     const matKhauField = document.getElementById('MatKhau');
-    matKhauField.value = '';
     matKhauField.required = true;
     matKhauField.placeholder = 'Tối thiểu 6 ký tự';
     
@@ -32,200 +177,90 @@ function openModal() {
     if (passRequired) passRequired.style.display = 'inline';
     if (passNote) passNote.style.display = 'none';
     
-    // Mở modal (không cho đóng khi click ngoài)
-    const modal = new bootstrap.Modal(modalElement, {
-        backdrop: 'static',
-        keyboard: false
-    });
     modal.show();
-    
-    console.log('Modal đã mở ở chế độ THÊM MỚI');
 }
 
-// Mở popup sửa thông tin nhân sự
 function editData(id, event) {
-    console.log('=== Sửa nhân sự ID:', id, '===');
+    if (!id || id === 0) return;
     
-    // Kiểm tra ID có hợp lệ không
-    if (!id || id === 0) {
-        alert('Lỗi: ID không hợp lệ!');
-        return;
+    let btn = event?.target.closest('button');
+    if (btn) {
+        btn.disabled = true;
+        btn.dataset.originalHTML = btn.innerHTML;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
     }
-    
-    // Hiện loading trên nút sửa
-    let btn = null;
-    if (event) {
-        btn = event.target.closest('button');
-        if (btn) {
-            btn.disabled = true;
-            const originalHTML = btn.innerHTML;
-            btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
-            btn.dataset.originalHTML = originalHTML;
-        }
-    }
-    
-    // Gọi API lấy thông tin nhân sự
-    const url = '/NhanSu/GetById?id=' + id;
-    console.log('Đang tải dữ liệu từ:', url);
-    
-    fetch(url)
-        .then(response => {
-            console.log('HTTP Status:', response.status);
-            
-            if (!response.ok) {
-                throw new Error('Lỗi HTTP ' + response.status);
-            }
-            
-            return response.json();
-        })
+
+    fetch('/NhanSu/GetById?id=' + id)
+        .then(r => r.json())
         .then(res => {
-            console.log('Dữ liệu nhận được:', res);
-            
-            // Khôi phục nút về trạng thái bình thường
             if (btn) {
                 btn.disabled = false;
                 btn.innerHTML = btn.dataset.originalHTML || '<i class="bi bi-pencil"></i>';
             }
             
-            // Kiểm tra server có trả lỗi không
-            if (res.success === false) {
-                alert(res.message || "Không tìm thấy dữ liệu!");
-                return;
-            }
-            
-            // Chuẩn hóa dữ liệu (server trả về camelCase)
-            const data = {
-                maNV: res.maNV || res.MaNV,
-                hoTen: res.hoTen || res.HoTen || '',
-                chucVu: res.chucVu || res.ChucVu || '',
-                sdt: res.sdt || res.SDT || '',
-                maXa: res.maXa || res.MaXa || '',
-                tenDangNhap: res.tenDangNhap || res.TenDangNhap || '',
-                quyen: res.quyen || res.Quyen || 'NhanVien_Thon'
-            };
-            
-            console.log('Dữ liệu đã chuẩn hóa:', data);
-            
-            if (!data.maNV || data.maNV === 0) {
-                console.error('Lỗi: MaNV không hợp lệ:', data.maNV);
-                alert('Không nhận được dữ liệu từ server!');
-                return;
-            }
-            
-            // Lấy form và modal
-            const modalElement = document.getElementById('nhanSuModal');
+            if (!res.success) return;
+
             const form = document.getElementById('frmNhanSu');
-            
-            if (!modalElement || !form) {
-                alert('Lỗi: Không tìm thấy form!');
-                return;
-            }
-            
-            // Đóng modal cũ nếu có
-            const existingModal = bootstrap.Modal.getInstance(modalElement);
-            if (existingModal) {
-                existingModal.hide();
-                existingModal.dispose();
-            }
-            
-            // Xóa validation cũ
+            const modalElement = document.getElementById('nhanSuModal');
+            if (!form || !modalElement) return;
+
             form.classList.remove('was-validated');
+            document.getElementById('MaNV').value = res.maNV;
+            document.getElementById('HoTen').value = res.hoTen || '';
+            document.getElementById('ChucVu').value = res.chucVu || '';
+            document.getElementById('SDT').value = res.sdt || '';
+            document.getElementById('MaXa').value = res.maXa || '';
+            document.getElementById('TenDangNhap').value = res.tenDangNhap || '';
+            document.getElementById('Quyen').value = res.quyen || 'NhanVien_Thon';
             
-            // Điền dữ liệu vào form
-            document.getElementById('MaNV').value = data.maNV;
-            document.getElementById('HoTen').value = data.hoTen;
-            document.getElementById('ChucVu').value = data.chucVu;
-            document.getElementById('SDT').value = data.sdt;
-            document.getElementById('MaXa').value = data.maXa;
-            document.getElementById('TenDangNhap').value = data.tenDangNhap;
-            document.getElementById('Quyen').value = data.quyen;
-            
-            console.log('Form đã được điền dữ liệu');
-            
-            // Khi sửa thì mật khẩu không bắt buộc (để trống = không đổi)
             const matKhauField = document.getElementById('MatKhau');
             matKhauField.value = '';
             matKhauField.required = false;
             matKhauField.placeholder = 'Để trống nếu không đổi';
-            
+
             const passRequired = document.getElementById('passRequired');
             const passNote = document.getElementById('passNote');
             if (passRequired) passRequired.style.display = 'none';
             if (passNote) passNote.style.display = 'block';
-            
-            // Đổi tiêu đề modal
-            document.getElementById('modalTitle').textContent = "Cập nhật Nhân sự";
-            
-            // Mở modal
-            const modal = new bootstrap.Modal(modalElement, {
-                backdrop: 'static',
-                keyboard: false
-            });
+
+            document.getElementById('modalTitle').textContent = 'Cập nhật Nhân sự';
+
+            const modal = bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement, { backdrop: 'static', keyboard: false });
             modal.show();
-            
-            console.log('Modal sửa đã mở thành công');
         })
-        .catch(error => {
-            console.error('Lỗi:', error);
-            
-            // Khôi phục nút
+        .catch(e => {
             if (btn) {
                 btn.disabled = false;
                 btn.innerHTML = btn.dataset.originalHTML || '<i class="bi bi-pencil"></i>';
             }
-            
-            alert("Lỗi: " + error.message);
+            console.error(e);
         });
 }
 
-// Lưu dữ liệu (thêm mới hoặc cập nhật)
 function saveData() {
     const form = document.getElementById('frmNhanSu');
-    const maNVValue = document.getElementById('MaNV').value;
-    
-    console.log('=== Đang lưu dữ liệu ===');
-    console.log('MaNV:', maNVValue);
-    console.log('Chế độ:', parseInt(maNVValue) > 0 ? 'CẬP NHẬT' : 'THÊM MỚI');
-    
-    // Kiểm tra validation HTML5
     if (!form.checkValidity()) {
         form.classList.add('was-validated');
-        alert('Vui lòng điền đầy đủ thông tin bắt buộc!');
         return;
     }
-    
-    // Disable nút lưu và hiện loading
+
     const btnSave = document.getElementById('btnSave');
     btnSave.disabled = true;
     btnSave.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Đang lưu...';
-    
+
     const formData = new FormData(form);
-    
-    // Log để debug
-    console.log('Dữ liệu form:');
-    for (let [key, value] of formData.entries()) {
-        console.log(`  ${key}: "${value}"`);
-    }
-    
     const maNV = parseInt(formData.get('MaNV')) || 0;
     const matKhau = formData.get('MatKhau');
-    
-    // Nếu đang sửa và không nhập mật khẩu thì xóa field đó (= không đổi pass)
-    if (maNV > 0 && !matKhau) {
-        formData.delete('MatKhau');
-        console.log('Không thay đổi mật khẩu');
-    }
-    
-    // Lấy CSRF token (bắt buộc cho POST request)
+
+    if (maNV > 0 && !matKhau) formData.delete('MatKhau');
+
     const tokenInput = form.querySelector('input[name="__RequestVerificationToken"]');
     if (!tokenInput) {
-        alert('Lỗi: Không tìm thấy CSRF token!');
         btnSave.disabled = false;
         btnSave.innerHTML = '<i class="bi bi-save"></i> Lưu dữ liệu';
         return;
     }
-    
-    // Gọi API lưu
+
     fetch('/NhanSu/Save', {
         method: 'POST',
         body: new URLSearchParams(formData),
@@ -234,58 +269,29 @@ function saveData() {
             'RequestVerificationToken': tokenInput.value
         }
     })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('HTTP ' + response.status);
-        }
-        return response.json();
-    })
+    .then(r => r.json())
     .then(res => {
-        console.log('Kết quả:', res);
-        
-        // Khôi phục nút lưu
         btnSave.disabled = false;
         btnSave.innerHTML = '<i class="bi bi-save"></i> Lưu dữ liệu';
         
         if (res.success) {
-            // Đóng modal
-            const modalElement = document.getElementById('nhanSuModal');
-            const modal = bootstrap.Modal.getInstance(modalElement);
-            if (modal) modal.hide();
-            
-            // Thông báo và reload trang
-            alert(res.message);
-            window.location.reload();
-        } else {
-            alert("Lỗi: " + res.message);
+            bootstrap.Modal.getInstance(document.getElementById('nhanSuModal'))?.hide();
+            setTimeout(() => location.reload(), 500);
         }
     })
-    .catch(error => {
-        // Khôi phục nút lưu
+    .catch(() => {
         btnSave.disabled = false;
         btnSave.innerHTML = '<i class="bi bi-save"></i> Lưu dữ liệu';
-        alert("Lỗi: " + error.message);
-        console.error('Error:', error);
     });
 }
 
-// Xóa nhân sự
 function deleteData(id) {
-    // Confirm trước khi xóa
-    if (!confirm("Bạn có chắc chắn muốn xóa nhân sự này và tài khoản liên quan?")) {
-        return;
-    }
-    
-    // Lấy CSRF token
+    if (!confirm('Bạn có chắc chắn muốn xóa nhân sự này và tài khoản liên quan?')) return;
+
     const form = document.getElementById('frmNhanSu');
-    const tokenInput = form.querySelector('input[name="__RequestVerificationToken"]');
-    
-    if (!tokenInput) {
-        alert('Lỗi: Không tìm thấy CSRF token!');
-        return;
-    }
-    
-    // Gọi API xóa
+    const tokenInput = form?.querySelector('input[name="__RequestVerificationToken"]');
+    if (!tokenInput) return;
+
     fetch('/NhanSu/Delete', {
         method: 'POST',
         headers: {
@@ -294,29 +300,9 @@ function deleteData(id) {
         },
         body: 'id=' + id
     })
-    .then(response => response.json())
+    .then(r => r.json())
     .then(res => {
-        alert(res.success ? res.message : "Lỗi: " + res.message);
-        if (res.success) window.location.reload();
+        if (res.success) setTimeout(() => location.reload(), 500);
     })
-    .catch(error => {
-        alert("Lỗi: " + error.message);
-        console.error('Error:', error);
-    });
+    .catch(e => console.error(e));
 }
-
-// Tự động ẩn alert sau 5 giây
-document.addEventListener('DOMContentLoaded', function() {
-    const alerts = document.querySelectorAll('.alert');
-    alerts.forEach(function(alert) {
-        setTimeout(function() {
-            try {
-                const bsAlert = new bootstrap.Alert(alert);
-                bsAlert.close();
-            } catch (e) {
-                // Alert đã bị đóng rồi, không làm gì
-                console.log('Alert đã đóng');
-            }
-        }, 5000);
-    });
-});

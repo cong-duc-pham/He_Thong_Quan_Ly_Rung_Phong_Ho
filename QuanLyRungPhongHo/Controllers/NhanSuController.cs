@@ -315,5 +315,60 @@ namespace QuanLyRungPhongHo.Controllers
                 return BitConverter.ToString(hashedBytes).Replace("-", "").ToLower();
             }
         }
+
+        // API Search real-time (JSON response)
+        [HttpGet]
+        public async Task<JsonResult> SearchRealtime(string searchString, string roleFilter, string maXaFilter)
+        {
+            try
+            {
+                var query = from ns in _context.NhanSus
+                            join xa in _context.DanhMucXas on ns.MaXa equals xa.MaXa into xaGroup
+                            from x in xaGroup.DefaultIfEmpty()
+                            join tk in _context.TaiKhoans on ns.MaNV equals tk.MaNV into tkGroup
+                            from t in tkGroup.DefaultIfEmpty()
+                            select new NhanSuViewModel
+                            {
+                                MaNV = ns.MaNV,
+                                HoTen = ns.HoTen,
+                                ChucVu = ns.ChucVu ?? "",
+                                SDT = ns.SDT ?? "",
+                                MaXa = ns.MaXa,
+                                TenXa = x != null ? x.TenXa : "Chưa phân công",
+                                TenDangNhap = t != null ? t.TenDangNhap : "",
+                                Quyen = t != null ? t.Quyen : ""
+                            };
+
+                if (!string.IsNullOrEmpty(searchString))
+                {
+                    query = query.Where(x => x.HoTen.Contains(searchString) || 
+                                             (x.SDT != null && x.SDT.Contains(searchString)));
+                }
+                if (!string.IsNullOrEmpty(roleFilter))
+                {
+                    query = query.Where(x => x.ChucVu == roleFilter);
+                }
+                if (!string.IsNullOrEmpty(maXaFilter))
+                {
+                    query = query.Where(x => x.MaXa == maXaFilter);
+                }
+
+                var result = await query.OrderByDescending(x => x.MaNV).ToListAsync();
+                
+                return Json(new
+                {
+                    success = true,
+                    items = result,
+                    totalRecords = result.Count,
+                    message = result.Count == 0 ? "Không tìm thấy dữ liệu" : 
+                              result.Count == 1 ? "Tìm thấy 1 bản ghi" : 
+                              $"Tìm thấy {result.Count} bản ghi"
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Lỗi: " + ex.Message });
+            }
+        }
     }
 }

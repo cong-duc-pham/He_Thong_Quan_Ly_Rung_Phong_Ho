@@ -1,7 +1,10 @@
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
 @model IEnumerable<QuanLyRungPhongHo.Models.DanhMucXa>
 
 @{
-    ViewData["Title"] = "Danh mục Xã";
+    ViewData["Title"] = Localizer["PageTitle"];
     var currentPage = (int)ViewData["PageNumber"];
     var totalPages = (int)ViewData["TotalPages"];
     var totalRecords = (int)ViewData["TotalRecords"];
@@ -13,19 +16,19 @@
 }
 
 <div class="digioi-page"
-    id="xa-page"
-    data-endpoint="@Url.Action("GetPaged", "DanhMucXa")"
-    data-pagesize="10"
-    data-initial-page="@currentPage"
-    data-initial-search="@currentFilter">
+     id="xa-page"
+     data-endpoint="@Url.Action("GetPaged", "DanhMucXa")"
+     data-pagesize="10"
+     data-initial-page="@currentPage"
+     data-initial-search="@currentFilter">
 
     <!-- Header -->
     <div class="digioi-header">
         <h2>
-            <i class="bi bi-building"></i> Danh mục Xã
+            <i class="bi bi-building"></i> @Localizer["PageTitle"]
         </h2>
         <a asp-action="Create" class="btn btn-success">
-            <i class="bi bi-plus-circle"></i> Thêm Xã
+            <i class="bi bi-plus-circle"></i> @Localizer["AddXa"]
         </a>
     </div>
 
@@ -49,19 +52,18 @@
     <!-- Tìm kiếm -->
     <div class="digioi-card mb-3">
         <div class="card-body">
-            <form asp-action="Index" method="get" class="digioi-search no-ajax" id="xa-search-form">
+            <form asp-action="Index" method="get" class="digioi-search no-ajax">
                 <div class="input-group">
                     <span class="input-group-text bg-success text-white">
                         <i class="bi bi-search"></i>
                     </span>
                     <input type="text"
                            name="searchString"
-                           id="xa-search"
-                           value="@ViewData["CurrentFilter"]"
+                           value="@currentFilter"
                            class="form-control"
-                           placeholder="Tìm theo Mã xã hoặc Tên xã..." />
+                           placeholder="@Localizer["SearchPlaceholder"]" />
                     <button class="btn btn-success" type="submit">
-                        Tìm kiếm
+                        @Localizer["Search"]
                     </button>
                 </div>
             </form>
@@ -70,17 +72,17 @@
 
     <!-- Thông tin -->
     <div class="mb-3">
-        <span class="badge bg-info text-dark" id="xa-total">
-            Tổng số: @ViewData["TotalRecords"] xã
+        <span class="badge bg-info text-dark">
+            @Localizer["Total"]: @totalRecords
         </span>
 
-        @if (!string.IsNullOrEmpty(ViewData["CurrentFilter"]?.ToString()))
+        @if (!string.IsNullOrEmpty(currentFilter))
         {
             <span class="badge bg-warning text-dark">
-                Tìm kiếm: "@ViewData["CurrentFilter"]"
+                @Localizer["Filter"]: "@currentFilter"
             </span>
             <a asp-action="Index" class="btn btn-sm btn-outline-secondary no-ajax">
-                <i class="bi bi-x-circle"></i> Xóa lọc
+                <i class="bi bi-x-circle"></i> @Localizer["ClearFilter"]
             </a>
         }
     </div>
@@ -92,14 +94,14 @@
                 <table class="table table-hover mb-0 digioi-table">
                     <thead>
                         <tr>
-                            <th style="width:10%">STT</th>
-                            <th style="width:20%">Mã Xã</th>
-                            <th style="width:45%">Tên Xã</th>
-                            <th style="width:10%" class="text-center">Số Thôn</th>
-                            <th style="width:15%" class="text-center">Thao tác</th>
+                            <th>STT</th>
+                            <th>@Localizer["MaXa"]</th>
+                            <th>@Localizer["TenXa"]</th>
+                            <th class="text-center">@Localizer["SoThon"]</th>
+                            <th class="text-center">@Localizer["Action"]</th>
                         </tr>
                     </thead>
-                    <tbody id="xa-table-body">
+                    <tbody>
                         @if (Model.Any())
                         {
                             int stt = (currentPage - 1) * 10 + 1;
@@ -137,7 +139,7 @@
                             <tr>
                                 <td colspan="5" class="text-center text-muted py-4">
                                     <i class="bi bi-inbox fs-1"></i>
-                                    <div>Không có dữ liệu</div>
+                                    <div>@Localizer["NoData"]</div>
                                 </td>
                             </tr>
                         }
@@ -150,12 +152,10 @@
     <!-- Phân trang -->
     @if (totalPages > 1)
     {
-        <nav class="mt-4" id="xa-pagination">
+        <nav class="mt-4">
             <ul class="pagination justify-content-center">
                 <li class="page-item @(currentPage == 1 ? "disabled" : "")">
                     <a class="page-link"
-                       data-page="@(currentPage - 1)"
-                       asp-action="Index"
                        asp-route-pageNumber="@(currentPage - 1)"
                        asp-route-searchString="@currentFilter">
                         «
@@ -174,8 +174,6 @@
                     {
                         <li class="page-item">
                             <a class="page-link"
-                               data-page="@i"
-                               asp-action="Index"
                                asp-route-pageNumber="@i"
                                asp-route-searchString="@currentFilter">
                                 @i
@@ -186,8 +184,6 @@
 
                 <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
                     <a class="page-link"
-                       data-page="@(currentPage + 1)"
-                       asp-action="Index"
                        asp-route-pageNumber="@(currentPage + 1)"
                        asp-route-searchString="@currentFilter">
                         »

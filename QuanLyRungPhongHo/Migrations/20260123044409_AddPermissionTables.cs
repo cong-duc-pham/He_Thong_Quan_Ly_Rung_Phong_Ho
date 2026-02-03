@@ -70,7 +70,7 @@ namespace QuanLyRungPhongHo.Migrations
             migrationBuilder.DropTable(
                 name: "RolePermissions");
 
-            migrationBuilder.DropTable(
+            migrationBuilder.DropTable( 
                 name: "Permissions");
         }
     }

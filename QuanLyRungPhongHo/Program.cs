@@ -1,15 +1,22 @@
 ﻿using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using QuanLyRungPhongHo.Data;
+using Microsoft.AspNetCore.Localization;
+using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-builder.Services.AddControllersWithViews();
+// ===================== SERVICES =====================
 
-// Cấu hình DbContext với Connection String đúng tên
+// MVC + Localization
+builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
+
+builder.Services.AddControllersWithViews()
+    .AddViewLocalization()
+    .AddDataAnnotationsLocalization();
+
+// DbContext
 var connectionString = builder.Configuration.GetConnectionString("QLRungPhongHoConnection");
-
 if (string.IsNullOrEmpty(connectionString))
 {
     throw new InvalidOperationException("Connection string 'QLRungPhongHoConnection' not found in appsettings.json");
@@ -18,7 +25,7 @@ if (string.IsNullOrEmpty(connectionString))
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 
-// Cấu hình Session
+// Session
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
@@ -28,7 +35,7 @@ builder.Services.AddSession(options =>
     options.Cookie.Name = ".QLRungPhongHo.Session";
 });
 
-// Cấu hình Authentication
+// Authentication
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
@@ -42,12 +49,40 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.Cookie.Name = ".QLRungPhongHo.Auth";
     });
 
-// Thêm Authorization
 builder.Services.AddAuthorization();
+
+// ===================== BUILD APP =====================
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// ===================== MIDDLEWARE =====================
+
+// Localization (PHẢI sau Build, trước Routing)
+var supportedCultures = new[]
+{
+    new CultureInfo("vi-VN"),
+    new CultureInfo("en-US")
+};
+
+
+
+var localizationOptions = new RequestLocalizationOptions
+{
+    DefaultRequestCulture = new RequestCulture("vi-VN"),
+    SupportedCultures = supportedCultures,
+    SupportedUICultures = supportedCultures
+};
+
+// 🔥 QUAN TRỌNG NHẤT: đọc culture từ COOKIE
+localizationOptions.RequestCultureProviders = new List<IRequestCultureProvider>
+{
+    new CookieRequestCultureProvider()
+};
+
+app.UseRequestLocalization(localizationOptions);
+
+
+// Error handling
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -63,11 +98,12 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-// Thứ tự quan trọng: Session -> Authentication -> Authorization
+// Thứ tự quan trọng
 app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
 
+// Routing
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");

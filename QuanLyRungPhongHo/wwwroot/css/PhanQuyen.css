@@ -2,16 +2,46 @@
    Trang Phân Quyền - Permission Management
    ============================================ */
 
+:root {
+    --pq-surface: #ffffff;
+    --pq-surface-2: #f8f9fa;
+    --pq-border: #dee2e6;
+    --pq-text: #1f2937;
+    --pq-accent-1: #667eea;
+    --pq-accent-2: #764ba2;
+    --pq-hover: #eef2f7;
+    --pq-success: #28a745;
+    --pq-warning: #ffc107;
+    --pq-info: #0dcaf0;
+    --pq-shadow: 0.08;
+}
+
+.theme-dark {
+    --pq-surface: #0f172a;
+    --pq-surface-2: #111f33;
+    --pq-border: #1f2937;
+    --pq-text: #e5e7eb;
+    --pq-accent-1: #4f46e5;
+    --pq-accent-2: #7c3aed;
+    --pq-hover: #16253d;
+    --pq-success: #22c55e;
+    --pq-warning: #facc15;
+    --pq-info: #38bdf8;
+    --pq-shadow: 0.25;
+}
+
 /* Role Section Styling */
 .role-section {
-    border: 1px solid #dee2e6;
+    border: 1px solid var(--pq-border);
     border-radius: 8px;
     overflow: hidden;
-    background: #fff;
+    background: var(--pq-surface);
+    color: var(--pq-text);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, var(--pq-shadow));
 }
 
 .role-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, var(--pq-accent-1) 0%, var(--pq-accent-2) 100%);
     padding: 15px 20px;
     margin-bottom: 0;
 }
@@ -29,20 +59,20 @@
 }
 
 .permission-table thead th {
-    background-color: #f8f9fa;
+    background-color: var(--pq-surface-2);
     font-weight: 600;
-    border-bottom: 2px solid #dee2e6;
+    border-bottom: 2px solid var(--pq-border);
     padding: 12px 15px;
 }
 
 .permission-table tbody tr:hover {
-    background-color: #f8f9fa;
+    background-color: var(--pq-hover);
 }
 
 .permission-table .module-cell {
-    background-color: #f8f9fa;
+    background-color: var(--pq-surface-2);
     font-weight: 600;
-    border-right: 2px solid #dee2e6;
+    border-right: 2px solid var(--pq-border);
     vertical-align: middle;
 }
 
@@ -54,8 +84,8 @@
 }
 
 .form-check-input.permission-toggle:checked {
-    background-color: #28a745;
-    border-color: #28a745;
+    background-color: var(--pq-success);
+    border-color: var(--pq-success);
 }
 
 .form-check-input.permission-toggle:disabled {
@@ -64,21 +94,21 @@
 }
 
 .form-check-input.permission-toggle:disabled:checked {
-    background-color: #ffc107;
-    border-color: #ffc107;
+    background-color: var(--pq-warning);
+    border-color: var(--pq-warning);
 }
 
 /* Icon Colors */
 .text-warning {
-    color: #ffc107 !important;
+    color: var(--pq-warning) !important;
 }
 
 .text-primary {
-    color: #007bff !important;
+    color: var(--pq-info) !important;
 }
 
 .text-success {
-    color: #28a745 !important;
+    color: var(--pq-success) !important;
 }
 
 /* Badge Styling */
@@ -134,24 +164,24 @@
 
 /* Alert Styling */
 .alert-info {
-    background-color: #d1ecf1;
-    border-color: #bee5eb;
+    background-color: rgba(13, 202, 240, 0.12);
+    border-color: rgba(13, 202, 240, 0.35);
     color: #0c5460;
 }
 
 /* Card Shadow */
 .card.shadow-sm {
-    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, var(--pq-shadow));
 }
 
 .card-header.bg-primary {
-    background-color: #007bff !important;
+    background-color: var(--pq-accent-1) !important;
 }
 
 /* Code Styling */
 code {
     font-size: 85%;
     padding: 0.2em 0.4em;
-    background-color: #f8f9fa;
+    background-color: var(--pq-surface-2);
     border-radius: 3px;
 }

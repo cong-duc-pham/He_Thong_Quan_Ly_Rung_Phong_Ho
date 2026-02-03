@@ -21,6 +21,29 @@
 </head>
 
 <body>
+    <script>
+        (function () {
+            try {
+                var raw = localStorage.getItem('qlrph.settings');
+                if (!raw) return;
+                var s = JSON.parse(raw);
+                var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+                var body = document.body;
+                var root = document.documentElement;
+                var isDark = s.theme === 'dark' || (s.theme === 'auto' && prefersDark);
+                if (isDark) {
+                    body.classList.add('theme-dark');
+                    root.classList.add('dark');
+                }
+                if (s.compactSidebar) body.classList.add('compact-sidebar');
+                if (s.density === 'compact') body.classList.add('density-compact');
+                if (s.density === 'spacious') body.classList.add('density-spacious');
+                if (s.highlightAlert) body.classList.add('highlight-alert');
+            } catch (e) {
+                // giữ im lặng nếu localStorage không khả dụng
+            }
+        })();
+    </script>
     <!-- HEADER -->
     <header class="header">
         <div class="header-left">
@@ -96,6 +119,12 @@
                         <a href="@Url.Action("Index", "NhatKyBaoVe")">
                             <i class="fas fa-exclamation-triangle"></i>
                             <span>Nhật ký bảo vệ</span>
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="@Url.Action("Index", "Settings")" class="no-ajax">
+                            <i class="fas fa-gear"></i>
+                            <span>Cài đặt</span>
                         </a>
                     </li>
 

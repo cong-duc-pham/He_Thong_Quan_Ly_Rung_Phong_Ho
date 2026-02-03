@@ -1,0 +1,175 @@
+@model QuanLyRungPhongHo.Models.SettingsViewModel
+@{
+    ViewData["Title"] = "Cài đặt";
+}
+
+<div class="settings-hero card border-0 shadow-sm mb-4">
+    <div class="card-body d-flex flex-wrap align-items-center justify-content-between gap-3">
+        <div>
+            <p class="text-uppercase text-muted small mb-1">Bảng điều khiển</p>
+            <h3 class="mb-2 fw-bold"><i class="fa-solid fa-gear me-2"></i>Cài đặt hệ thống</h3>
+            <p class="mb-0 text-secondary">Điều chỉnh trải nghiệm sử dụng, thông báo và thông tin cá nhân.</p>
+        </div>
+        <div class="d-flex align-items-center gap-3">
+            <div class="text-end">
+                <div class="fw-semibold">@Model.HoTen</div>
+                <div class="text-muted small">@Model.ChucVu</div>
+                <div class="badge bg-primary-subtle text-primary border">@Model.Quyen</div>
+            </div>
+            <div class="settings-avatar">
+                <i class="fa-solid fa-user"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="settings-alert" class="alert alert-success d-none" role="alert">
+    <i class="fa-solid fa-circle-check me-2"></i>Đã lưu cài đặt cá nhân (lưu trên trình duyệt này).
+</div>
+
+<div class="row g-4">
+    <div class="col-xl-4">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-light border-0">
+                <div class="fw-semibold"><i class="fa-solid fa-id-badge me-2 text-primary"></i>Thông tin hồ sơ</div>
+            </div>
+            <div class="card-body">
+                <dl class="row mb-0 small">
+                    <dt class="col-5">Họ tên</dt>
+                    <dd class="col-7">@(!string.IsNullOrEmpty(Model.HoTen) ? Model.HoTen : "—")</dd>
+
+                    <dt class="col-5">Tài khoản</dt>
+                    <dd class="col-7">@(!string.IsNullOrEmpty(Model.TenDangNhap) ? Model.TenDangNhap : "—")</dd>
+
+                    <dt class="col-5">Chức vụ</dt>
+                    <dd class="col-7">@(!string.IsNullOrEmpty(Model.ChucVu) ? Model.ChucVu : "—")</dd>
+
+                    <dt class="col-5">Quyền</dt>
+                    <dd class="col-7">@(!string.IsNullOrEmpty(Model.Quyen) ? Model.Quyen : "—")</dd>
+
+                    <dt class="col-5">Đơn vị</dt>
+                    <dd class="col-7">@(!string.IsNullOrEmpty(Model.DonViCongTac) ? Model.DonViCongTac : "—")</dd>
+
+                    <dt class="col-5">Số điện thoại</dt>
+                    <dd class="col-7">@(!string.IsNullOrEmpty(Model.SoDienThoai) ? Model.SoDienThoai : "—")</dd>
+                </dl>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-light border-0">
+                <div class="fw-semibold"><i class="fa-solid fa-circle-info me-2 text-success"></i>Liên hệ & ghi chú</div>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label">Email nhận thông báo</label>
+                    <input type="email" id="setting-contact-email" class="form-control" placeholder="nhap@email.com" />
+                    <div class="form-text">Chỉ lưu trên trình duyệt, chưa đồng bộ về máy chủ.</div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Số điện thoại</label>
+                    <input type="text" id="setting-contact-phone" class="form-control" value="@(Model.SoDienThoai ?? "")" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Ghi chú nội bộ</label>
+                    <textarea id="setting-contact-note" class="form-control" rows="3" placeholder="Nhập ghi chú cho ca trực, bàn giao..."></textarea>
+                </div>
+                <button type="button" class="btn btn-primary w-100" id="btn-save-contact">
+                    <i class="fa-solid fa-floppy-disk me-2"></i>Lưu cài đặt cá nhân
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-8">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-light border-0 d-flex justify-content-between align-items-center">
+                <div class="fw-semibold"><i class="fa-solid fa-display me-2 text-info"></i>Giao diện & hiển thị</div>
+                <span class="badge bg-info-subtle text-info">Lưu trên trình duyệt</span>
+            </div>
+            <div class="card-body settings-layout">
+                <div class="row gy-3 gx-4 align-items-start justify-content-center">
+                    <div class="col-12 col-lg-5">
+                        <label class="form-label mb-2">Chủ đề</label>
+                        <select id="setting-theme" class="form-select">
+                            <option value="light">Sáng</option>
+                            <option value="dark">Tối</option>
+                            <option value="auto">Tự động theo hệ thống</option>
+                        </select>
+                    </div>
+                    <div class="col-12 col-lg-5">
+                        <label class="form-label mb-2" for="setting-language">Ngôn ngữ giao diện</label>
+                        <select id="setting-language" class="form-select mb-2">
+                            <option value="vi">Tiếng Việt</option>
+                            <option value="en">English</option>
+                        </select>
+                        <p class="text-muted small mb-0">Áp dụng cho nhãn và thông báo giao diện (lưu trên trình duyệt).</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-light border-0 d-flex justify-content-between align-items-center">
+                <div class="fw-semibold"><i class="fa-solid fa-bell me-2 text-warning"></i>Thông báo</div>
+                <span class="text-muted small">Cấu hình cho trình duyệt này</span>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="setting-notify-email" checked>
+                            <label class="form-check-label" for="setting-notify-email">Email</label>
+                            <div class="small text-muted">Nhận báo cáo tổng hợp mỗi ngày.</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="setting-notify-sms">
+                            <label class="form-check-label" for="setting-notify-sms">SMS</label>
+                            <div class="small text-muted">Chỉ dùng cho cảnh báo khẩn cấp.</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="setting-notify-inapp" checked>
+                            <label class="form-check-label" for="setting-notify-inapp">Thông báo trong hệ thống</label>
+                            <div class="small text-muted">Hiển thị badge và popup cảnh báo.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-light border-0 d-flex justify-content-between align-items-center">
+                <div class="fw-semibold"><i class="fa-solid fa-shield-halved me-2 text-danger"></i>Bảo mật & phiên đăng nhập</div>
+                <span class="badge bg-danger-subtle text-danger">Đang đăng nhập</span>
+            </div>
+            <div class="card-body">
+                <div class="d-flex flex-wrap gap-3 align-items-center mb-3">
+                    <div class="security-chip bg-light border">Thiết bị hiện tại: <span class="fw-semibold">@Environment.MachineName</span></div>
+                    <div class="security-chip bg-light border">Phiên người dùng: <span class="fw-semibold">@Model.TenDangNhap</span></div>
+                    <div class="security-chip bg-light border">Mã TK: <span class="fw-semibold">@Model.MaTaiKhoan</span></div>
+                </div>
+                <p class="text-muted small mb-3">Để thay đổi mật khẩu hoặc đăng xuất khỏi tất cả thiết bị, vui lòng liên hệ quản trị viên hoặc đăng xuất và đăng nhập lại.</p>
+                <div class="d-flex flex-wrap gap-2">
+                    <a class="btn btn-outline-danger" asp-controller="Account" asp-action="Logout" data-bs-toggle="tooltip" data-bs-title="Đăng xuất khỏi thiết bị này">
+                        <i class="fa-solid fa-right-from-bracket me-2"></i>Đăng xuất
+                    </a>
+                    <a class="btn btn-outline-secondary" asp-controller="Home" asp-action="Index">
+                        <i class="fa-solid fa-house me-2"></i>Về trang chủ
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/settings.css" asp-append-version="true" />
+}
+
+@section Scripts {
+    <script src="~/js/settings.js" asp-append-version="true"></script>
+}

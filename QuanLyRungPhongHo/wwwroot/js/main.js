@@ -121,6 +121,8 @@
     async function handleFormSubmit(e) {
         e.preventDefault();
         const form = e.target;
+        const method = (form.method || 'GET').toUpperCase();
+        const action = form.action || window.location.href;
 
         // Validate form nếu có jQuery Validate (từ digioi.js)
         if (typeof $ !== 'undefined' && $(form).valid && !$(form).valid()) {
@@ -138,13 +140,25 @@
 
         try {
             const formData = new FormData(form);
-            const response = await fetch(form.action, {
-                method: form.method || 'POST',
-                body: formData,
+            let requestUrl = action;
+            let fetchOptions = {
+                method,
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest'
                 }
-            });
+            };
+
+            if (method === 'GET') {
+                const params = new URLSearchParams(formData);
+                const qs = params.toString();
+                if (qs) {
+                    requestUrl += (requestUrl.includes('?') ? '&' : '?') + qs;
+                }
+            } else {
+                fetchOptions.body = formData;
+            }
+
+            const response = await fetch(requestUrl, fetchOptions);
 
             if (!response.ok) throw new Error('Network response was not ok');
 

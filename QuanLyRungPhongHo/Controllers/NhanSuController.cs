@@ -312,10 +312,8 @@ namespace QuanLyRungPhongHo.Controllers
         // Khóa tài khoản (thay vì xóa)
         [HttpPost]
         [ValidateAntiForgeryToken]
-
-        public async Task<JsonResult> ToggleLock(int id)
         [CheckPermission("NhanSu.Delete")]
-        public async Task<JsonResult> Delete(int id)
+        public async Task<JsonResult> ToggleLock(int id)
         {
             using (var transaction = await _context.Database.BeginTransactionAsync())
             {
@@ -382,7 +380,6 @@ namespace QuanLyRungPhongHo.Controllers
         [ValidateAntiForgeryToken]
         [CheckPermission("NhanSu.Edit")]
         public async Task<JsonResult> UnlockAccount(int id)
-
         {
             try
             {

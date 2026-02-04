@@ -1,23 +1,13 @@
-
-﻿using Microsoft.AspNetCore.Authorization;
+    using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using QuanLyRungPhongHo.Data;
 using QuanLyRungPhongHo.Models;
 using QuanLyRungPhongHo.Validators;
+using QuanLyRungPhongHo.Attributes;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-
-namespace QuanLyRungPhongHo.Controllers
-{
-    [Authorize]
-
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using QuanLyRungPhongHo.Data;
-using QuanLyRungPhongHo.Attributes;
 
 namespace QuanLyRungPhongHo.Controllers
 {
@@ -33,6 +23,7 @@ namespace QuanLyRungPhongHo.Controllers
         }
 
         // Hiển thị trang quản lý ca làm việc
+        [CheckPermission("CaLamViec.View")]
         public async Task<IActionResult> Index()
         {
             try
@@ -389,14 +380,5 @@ namespace QuanLyRungPhongHo.Controllers
         public string GioBatDau { get; set; }
         public string GioKetThuc { get; set; }
         public string MoTa { get; set; }
-    }
-}
-        // GET: CaLamViec
-        [CheckPermission("CaLamViec.View")]
-        public async Task<IActionResult> Index()
-        {
-            // TODO: Implement ca làm việc management
-            return View();
-        }
     }
 }

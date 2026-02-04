@@ -215,27 +215,51 @@ function togglePassword(fieldId) {
     }
 }
 
+// Sửa lại hàm waitForValidator trong nhansu.js
+function waitForValidator(callback, maxAttempts = 10) {
+    let attempts = 0;
+
+    const checkInterval = setInterval(() => {
+        attempts++;
+        // Kiểm tra xem object đã tồn tại trong window chưa
+        if (window.NhanSuValidatorClient) {
+            clearInterval(checkInterval);
+            console.log('Validator found after', attempts, 'attempts');
+            callback(true);
+        } else if (attempts >= maxAttempts) {
+            clearInterval(checkInterval);
+            console.error(' Cannot find NhanSuValidatorClient in window scope.');
+            callback(false);
+        }
+    }, 50); // Kiểm tra nhanh hơn (50ms)
+}
+
 // Mở modal thêm mới
 function openModal() {
     const modalElement = document.getElementById('nhanSuModal');
     const form = document.getElementById('frmNhanSu');
     const modalTitle = document.getElementById('modalTitle');
 
-    if (!form || !modalElement) return;
+    if (!form || !modalElement) {
+        console.error('❌ Không tìm thấy form hoặc modal element!');
+        return;
+    }
 
     // Reset form
     form.reset();
     form.classList.remove('was-validated');
 
-    // Clear validation states
-    if (window.NhanSuValidatorClient) {
-        ['HoTen', 'SDT', 'Email', 'TenDangNhap', 'MatKhau', 'ChucVu', 'MaXa'].forEach(id => {
-            const field = document.getElementById(id);
-            if (field) {
-                window.NhanSuValidatorClient.clearValidation(field);
-            }
-        });
-    }
+    // Đợi validator load xong trước khi clear validation
+    waitForValidator((isReady) => {
+        if (isReady && window.NhanSuValidatorClient) {
+            ['HoTen', 'SDT', 'Email', 'TenDangNhap', 'MatKhau', 'ChucVu', 'MaXa'].forEach(id => {
+                const field = document.getElementById(id);
+                if (field) {
+                    window.NhanSuValidatorClient.clearValidation(field);
+                }
+            });
+        }
+    });
 
     // Set giá trị mặc định
     document.getElementById('MaNV').value = '0';
@@ -264,18 +288,29 @@ function openModal() {
     modal.show();
 
     // ===== KÍCH HOẠT VALIDATION NGAY KHI MỞ FORM =====
-    // Đợi modal hiển thị xong rồi mới bind events
     modalElement.addEventListener('shown.bs.modal', function onModalShown() {
-        console.log('🎯 Modal đã mở, khởi tạo validation...');
+        console.log('🎯 Modal đã mở, đang kiểm tra validation...');
 
-        // Khởi tạo validation realtime
-        if (window.NhanSuValidatorClient) {
-            // Rebind events để đảm bảo validation hoạt động
-            window.NhanSuValidatorClient.bindEvents();
-            console.log('✅ Validation đã được kích hoạt!');
-        } else {
-            console.error('❌ NhanSuValidatorClient không tồn tại!');
-        }
+        // Đợi validator load xong
+        waitForValidator((isReady) => {
+            if (isReady) {
+                window.NhanSuValidatorClient.bindEvents();
+                console.log('✅ Validation đã được kích hoạt!');
+            } else {
+                console.error('❌ NhanSuValidatorClient không load được!');
+                console.log('⚠️ Sử dụng HTML5 validation thay thế');
+                
+                // Fallback: Sử dụng HTML5 validation
+                form.setAttribute('novalidate', '');
+                form.addEventListener('submit', function(e) {
+                    if (!form.checkValidity()) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                });
+            }
+        });
 
         // Remove listener sau khi đã thực hiện
         modalElement.removeEventListener('shown.bs.modal', onModalShown);
@@ -319,15 +354,17 @@ function editData(id, event) {
             form.reset();
             form.classList.remove('was-validated');
 
-            // Clear validation states
-            if (window.NhanSuValidatorClient) {
-                ['HoTen', 'SDT', 'Email', 'TenDangNhap', 'MatKhau', 'ChucVu', 'MaXa'].forEach(fieldId => {
-                    const field = document.getElementById(fieldId);
-                    if (field) {
-                        window.NhanSuValidatorClient.clearValidation(field);
-                    }
-                });
-            }
+            // Đợi validator load xong trước khi clear validation
+            waitForValidator((isReady) => {
+                if (isReady && window.NhanSuValidatorClient) {
+                    ['HoTen', 'SDT', 'Email', 'TenDangNhap', 'MatKhau', 'ChucVu', 'MaXa'].forEach(fieldId => {
+                        const field = document.getElementById(fieldId);
+                        if (field) {
+                            window.NhanSuValidatorClient.clearValidation(field);
+                        }
+                    });
+                }
+            });
 
             // Fill data
             document.getElementById('MaNV').value = data.maNV;
@@ -370,13 +407,28 @@ function editData(id, event) {
 
             // ===== KÍCH HOẠT VALIDATION NGAY KHI MỞ FORM =====
             modalElement.addEventListener('shown.bs.modal', function onModalShown() {
-                console.log('🎯 Modal sửa đã mở, khởi tạo validation...');
+                console.log('🎯 Modal sửa đã mở, đang kiểm tra validation...');
 
-                if (window.NhanSuValidatorClient) {
-                    // Rebind events
-                    window.NhanSuValidatorClient.bindEvents();
-                    console.log('✅ Validation đã được kích hoạt!');
-                }
+                // Đợi validator load xong
+                waitForValidator((isReady) => {
+                    if (isReady) {
+                        window.NhanSuValidatorClient.bindEvents();
+                        console.log('✅ Validation đã được kích hoạt!');
+                    } else {
+                        console.error('❌ NhanSuValidatorClient không load được!');
+                        console.log('⚠️ Sử dụng HTML5 validation thay thế');
+                        
+                        // Fallback: Sử dụng HTML5 validation
+                        form.setAttribute('novalidate', '');
+                        form.addEventListener('submit', function(e) {
+                            if (!form.checkValidity()) {
+                                e.preventDefault();
+                                e.stopPropagation();
+                            }
+                            form.classList.add('was-validated');
+                        });
+                    }
+                });
 
                 modalElement.removeEventListener('shown.bs.modal', onModalShown);
             }, { once: true });
@@ -396,40 +448,52 @@ function editData(id, event) {
 function saveData() {
     const form = document.getElementById('frmNhanSu');
 
-    // === VALIDATE VỚI REALTIME VALIDATION ===
-    if (window.NhanSuValidatorClient && !window.NhanSuValidatorClient.validateForm()) {
-        // Hiển thị thông báo
-        const alertDiv = document.createElement('div');
-        alertDiv.className = 'alert alert-danger alert-dismissible fade show mt-3';
-        alertDiv.innerHTML = `
-            <i class="bi bi-exclamation-triangle"></i> 
-            Vui lòng kiểm tra lại các trường đánh dấu đỏ!
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        `;
+    // Đợi validator, sau đó validate
+    waitForValidator((isReady) => {
+        if (isReady && window.NhanSuValidatorClient) {
+            // === VALIDATE VỚI REALTIME VALIDATION ===
+            if (!window.NhanSuValidatorClient.validateForm()) {
+                // Hiển thị thông báo
+                const alertDiv = document.createElement('div');
+                alertDiv.className = 'alert alert-danger alert-dismissible fade show mt-3';
+                alertDiv.innerHTML = `
+                    <i class="bi bi-exclamation-triangle"></i> 
+                    Vui lòng kiểm tra lại các trường đánh dấu đỏ!
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                `;
 
-        const modalBody = form.parentElement;
-        const existingAlert = modalBody.querySelector('.alert-danger');
-        if (existingAlert) existingAlert.remove();
+                const modalBody = form.parentElement;
+                const existingAlert = modalBody.querySelector('.alert-danger');
+                if (existingAlert) existingAlert.remove();
 
-        modalBody.insertBefore(alertDiv, form);
+                modalBody.insertBefore(alertDiv, form);
 
-        // Auto close sau 5s
-        setTimeout(() => {
-            try {
-                new bootstrap.Alert(alertDiv).close();
-            } catch (e) { }
-        }, 5000);
+                // Auto close sau 5s
+                setTimeout(() => {
+                    try {
+                        new bootstrap.Alert(alertDiv).close();
+                    } catch (e) { }
+                }, 5000);
 
-        return;
-    }
+                return;
+            }
+        } else {
+            // Fallback: Nếu không có NhanSuValidatorClient, dùng native HTML5 validation
+            if (!form.checkValidity()) {
+                form.classList.add('was-validated');
+                return;
+            }
+        }
 
-    // Fallback: Nếu không có NhanSuValidatorClient, dùng native HTML5 validation
-    if (!form.checkValidity()) {
-        form.classList.add('was-validated');
-        return;
-    }
+        // Tiến hành lưu dữ liệu
+        proceedSave();
+    });
+}
 
+function proceedSave() {
+    const form = document.getElementById('frmNhanSu');
     const btnSave = document.getElementById('btnSave');
+    
     btnSave.disabled = true;
     btnSave.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Đang lưu...';
 

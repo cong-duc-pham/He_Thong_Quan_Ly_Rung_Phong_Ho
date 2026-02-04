@@ -199,13 +199,9 @@
     </div>
 </div>
 
+<!-- Modal Thêm/Sửa Nhân Sự -->
 <div class="modal fade" id="nhanSuModal" tabindex="-1" data-bs-backdrop="static">
     <div class="modal-dialog modal-lg modal-dialog-centered">
-<
-        <div class="modal-content border-0 shadow">
-            <div class="modal-header bg-success text-white">
-                <h5 class="modal-title text-white fw-bold" id="modalTitle">
-
         <div class="modal-content border-0 shadow-lg">
             <div class="modal-header position-relative overflow-hidden" 
                  style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%) !important; 
@@ -213,7 +209,6 @@
                         border-bottom: none !important;">
                 <h5 class="modal-title text-white fw-bold position-relative" id="modalTitle" 
                     style="font-size: 1.35rem; letter-spacing: 0.3px; color: #ffffff !important;">
-
                     <i class="bi bi-person-plus-fill me-2"></i>@Localizer["ModalTitleAdd"]
                 </h5>
                 <button type="button" class="btn-close btn-close-white position-relative" data-bs-dismiss="modal"></button>
@@ -256,8 +251,7 @@
                         <div class="row g-3 mt-1">
                             <div class="col-md-6">
                                 <label class="form-label fw-semibold">@Localizer["PhoneLabel"] <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control form-control-sm" name="SDT" id="SDT"
-                                       pattern="^(03|05|07|08|09|01[2|6|8|9])+([0-9]{8})$" required>
+                                <input type="text" class="form-control form-control-sm" name="SDT" id="SDT" required>
                                 <div class="invalid-feedback">@Localizer["PhoneInvalid"]</div>
                                 <div class="valid-feedback"></div>
                             </div>
@@ -327,6 +321,40 @@
     <script src="~/js/nhansu-validator.js" asp-append-version="true"></script>
     <script src="~/js/nhansu.js" asp-append-version="true"></script>
     <script>
+        $(document).ready(function () {
+            // Kiểm tra cưỡng bức một lần nữa khi trang nạp xong
+            if (window.NhanSuValidatorClient) {
+                window.NhanSuValidatorClient.init();
+            }
+        });
+    </script>
+    <script>
+        // Đảm bảo NhanSuValidatorClient được load trước khi sử dụng
+        (function() {
+            'use strict';
+            
+            // Kiểm tra validator đã load chưa
+            function checkValidatorLoaded() {
+                if (typeof window.NhanSuValidatorClient === 'undefined') {
+                    console.error('❌ CẢNH BÁO: nhansu-validator.js chưa được load!');
+                    console.log('🔄 Đang chờ validator load...');
+                    
+                    // Thử lại sau 100ms
+                    setTimeout(checkValidatorLoaded, 100);
+                    return false;
+                }
+                console.log('✅ NhanSuValidatorClient đã sẵn sàng!');
+                return true;
+            }
+            
+            // Kiểm tra ngay khi script chạy
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', checkValidatorLoaded);
+            } else {
+                checkValidatorLoaded();
+            }
+        })();
+        
         // Auto-update quyền khi chọn chức vụ
         document.addEventListener('DOMContentLoaded', function() {
             const chucVuSelect = document.getElementById('ChucVu');

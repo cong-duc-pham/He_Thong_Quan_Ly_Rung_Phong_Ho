@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using QuanLyRungPhongHo.Attributes;
 using QuanLyRungPhongHo.Data;
 using QuanLyRungPhongHo.Models;
 
@@ -20,6 +21,7 @@ namespace QuanLyRungPhongHo.Controllers
 
         // GET: LoRung
         // Hiển thị danh sách Lô rừng với multi-filter và phân trang
+        [CheckPermission("LoRung.View")]
         public async Task<IActionResult> Index(string searchXa, string searchThon, string searchLoai, string searchTrangThai, int? pageNumber)
         {
             try
@@ -105,6 +107,7 @@ namespace QuanLyRungPhongHo.Controllers
         }
 
         // GET: LoRung/Create
+        [CheckPermission("LoRung.Create")]
         public async Task<IActionResult> Create()
         {
             // Load dropdown Xã
@@ -134,6 +137,7 @@ namespace QuanLyRungPhongHo.Controllers
         // POST: LoRung/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [CheckPermission("LoRung.Create")]
         public async Task<IActionResult> Create([Bind("SoTieuKhu,SoKhoanh,SoLo,MaThon,DienTich,LoaiRung,TrangThai")] LoRung loRung)
         {
             try
@@ -172,6 +176,7 @@ namespace QuanLyRungPhongHo.Controllers
         }
 
         // GET: LoRung/Edit/5
+        [CheckPermission("LoRung.Edit")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -226,6 +231,7 @@ namespace QuanLyRungPhongHo.Controllers
         // POST: LoRung/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [CheckPermission("LoRung.Edit")]
         public async Task<IActionResult> Edit(int id, [Bind("MaLo,SoTieuKhu,SoKhoanh,SoLo,MaThon,DienTich,LoaiRung,TrangThai")] LoRung loRung)
         {
             if (id != loRung.MaLo)
@@ -281,6 +287,7 @@ namespace QuanLyRungPhongHo.Controllers
         }
 
         // GET: LoRung/Delete/5
+        [CheckPermission("LoRung.Delete")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -313,6 +320,7 @@ namespace QuanLyRungPhongHo.Controllers
         // POST: LoRung/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [CheckPermission("LoRung.Delete")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             try
@@ -344,6 +352,7 @@ namespace QuanLyRungPhongHo.Controllers
 
         // API: Lấy danh sách lô rừng phân trang (AJAX)
         [HttpGet]
+        [CheckPermission("LoRung.View")]
         public async Task<JsonResult> GetPaged(string? searchXa, string? searchThon, string? searchLoai, string? searchTrangThai, int pageNumber = 1, int pageSize = PageSize)
         {
             try
@@ -417,6 +426,7 @@ namespace QuanLyRungPhongHo.Controllers
 
         // API: Lấy danh sách lô rừng (dùng cho AJAX)
         [HttpGet]
+        [CheckPermission("LoRung.View")]
         public async Task<JsonResult> GetAll(string? maXa, string? maThon, string? loaiRung, string? trangThai)
         {
             try
@@ -471,6 +481,7 @@ namespace QuanLyRungPhongHo.Controllers
 
         // API: Lấy chi tiết lô rừng
         [HttpGet]
+        [CheckPermission("LoRung.View")]
         public async Task<JsonResult> GetDetails(int id)
         {
             try

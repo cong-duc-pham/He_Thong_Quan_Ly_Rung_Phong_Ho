@@ -3,10 +3,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using QuanLyRungPhongHo.Data;
 using QuanLyRungPhongHo.Models;
+using QuanLyRungPhongHo.Attributes;
 
 namespace QuanLyRungPhongHo.Controllers
 {
-    [Authorize]
+    [Authorize] // Chỉ yêu cầu đăng nhập, quyền được kiểm tra bởi CheckPermission
     public class NgayNghiLeController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -17,6 +18,7 @@ namespace QuanLyRungPhongHo.Controllers
         }
 
         // GET: NgayNghiLe/Index
+        [CheckPermission("NgayNghiLe.View")]
         public async Task<IActionResult> Index()
         {
             var ngayNghiLes = await _context.NgayNghiLes
@@ -26,6 +28,7 @@ namespace QuanLyRungPhongHo.Controllers
         }
 
         // GET: NgayNghiLe/Create
+        [CheckPermission("NgayNghiLe.Create")]
         public IActionResult Create()
         {
             return View();
@@ -34,6 +37,7 @@ namespace QuanLyRungPhongHo.Controllers
         // POST: NgayNghiLe/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [CheckPermission("NgayNghiLe.Create")]
         public async Task<IActionResult> Create(NgayNghiLe ngayNghiLe)
         {
             try
@@ -73,6 +77,7 @@ namespace QuanLyRungPhongHo.Controllers
         }
 
         // GET: NgayNghiLe/Edit/5
+        [CheckPermission("NgayNghiLe.Edit")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -92,6 +97,7 @@ namespace QuanLyRungPhongHo.Controllers
         // POST: NgayNghiLe/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [CheckPermission("NgayNghiLe.Edit")]
         public async Task<IActionResult> Edit(int id, NgayNghiLe ngayNghiLe)
         {
             if (id != ngayNghiLe.MaNgayNghi)
@@ -146,6 +152,7 @@ namespace QuanLyRungPhongHo.Controllers
         // POST: NgayNghiLe/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [CheckPermission("NgayNghiLe.Delete")]
         public async Task<IActionResult> Delete(int id)
         {
             try

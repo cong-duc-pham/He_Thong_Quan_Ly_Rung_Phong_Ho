@@ -47,9 +47,9 @@
                 <div class="col-md-3">
                     <select id="nhansuRoleFilter" name="roleFilter" class="form-select">
                         <option value="">@Localizer["AllPositions"]</option>
-                        <option value="Trạm trưởng">@Localizer["PositionStationChief"]</option>
-                        <option value="Kiểm lâm viên">@Localizer["PositionForester"]</option>
-                        <option value="Bảo vệ rừng">@Localizer["PositionForestGuard"]</option>
+                        <option value="Quản trị viên Tỉnh">Quản trị viên Tỉnh</option>
+                        <option value="Quản lý Xã">Quản lý Xã</option>
+                        <option value="Kiểm lâm viên">Kiểm lâm viên</option>
                     </select>
                 </div>
                 <div class="col-md-2">
@@ -175,6 +175,7 @@
                 <form id="frmNhanSu" novalidate>
                     @Html.AntiForgeryToken()
                     <input type="hidden" id="MaNV" name="MaNV" value="0">
+                    <input type="hidden" id="Quyen" name="Quyen" value="Kiem_Lam">
 
                     <!-- Thông tin cá nhân -->
                     <div class="mb-4">
@@ -192,16 +193,16 @@
                                 <label class="form-label fw-semibold">@Localizer["PositionLabel"] <span class="text-danger">*</span></label>
                                 <select class="form-select form-select-sm" name="ChucVu" id="ChucVu" required>
                                     <option value="">@Localizer["ChoosePosition"]</option>
-                                    <option value="Kiểm lâm">@Localizer["PositionForester"]</option>
-                                    <option value="Phó Kiểm lâm">@Localizer["PositionDeputyForester"]</option>
-                                    <option value="Trưởng trạm">@Localizer["PositionStationChief"]</option>
-                                    <option value="Phó trạm">@Localizer["PositionDeputyStationChief"]</option>
-                                    <option value="Nhân viên bảo vệ rừng">@Localizer["PositionForestGuard"]</option>
-                                    <option value="Cán bộ kỹ thuật">@Localizer["PositionTechnicalOfficer"]</option>
-                                    <option value="Hướng dẫn viên">@Localizer["PositionGuide"]</option>
+                                    <option value="Quản trị viên Tỉnh" data-quyen="Admin_Tinh">Quản trị viên Tỉnh</option>
+                                    <option value="Quản lý Xã" data-quyen="QuanLy_Xa">Quản lý Xã</option>
+                                    <option value="Kiểm lâm viên" data-quyen="Kiem_Lam">Kiểm lâm viên</option>
                                 </select>
                                 <div class="invalid-feedback">@Localizer["PositionRequired"]</div>
                                 <div class="valid-feedback"></div>
+                                <small class="text-muted">
+                                    <i class="bi bi-info-circle"></i> 
+                                    <span id="quyenHint">Quyền hệ thống sẽ được tự động gán theo chức vụ</span>
+                                </small>
                             </div>
                         </div>
 
@@ -238,21 +239,11 @@
                             <i class="bi bi-shield-lock-fill me-2"></i>@Localizer["AccountInfo"]
                         </h6>
                         <div class="row g-3">
-                            <div class="col-md-6">
+                            <div class="col-md-12">
                                 <label class="form-label fw-semibold">@Localizer["UsernameLabel"] <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control form-control-sm" name="TenDangNhap"
                                     id="TenDangNhap" pattern="^[a-zA-Z0-9_]{5,50}$" required>
                                 <div class="invalid-feedback">@Localizer["UsernameInvalid"]</div>
-                                <div class="valid-feedback"></div>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-semibold">@Localizer["RoleLabel"] <span class="text-danger">*</span></label>
-                                <select class="form-select form-select-sm" name="Quyen" id="Quyen" required>
-                                    <option value="NhanVien_Thon">@Localizer["RoleStaff"]</option>
-                                    <option value="QuanLy_Xa">@Localizer["RoleManager"]</option>
-                                    <option value="Admin_Tinh">@Localizer["RoleAdmin"]</option>
-                                </select>
-                                <div class="invalid-feedback"></div>
                                 <div class="valid-feedback"></div>
                             </div>
                         </div>
@@ -288,4 +279,34 @@
 @section Scripts {
     <script src="~/js/nhansu-validator.js" asp-append-version="true"></script>
     <script src="~/js/nhansu.js" asp-append-version="true"></script>
+    <script>
+        // Auto-update quyền khi chọn chức vụ
+        document.addEventListener('DOMContentLoaded', function() {
+            const chucVuSelect = document.getElementById('ChucVu');
+            const quyenInput = document.getElementById('Quyen');
+            const quyenHint = document.getElementById('quyenHint');
+            
+            if (chucVuSelect && quyenInput && quyenHint) {
+                chucVuSelect.addEventListener('change', function() {
+                    const selectedOption = this.options[this.selectedIndex];
+                    const quyen = selectedOption.getAttribute('data-quyen');
+                    if (quyen) {
+                        quyenInput.value = quyen;
+                        
+                        // Hiển thị hint
+                        const quyenMap = {
+                            'Admin_Tinh': 'Toàn quyền quản trị hệ thống',
+                            'QuanLy_Xa': 'Quản lý dữ liệu cấp Xã',
+                            'Kiem_Lam': 'Ghi nhật ký và xem dữ liệu'
+                        };
+                        quyenHint.textContent = `→ Quyền: ${quyenMap[quyen] || quyen}`;
+                        quyenHint.classList.add('text-primary', 'fw-bold');
+                    } else {
+                        quyenHint.textContent = 'Quyền hệ thống sẽ được tự động gán theo chức vụ';
+                        quyenHint.classList.remove('text-primary', 'fw-bold');
+                    }
+                });
+            }
+        });
+    </script>
 }

@@ -11,16 +11,20 @@ namespace QuanLyRungPhongHo.Validators
     {
         #region Validation Rules Constants
 
-        // Danh sách chức vụ hợp lệ trong hệ thống quản lý rừng
+        // Danh sách chức vụ hợp lệ (theo phân quyền hệ thống)
         private static readonly HashSet<string> ChucVuHopLe = new()
         {
-            "Kiểm lâm",
-            "Phó Kiểm lâm",
-            "Trưởng trạm",
-            "Phó trạm",
-            "Nhân viên bảo vệ rừng",
-            "Cán bộ kỹ thuật",
-            "Hướng dẫn viên"
+            "Quản trị viên Tỉnh",
+            "Quản lý Xã",
+            "Kiểm lâm viên"
+        };
+
+        // Mapping chức vụ -> quyền hệ thống
+        private static readonly Dictionary<string, string> ChucVuQuyenMap = new()
+        {
+            { "Quản trị viên Tỉnh", "Admin_Tinh" },
+            { "Quản lý Xã", "QuanLy_Xa" },
+            { "Kiểm lâm viên", "Kiem_Lam" }
         };
 
         // Danh sách quyền hệ thống hợp lệ
@@ -35,10 +39,6 @@ namespace QuanLyRungPhongHo.Validators
         private const string VietnamPhonePattern = @"^(0|\+84)(3[2-9]|5[6|8|9]|7[0|6-9]|8[1-9]|9[0-9])[0-9]{7}$";
         private const string UsernamePattern = @"^[a-zA-Z0-9_]{5,50}$";
         private const string VietnameseNamePattern = @"^[a-zA-ZÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂưăạảấầẩẫậắằẳẵặẹẻẽềềểỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵýỷỹ\s]{2,100}$";
-
-        // Tuổi hợp lệ cho nhân viên (18-65 tuổi)
-        private const int MIN_AGE = 18;
-        private const int MAX_AGE = 65;
 
         // Độ dài giới hạn
         private const int MIN_PASSWORD_LENGTH = 6;
@@ -86,7 +86,7 @@ namespace QuanLyRungPhongHo.Validators
         }
 
         /// <summary>
-        /// Validate chức vụ
+        /// Validate chức vụ (theo phân quyền hệ thống)
         /// </summary>
         public static (bool IsValid, string ErrorMessage) ValidateChucVu(string? chucVu)
         {
@@ -99,6 +99,19 @@ namespace QuanLyRungPhongHo.Validators
                 return (false, $"Chức vụ không hợp lệ! Các chức vụ hợp lệ: {string.Join(", ", ChucVuHopLe)}");
 
             return (true, string.Empty);
+        }
+
+        /// <summary>
+        /// Mapping chức vụ sang quyền hệ thống
+        /// </summary>
+        public static string GetQuyenFromChucVu(string chucVu)
+        {
+            if (string.IsNullOrWhiteSpace(chucVu))
+                return "Kiem_Lam"; // Default
+
+            chucVu = chucVu.Trim();
+            
+            return ChucVuQuyenMap.TryGetValue(chucVu, out var quyen) ? quyen : "Kiem_Lam";
         }
 
         /// <summary>
@@ -294,29 +307,6 @@ namespace QuanLyRungPhongHo.Validators
             // Kiểm tra định dạng mã xã (thường là 5-10 ký tự)
             if (maXa.Length < 2 || maXa.Length > 20)
                 return (false, "Mã xã không hợp lệ!");
-
-            return (true, string.Empty);
-        }
-
-        /// <summary>
-        /// Validate logic nghiệp vụ: Quyền phù hợp với chức vụ
-        /// </summary>
-        public static (bool IsValid, string ErrorMessage) ValidateQuyenVsChucVu(string? quyen, string? chucVu)
-        {
-            if (string.IsNullOrWhiteSpace(quyen) || string.IsNullOrWhiteSpace(chucVu))
-                return (true, string.Empty); // Bỏ qua nếu chưa có đủ dữ liệu
-
-            // Logic nghiệp vụ: Chức vụ cao phải có quyền phù hợp
-            if (chucVu == "Trưởng trạm" || chucVu == "Phó trạm")
-            {
-                if (quyen == "Kiem_Lam")
-                    return (false, "Chức vụ Trưởng trạm/Phó trạm phải có quyền QuanLy_Xa trở lên!");
-            }
-
-            if (chucVu == "Kiểm lâm" && quyen == "Admin_Tinh")
-            {
-                return (false, "Chức vụ Kiểm lâm không phù hợp với quyền Admin_Tinh!");
-            }
 
             return (true, string.Empty);
         }

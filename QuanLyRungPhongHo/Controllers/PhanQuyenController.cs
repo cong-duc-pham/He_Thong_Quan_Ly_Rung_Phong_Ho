@@ -132,13 +132,8 @@ namespace QuanLyRungPhongHo.Controllers
             // Dọn dẹp các quyền cũ không còn sử dụng
             await CleanupOldPermissions();
             
-            // Kiểm tra và tạo Permissions nếu chưa có
-            bool hasPermissions = await _context.Permissions.AnyAsync();
-            
-            if (!hasPermissions)
-            {
-                await CreatePermissions();
-            }
+            // Luôn đảm bảo tạo các permissions mới nếu chưa có
+            await EnsureAllPermissionsExist();
             
             // Luôn kiểm tra và cập nhật RolePermissions
             await InitializeRolePermissions();
@@ -155,7 +150,11 @@ namespace QuanLyRungPhongHo.Controllers
                 "TaiKhoan.ResetPassword",
                 "Report.ViewAll",
                 "Report.ViewOwn",
-                "Report.Export"
+                "Report.Export",
+                "CaLam.View",
+                "CaLam.Create",
+                "CaLam.Edit",
+                "CaLam.Delete"
             };
 
             // Xóa các RolePermission liên quan đến Permission cũ
@@ -177,6 +176,99 @@ namespace QuanLyRungPhongHo.Controllers
             if (oldPermissions.Any())
             {
                 _context.Permissions.RemoveRange(oldPermissions);
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        private async Task EnsureAllPermissionsExist()
+        {
+            var permissionsToCreate = new List<Permission>
+            {
+                // Module: Danh mục Xã
+                new() { PermissionCode = "DanhMucXa.View", PermissionName = "Xem danh sách Xã", ModuleName = "Danh mục Xã" },
+                new() { PermissionCode = "DanhMucXa.Create", PermissionName = "Tạo mới Xã", ModuleName = "Danh mục Xã" },
+                new() { PermissionCode = "DanhMucXa.Edit", PermissionName = "Sửa thông tin Xã", ModuleName = "Danh mục Xã" },
+                new() { PermissionCode = "DanhMucXa.Delete", PermissionName = "Xóa Xã", ModuleName = "Danh mục Xã" },
+
+                // Module: Danh mục Thôn
+                new() { PermissionCode = "DanhMucThon.View", PermissionName = "Xem danh sách Thôn", ModuleName = "Danh mục Thôn" },
+                new() { PermissionCode = "DanhMucThon.Create", PermissionName = "Tạo mới Thôn", ModuleName = "Danh mục Thôn" },
+                new() { PermissionCode = "DanhMucThon.Edit", PermissionName = "Sửa thông tin Thôn", ModuleName = "Danh mục Thôn" },
+                new() { PermissionCode = "DanhMucThon.Delete", PermissionName = "Xóa Thôn", ModuleName = "Danh mục Thôn" },
+
+                // Module: Lô rừng
+                new() { PermissionCode = "LoRung.View", PermissionName = "Xem danh sách Lô rừng", ModuleName = "Lô Rừng" },
+                new() { PermissionCode = "LoRung.Create", PermissionName = "Tạo mới Lô rừng", ModuleName = "Lô Rừng" },
+                new() { PermissionCode = "LoRung.Edit", PermissionName = "Sửa thông tin Lô rừng", ModuleName = "Lô Rừng" },
+                new() { PermissionCode = "LoRung.Delete", PermissionName = "Xóa Lô rừng", ModuleName = "Lô Rừng" },
+
+                // Module: Nhân Sự (bao gồm cả quản lý tài khoản)
+                new() { PermissionCode = "NhanSu.View", PermissionName = "Xem danh sách Nhân sự", ModuleName = "Nhân Sự" },
+                new() { PermissionCode = "NhanSu.Create", PermissionName = "Tạo mới Nhân sự & Tài khoản", ModuleName = "Nhân Sự" },
+                new() { PermissionCode = "NhanSu.Edit", PermissionName = "Sửa Nhân sự & Tài khoản", ModuleName = "Nhân Sự" },
+                new() { PermissionCode = "NhanSu.Delete", PermissionName = "Xóa Nhân sự & Tài khoản", ModuleName = "Nhân Sự" },
+
+                // Module: Nhật Ký Bảo Vệ
+                new() { PermissionCode = "NhatKyBaoVe.View", PermissionName = "Xem Nhật ký bảo vệ", ModuleName = "Nhật Ký Bảo Vệ" },
+                new() { PermissionCode = "NhatKyBaoVe.Create", PermissionName = "Tạo Nhật ký bảo vệ", ModuleName = "Nhật Ký Bảo Vệ" },
+                new() { PermissionCode = "NhatKyBaoVe.Edit", PermissionName = "Sửa Nhật ký bảo vệ", ModuleName = "Nhật Ký Bảo Vệ" },
+                new() { PermissionCode = "NhatKyBaoVe.Delete", PermissionName = "Xóa Nhật ký bảo vệ", ModuleName = "Nhật Ký Bảo Vệ" },
+
+                // Module: Sinh Vật
+                new() { PermissionCode = "SinhVat.View", PermissionName = "Xem danh sách Sinh vật", ModuleName = "Sinh Vật" },
+                new() { PermissionCode = "SinhVat.Create", PermissionName = "Tạo mới Sinh vật", ModuleName = "Sinh Vật" },
+                new() { PermissionCode = "SinhVat.Edit", PermissionName = "Sửa thông tin Sinh vật", ModuleName = "Sinh Vật" },
+                new() { PermissionCode = "SinhVat.Delete", PermissionName = "Xóa Sinh vật", ModuleName = "Sinh Vật" },
+
+                // Module: Quản Lý Ca
+                new() { PermissionCode = "QuanLyCa.View", PermissionName = "Xem danh sách Ca", ModuleName = "Quản Lý Ca" },
+                new() { PermissionCode = "QuanLyCa.Create", PermissionName = "Tạo mới Ca", ModuleName = "Quản Lý Ca" },
+                new() { PermissionCode = "QuanLyCa.Edit", PermissionName = "Sửa thông tin Ca", ModuleName = "Quản Lý Ca" },
+                new() { PermissionCode = "QuanLyCa.Delete", PermissionName = "Xóa Ca", ModuleName = "Quản Lý Ca" },
+
+                // Module: Phân Lịch Làm Việc
+                new() { PermissionCode = "PhanLichLamViec.View", PermissionName = "Xem phân lịch làm việc", ModuleName = "Phân Lịch Làm Việc" },
+                new() { PermissionCode = "PhanLichLamViec.Create", PermissionName = "Tạo phân lịch làm việc", ModuleName = "Phân Lịch Làm Việc" },
+                new() { PermissionCode = "PhanLichLamViec.Edit", PermissionName = "Sửa phân lịch làm việc", ModuleName = "Phân Lịch Làm Việc" },
+                new() { PermissionCode = "PhanLichLamViec.Delete", PermissionName = "Xóa phân lịch làm việc", ModuleName = "Phân Lịch Làm Việc" },
+
+                // Module: Đơn Xin Nghỉ
+                new() { PermissionCode = "DonXinNghi.View", PermissionName = "Xem đơn xin nghỉ", ModuleName = "Đơn Xin Nghỉ" },
+                new() { PermissionCode = "DonXinNghi.Create", PermissionName = "Tạo đơn xin nghỉ", ModuleName = "Đơn Xin Nghỉ" },
+                new() { PermissionCode = "DonXinNghi.Edit", PermissionName = "Sửa đơn xin nghỉ", ModuleName = "Đơn Xin Nghỉ" },
+                new() { PermissionCode = "DonXinNghi.Delete", PermissionName = "Xóa đơn xin nghỉ", ModuleName = "Đơn Xin Nghỉ" },
+                new() { PermissionCode = "DonXinNghi.Approve", PermissionName = "Duyệt đơn xin nghỉ", ModuleName = "Đơn Xin Nghỉ" },
+
+                // Module: Chấm Công
+                new() { PermissionCode = "ChamCong.View", PermissionName = "Xem chấm công", ModuleName = "Chấm Công" },
+                new() { PermissionCode = "ChamCong.Create", PermissionName = "Tạo chấm công", ModuleName = "Chấm Công" },
+                new() { PermissionCode = "ChamCong.Edit", PermissionName = "Sửa chấm công", ModuleName = "Chấm Công" },
+                new() { PermissionCode = "ChamCong.Delete", PermissionName = "Xóa chấm công", ModuleName = "Chấm Công" },
+
+                // Module: Ngày Nghỉ Lễ
+                new() { PermissionCode = "NgayNghiLe.View", PermissionName = "Xem danh sách ngày nghỉ lễ", ModuleName = "Ngày Nghỉ Lễ" },
+                new() { PermissionCode = "NgayNghiLe.Create", PermissionName = "Tạo ngày nghỉ lễ", ModuleName = "Ngày Nghỉ Lễ" },
+                new() { PermissionCode = "NgayNghiLe.Edit", PermissionName = "Sửa ngày nghỉ lễ", ModuleName = "Ngày Nghỉ Lễ" },
+                new() { PermissionCode = "NgayNghiLe.Delete", PermissionName = "Xóa ngày nghỉ lễ", ModuleName = "Ngày Nghỉ Lễ" },
+
+                // Module: Báo Cáo Thống Kê
+                new() { PermissionCode = "BaoCaoThongKe.View", PermissionName = "Xem báo cáo thống kê", ModuleName = "Báo Cáo Thống Kê" },
+                new() { PermissionCode = "BaoCaoThongKe.Export", PermissionName = "Xuất báo cáo (CSV/PDF)", ModuleName = "Báo Cáo Thống Kê" }
+            };
+
+            // Lấy danh sách permission codes hiện có
+            var existingCodes = await _context.Permissions
+                .Select(p => p.PermissionCode)
+                .ToListAsync();
+
+            // Chỉ thêm các permission chưa có
+            var newPermissions = permissionsToCreate
+                .Where(p => !existingCodes.Contains(p.PermissionCode))
+                .ToList();
+
+            if (newPermissions.Any())
+            {
+                _context.Permissions.AddRange(newPermissions);
                 await _context.SaveChangesAsync();
             }
         }
@@ -222,6 +314,37 @@ namespace QuanLyRungPhongHo.Controllers
                 new() { PermissionCode = "SinhVat.Edit", PermissionName = "Sửa thông tin Sinh vật", ModuleName = "Sinh Vật" },
                 new() { PermissionCode = "SinhVat.Delete", PermissionName = "Xóa Sinh vật", ModuleName = "Sinh Vật" },
 
+                // Module: Quản Lý Ca
+                new() { PermissionCode = "QuanLyCa.View", PermissionName = "Xem danh sách Ca", ModuleName = "Quản Lý Ca" },
+                new() { PermissionCode = "QuanLyCa.Create", PermissionName = "Tạo mới Ca", ModuleName = "Quản Lý Ca" },
+                new() { PermissionCode = "QuanLyCa.Edit", PermissionName = "Sửa thông tin Ca", ModuleName = "Quản Lý Ca" },
+                new() { PermissionCode = "QuanLyCa.Delete", PermissionName = "Xóa Ca", ModuleName = "Quản Lý Ca" },
+
+                // Module: Phân Lịch Làm Việc
+                new() { PermissionCode = "PhanLichLamViec.View", PermissionName = "Xem phân lịch làm việc", ModuleName = "Phân Lịch Làm Việc" },
+                new() { PermissionCode = "PhanLichLamViec.Create", PermissionName = "Tạo phân lịch làm việc", ModuleName = "Phân Lịch Làm Việc" },
+                new() { PermissionCode = "PhanLichLamViec.Edit", PermissionName = "Sửa phân lịch làm việc", ModuleName = "Phân Lịch Làm Việc" },
+                new() { PermissionCode = "PhanLichLamViec.Delete", PermissionName = "Xóa phân lịch làm việc", ModuleName = "Phân Lịch Làm Việc" },
+
+                // Module: Đơn Xin Nghỉ
+                new() { PermissionCode = "DonXinNghi.View", PermissionName = "Xem đơn xin nghỉ", ModuleName = "Đơn Xin Nghỉ" },
+                new() { PermissionCode = "DonXinNghi.Create", PermissionName = "Tạo đơn xin nghỉ", ModuleName = "Đơn Xin Nghỉ" },
+                new() { PermissionCode = "DonXinNghi.Edit", PermissionName = "Sửa đơn xin nghỉ", ModuleName = "Đơn Xin Nghỉ" },
+                new() { PermissionCode = "DonXinNghi.Delete", PermissionName = "Xóa đơn xin nghỉ", ModuleName = "Đơn Xin Nghỉ" },
+                new() { PermissionCode = "DonXinNghi.Approve", PermissionName = "Duyệt đơn xin nghỉ", ModuleName = "Đơn Xin Nghỉ" },
+
+                // Module: Chấm Công
+                new() { PermissionCode = "ChamCong.View", PermissionName = "Xem chấm công", ModuleName = "Chấm Công" },
+                new() { PermissionCode = "ChamCong.Create", PermissionName = "Tạo chấm công", ModuleName = "Chấm Công" },
+                new() { PermissionCode = "ChamCong.Edit", PermissionName = "Sửa chấm công", ModuleName = "Chấm Công" },
+                new() { PermissionCode = "ChamCong.Delete", PermissionName = "Xóa chấm công", ModuleName = "Chấm Công" },
+
+                // Module: Ngày Nghỉ Lễ
+                new() { PermissionCode = "NgayNghiLe.View", PermissionName = "Xem danh sách ngày nghỉ lễ", ModuleName = "Ngày Nghỉ Lễ" },
+                new() { PermissionCode = "NgayNghiLe.Create", PermissionName = "Tạo ngày nghỉ lễ", ModuleName = "Ngày Nghỉ Lễ" },
+                new() { PermissionCode = "NgayNghiLe.Edit", PermissionName = "Sửa ngày nghỉ lễ", ModuleName = "Ngày Nghỉ Lễ" },
+                new() { PermissionCode = "NgayNghiLe.Delete", PermissionName = "Xóa ngày nghỉ lễ", ModuleName = "Ngày Nghỉ Lễ" },
+
                 // Module: Báo Cáo Thống Kê
                 new() { PermissionCode = "BaoCaoThongKe.View", PermissionName = "Xem báo cáo thống kê", ModuleName = "Báo Cáo Thống Kê" },
                 new() { PermissionCode = "BaoCaoThongKe.Export", PermissionName = "Xuất báo cáo (CSV/PDF)", ModuleName = "Báo Cáo Thống Kê" }
@@ -254,6 +377,10 @@ namespace QuanLyRungPhongHo.Controllers
                 "NhatKyBaoVe.View", "NhatKyBaoVe.Create", "NhatKyBaoVe.Edit", "NhatKyBaoVe.Delete",
                 // Sinh vật - Full quyền
                 "SinhVat.View", "SinhVat.Create", "SinhVat.Edit", "SinhVat.Delete",
+                // Đơn xin nghỉ - Xem, Duyệt
+                "DonXinNghi.View", "DonXinNghi.Approve",
+                // Chấm công - Full quyền
+                "ChamCong.View", "ChamCong.Create", "ChamCong.Edit", "ChamCong.Delete",
                 // Báo cáo - Xem và xuất
                 "BaoCaoThongKe.View", "BaoCaoThongKe.Export"
             };
@@ -264,6 +391,10 @@ namespace QuanLyRungPhongHo.Controllers
             {
                 // Xem các danh mục (chỉ xem, không sửa)
                 "DanhMucXa.View", "DanhMucThon.View", "LoRung.View", "NhanSu.View", "SinhVat.View",
+                // Đơn xin nghỉ - Tạo và xem (để gửi đơn)
+                "DonXinNghi.View", "DonXinNghi.Create",
+                // Chấm công - Chỉ xem
+                "ChamCong.View",
                 // Nhật ký bảo vệ - Xem, Tạo, Sửa (không xóa)
                 "NhatKyBaoVe.View", "NhatKyBaoVe.Create", "NhatKyBaoVe.Edit",
                 // Báo cáo - Xem (không xuất)

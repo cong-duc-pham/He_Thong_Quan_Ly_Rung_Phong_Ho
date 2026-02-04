@@ -744,3 +744,72 @@ button[type="submit"].btn-primary:hover,
         font-size: 16px;
     }
 }
+
+/* ===== FIX TABLE HEADER TEXT COLOR ===== */
+/* Đảm bảo text trong thead luôn hiển thị rõ ràng trong cả light và dark mode */
+.table thead th,
+.table thead td,
+.digioi-table thead th,
+.digioi-table thead td,
+thead th,
+thead td {
+    color: #ffffff !important;
+}
+
+/* Fix cho các class Bootstrap màu xanh */
+.bg-primary,
+.bg-info,
+.bg-success,
+.bg-danger,
+.badge.bg-info,
+.badge.bg-primary {
+    color: #ffffff !important;
+}
+
+/* Fix cho các button và input có background xanh */
+.input-group-text.bg-success,
+.input-group-text.bg-primary,
+.input-group-text.bg-info,
+.input-group-text.bg-danger {
+    color: #ffffff !important;
+}
+
+/* Dark mode specific fixes */
+html.dark .table thead th,
+html.dark .table thead td,
+html.dark .digioi-table thead th,
+html.dark .digioi-table thead td,
+html.dark thead th,
+html.dark thead td {
+    color: #ffffff !important;
+}
+
+/* Fix cho card header với background màu xanh */
+.card-header.bg-success,
+.card-header.bg-primary,
+.card-header.bg-info,
+.card-header.bg-danger {
+    color: #ffffff !important;
+}
+
+/* Fix cho welcome banner và các gradient background */
+.bg-success.bg-gradient,
+.bg-primary.bg-gradient,
+.bg-info.bg-gradient {
+    color: #ffffff !important;
+}
+
+/* Fix cho badge có text-dark */
+.badge.bg-info.text-dark {
+    color: #000000 !important;
+}
+
+/* Đảm bảo text trong table header với các class Bootstrap */
+.table thead.bg-success th,
+.table thead.bg-success td,
+.table thead.bg-primary th,
+.table thead.bg-danger th,
+.table thead.bg-danger td,
+.table thead.bg-primary td {
+    color: #ffffff !important;
+}

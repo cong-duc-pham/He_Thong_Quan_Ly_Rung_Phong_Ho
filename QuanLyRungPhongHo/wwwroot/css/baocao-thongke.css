@@ -224,6 +224,11 @@
     z-index: 10;
 }
 
+.table-compact thead th,
+.table-compact thead td {
+    color: #ffffff !important;
+}
+
 .table-compact tfoot {
     position: sticky;
     bottom: 0;

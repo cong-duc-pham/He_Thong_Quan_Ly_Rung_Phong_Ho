@@ -19,6 +19,13 @@ namespace QuanLyRungPhongHo.Models
         [Display(Name = "Số điện thoại")]
         public string? SoDienThoai { get; set; }
 
+        [Display(Name = "Email")]
+        [EmailAddress(ErrorMessage = "Email không hợp lệ")]
+        public string? Email { get; set; }
+
+        [Display(Name = "Ghi chú nội bộ")]
+        public string? GhiChuNoiBo { get; set; }
+
         [Display(Name = "Đơn vị công tác")]
         public string? DonViCongTac { get; set; }
 

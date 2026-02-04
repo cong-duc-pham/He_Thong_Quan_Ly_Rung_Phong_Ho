@@ -1,0 +1,236 @@
+﻿@{
+    ViewData["Title"] = "Phân lịch làm việc";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/lichlamviec.css" asp-append-version="true" />
+}
+
+<div class="container-fluid px-4 py-4">
+    <!-- Header -->
+    <div class="page-header">
+        <h1>
+            <i class="fas fa-calendar-check"></i>
+            Phân Lịch Làm Việc
+        </h1>
+        <p>Kéo thả nhân viên vào các ca làm việc trong tuần</p>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls">
+        <div class="week-selector">
+            <button onclick="previousWeek()" class="week-nav-btn">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <div class="week-info" id="weekInfo">
+                Tuần 6: 02/02/2026 - 08/02/2026
+            </div>
+            <button onclick="nextWeek()" class="week-nav-btn">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+        <div class="action-buttons">
+            <button class="btn btn-secondary" onclick="clearSchedule()">
+                <i class="fas fa-eraser"></i>
+                Xóa lịch
+            </button>
+            
+            <button class="btn btn-primary" onclick="saveSchedule()">
+                <i class="fas fa-save"></i>
+                Lưu lịch
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Layout -->
+    <div class="main-layout">
+        <!-- Sidebar - Danh sách nhân viên -->
+        <div class="employees-panel">
+            <div class="panel-header">
+                <h3>
+                    <i class="fas fa-users"></i>
+                    Danh sách nhân viên
+                </h3>
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Tìm nhân viên..." id="searchEmployee">
+                </div>
+            </div>
+
+            <div class="stats-bar">
+                <div class="stat-card">
+                    <div class="stat-label">Tổng NV</div>
+                    <div class="stat-value" id="totalEmployees">0</div>
+                </div>
+                <div class="stat-card stat-card-assigned">
+                    <div class="stat-label">Đã phân</div>
+                    <div class="stat-value" id="assignedCount">0</div>
+                </div>
+            </div>
+
+            <div class="employees-list" id="employeesList">
+                <!-- Employees will be loaded here by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Schedule Grid -->
+        <div class="schedule-panel">
+            <div class="schedule-header">
+                <h3>
+                    <i class="fas fa-calendar-week"></i>
+                    Lịch làm việc tuần
+                </h3>
+            </div>
+
+            <div class="schedule-grid">
+                <table class="schedule-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 140px;">Ca làm việc</th>
+                            <th class="day-header">
+                                <div class="day-name">Thứ Hai</div>
+                                <div class="day-date">02/02</div>
+                            </th>
+                            <th class="day-header">
+                                <div class="day-name">Thứ Ba</div>
+                                <div class="day-date">03/02</div>
+                            </th>
+                            <th class="day-header today">
+                                <div class="day-name">Thứ Tư</div>
+                                <div class="day-date">04/02</div>
+                            </th>
+                            <th class="day-header">
+                                <div class="day-name">Thứ Năm</div>
+                                <div class="day-date">05/02</div>
+                            </th>
+                            <th class="day-header">
+                                <div class="day-name">Thứ Sáu</div>
+                                <div class="day-date">06/02</div>
+                            </th>
+                            <th class="day-header weekend">
+                                <div class="day-name">Thứ Bảy</div>
+                                <div class="day-date">07/02</div>
+                            </th>
+                            <th class="day-header weekend">
+                                <div class="day-name">Chủ Nhật</div>
+                                <div class="day-date">08/02</div>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Ca Sáng - MaCa = 1 -->
+                        <tr>
+                            <td class="shift-label morning">
+                                <i class="fas fa-sun"></i>
+                                Ca Sáng<br>
+                                <small style="opacity: 0.7;">07:00-11:00</small>
+                            </td>
+                            <td class="schedule-cell" data-day="mon" data-shift="1"></td>
+                            <td class="schedule-cell" data-day="tue" data-shift="1"></td>
+                            <td class="schedule-cell" data-day="wed" data-shift="1"></td>
+                            <td class="schedule-cell" data-day="thu" data-shift="1"></td>
+                            <td class="schedule-cell" data-day="fri" data-shift="1"></td>
+                            <td class="schedule-cell weekend" data-day="sat" data-shift="1"></td>
+                            <td class="schedule-cell weekend" data-day="sun" data-shift="1"></td>
+                        </tr>
+                        <!-- Ca Chiều - MaCa = 2 -->
+                        <tr>
+                            <td class="shift-label afternoon">
+                                <i class="fas fa-cloud-sun"></i>
+                                Ca Chiều<br>
+                                <small style="opacity: 0.7;">13:00-17:00</small>
+                            </td>
+                            <td class="schedule-cell" data-day="mon" data-shift="2"></td>
+                            <td class="schedule-cell" data-day="tue" data-shift="2"></td>
+                            <td class="schedule-cell" data-day="wed" data-shift="2"></td>
+                            <td class="schedule-cell" data-day="thu" data-shift="2"></td>
+                            <td class="schedule-cell" data-day="fri" data-shift="2"></td>
+                            <td class="schedule-cell weekend" data-day="sat" data-shift="2"></td>
+                            <td class="schedule-cell weekend" data-day="sun" data-shift="2"></td>
+                        </tr>
+                        <!-- Ca Tối - MaCa = 3 -->
+                        <tr>
+                            <td class="shift-label evening">
+                                <i class="fas fa-moon"></i>
+                                Ca Tối<br>
+                                <small style="opacity: 0.7;">18:00-22:00</small>
+                            </td>
+                            <td class="schedule-cell" data-day="mon" data-shift="3"></td>
+                            <td class="schedule-cell" data-day="tue" data-shift="3"></td>
+                            <td class="schedule-cell" data-day="wed" data-shift="3"></td>
+                            <td class="schedule-cell" data-day="thu" data-shift="3"></td>
+                            <td class="schedule-cell" data-day="fri" data-shift="3"></td>
+                            <td class="schedule-cell weekend" data-day="sat" data-shift="3"></td>
+                            <td class="schedule-cell weekend" data-day="sun" data-shift="3"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #dcfce7;"></div>
+                    <span>Hôm nay</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #fef3c7;"></div>
+                    <span>Cuối tuần</span>
+                </div>
+                <div class="legend-item">
+                    <i class="fas fa-grip-vertical" style="color: #9ca3af;"></i>
+                    <span>Kéo thả để phân ca</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- ✅ XÓA script cũ trong _Layout, chỉ load 1 lần ở đây -->
+    @* <script src="~/js/lichlamviec.js" asp-append-version="true"></script> *@
+
+    <script>
+        // ✅ FIX: Đảm bảo init chỉ chạy 1 lần và đúng thời điểm
+        (function() {
+            let initialized = false;
+
+            function tryInit() {
+                // Kiểm tra xem đã khởi tạo chưa
+                if (initialized) {
+                    console.log('⚠️ Already initialized, skipping...');
+                    return;
+                }
+
+                // Kiểm tra các element cần thiết đã tồn tại chưa
+                const employeesList = document.getElementById('employeesList');
+                const searchEmployee = document.getElementById('searchEmployee');
+                const scheduleCells = document.querySelectorAll('.schedule-cell');
+
+                if (!employeesList || !searchEmployee || scheduleCells.length === 0) {
+                    console.log('⏳ Waiting for DOM elements...');
+                    setTimeout(tryInit, 100);
+                    return;
+                }
+
+                // Kiểm tra hàm init có tồn tại không
+                if (typeof window.init !== 'function') {
+                    console.error('❌ Function init() not found! Check lichlamviec.js');
+                    return;
+                }
+
+                console.log('🚀 All elements ready, initializing...');
+                initialized = true;
+
+                // Gọi hàm init
+                window.init();
+            }
+
+            // Bắt đầu thử khởi tạo
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', tryInit);
+            } else {
+                setTimeout(tryInit, 50);
+            }
+        })();
+    </script>
+}

@@ -7,19 +7,20 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - @Localizer["AppName"]</title>
-
+    <title>@ViewData["Title"] - @Localizer["AppName"]</title>   
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
+    <link rel="stylesheet" href="~/css/lichlamviec.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/digioi.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/sinhvat.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/baocao-thongke.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/PhanQuyen.css" asp-append-version="true" />
+   
     <link href="~/css/styles.css" rel="stylesheet" />
-    <link href="~/css/forestry.css" rel="stylesheet" asp-append-version="true" />
+    @* <link href="~/css/forestry.css" rel="stylesheet" asp-append-version="true" /> *@
 
     @await RenderSectionAsync("Styles", required: false)
 </head>
@@ -237,18 +238,23 @@
         </main>
     </div>
 
+    <script src="~/js/lichlamviec.js" asp-append-version="true"></script>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
     <script src="~/js/theme-manager.js" asp-append-version="true"></script>
+
+
     <script src="~/js/main.js" asp-append-version="true"></script>
     <script src="~/js/sinhvat.js"></script>
-    <script src="~/js/forestry.js" asp-append-version="true"></script>
+    @* <script src="~/js/forestry.js" asp-append-version="true"></script> *@
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="~/js/digioi.js" asp-append-version="true"></script>
     <script src="~/js/lorung.js" asp-append-version="true"></script>
     <script src="~/js/nhansu.js" asp-append-version="true"></script>
     <script src="~/js/baocao-thongke.js" asp-append-version="true"></script>
-    
     <script>
         // Khởi tạo theme toggle button
         document.addEventListener('DOMContentLoaded', function() {

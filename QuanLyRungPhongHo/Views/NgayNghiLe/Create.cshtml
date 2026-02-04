@@ -1,0 +1,217 @@
+@model QLRungPhongHo.Models.NgayNghiLe
+
+@{
+    ViewBag.Title = "Thêm ngày nghỉ lễ";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid p-3">
+    <div class="row mb-3">
+        <div class="col">
+            <h3 class="text-success fw-bold">
+                <i class="bi bi-plus-circle"></i> Thêm ngày nghỉ lễ
+            </h3>
+        </div>
+    </div>
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show">
+            <i class="bi bi-exclamation-triangle"></i> @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-body" style="text-align: left;">
+                    <style>
+                        /* Remove all validation background patterns */
+                        #formNgayNghi .form-control,
+                        #formNgayNghi .form-select,
+                        #formNgayNghi input,
+                        #formNgayNghi select,
+                        #formNgayNghi textarea {
+                            background-image: none !important;
+                        }
+                        #formNgayNghi .form-control:valid,
+                        #formNgayNghi .form-control.is-valid,
+                        #formNgayNghi .form-select:valid,
+                        #formNgayNghi .form-select.is-valid,
+                        #formNgayNghi input:valid,
+                        #formNgayNghi select:valid {
+                            background-image: none !important;
+                            border-color: #198754 !important;
+                        }
+                        #formNgayNghi .form-control:invalid,
+                        #formNgayNghi .form-control.is-invalid,
+                        #formNgayNghi .form-select:invalid,
+                        #formNgayNghi .form-select.is-invalid {
+                            background-image: none !important;
+                        }
+                        /* Left align labels and prevent wrapping */
+                        #formNgayNghi label { 
+                            text-align: left !important; 
+                            display: inline-block !important;
+                            width: auto !important;
+                            white-space: nowrap !important;
+                        }
+                        #formNgayNghi label span,
+                        #formNgayNghi label .text-danger {
+                            display: inline !important;
+                            white-space: nowrap !important;
+                        }
+                    </style>
+                    <form asp-action="Create" method="post" id="formNgayNghi">
+                        @Html.AntiForgeryToken()
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Tên ngày nghỉ <span class="text-danger">*</span></label>
+                            <input asp-for="TenNgayNghi" class="form-control" placeholder="Ví dụ: Tết Nguyên Đán 2026" maxlength="200" required />
+                            <div class="invalid-feedback">Vui lòng nhập tên ngày nghỉ</div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Từ ngày <span class="text-danger">*</span></label>
+                                <input asp-for="NgayBatDau" type="date" class="form-control" id="ngayBatDau" required />
+                                <div class="invalid-feedback">Vui lòng chọn ngày bắt đầu</div>
+                                <small class="text-muted">Có thể chọn bất kỳ ngày nào</small>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Đến ngày <span class="text-danger">*</span></label>
+                                <input asp-for="NgayKetThuc" type="date" class="form-control" id="ngayKetThuc" required />
+                                <div class="invalid-feedback">Vui lòng chọn ngày kết thúc</div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Loại ngày nghỉ <span class="text-danger">*</span></label>
+                            <select asp-for="LoaiNgayNghi" class="form-select" required>
+                                <option value="">-- Chọn loại --</option>
+                                <option value="Lễ Tết">Lễ Tết</option>
+                                <option value="Ngày lễ quốc gia">Ngày lễ quốc gia</option>
+                                <option value="Ngày nghỉ đặc biệt">Ngày nghỉ đặc biệt</option>
+                            </select>
+                            <div class="invalid-feedback">Vui lòng chọn loại ngày nghỉ</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Ghi chú</label>
+                            <textarea asp-for="GhiChu" class="form-control" rows="3" placeholder="Nhập ghi chú nếu có..."></textarea>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2">
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="bi bi-x-circle"></i> Hủy
+                            </a>
+                            <button type="submit" class="btn btn-success">
+                                <i class="bi bi-check-circle"></i> Lưu
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <style>
+        /* Remove validation background patterns */
+        .form-control:valid,
+        .form-control.is-valid,
+        .form-select:valid,
+        .form-select.is-valid {
+            background-image: none !important;
+        }
+        .form-control:invalid,
+        .form-control.is-invalid,
+        .form-select:invalid,
+        .form-select.is-invalid {
+            background-image: none !important;
+        }
+        /* Left align labels - stronger selectors */
+        .card-body label,
+        .card-body .form-label,
+        label.form-label,
+        div.mb-3 > label {
+            text-align: left !important;
+            display: block !important;
+            width: 100% !important;
+        }
+    </style>
+    <script>
+        // Alert notification function
+        function showAlert(message, type = 'danger') {
+            const alertHtml = `
+                <div class="alert alert-${type} alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3" role="alert" style="z-index: 9999; min-width: 400px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+                    <i class="bi bi-${type === 'success' ? 'check-circle-fill' : 'exclamation-triangle-fill'}"></i>
+                    <strong>${type === 'success' ? 'Thành công!' : 'Lỗi!'}</strong> ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            `;
+            
+            document.body.insertAdjacentHTML('beforeend', alertHtml);
+            const alertElement = document.body.lastElementChild;
+            
+            // Auto remove after 5 seconds
+            setTimeout(function() {
+                const bsAlert = bootstrap.Alert.getInstance(alertElement);
+                if (bsAlert) {
+                    bsAlert.close();
+                }
+            }, 5000);
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const ngayBatDau = document.getElementById('ngayBatDau');
+            const ngayKetThuc = document.getElementById('ngayKetThuc');
+            const form = document.getElementById('formNgayNghi');
+            
+            // Allow any date for scheduling purposes
+            const today = new Date().toISOString().split('T')[0];
+
+            // Auto-update end date min when start date changes
+            ngayBatDau.addEventListener('change', function() {
+                ngayKetThuc.setAttribute('min', this.value);
+                // If end date is before start date, update it
+                if (ngayKetThuc.value && ngayKetThuc.value < this.value) {
+                    ngayKetThuc.value = this.value;
+                    showAlert('Đã tự động cập nhật ngày kết thúc theo ngày bắt đầu', 'success');
+                }
+            });
+
+            // Validation on submit
+            form.addEventListener('submit', function(e) {
+                // Check form validity
+                if (!form.checkValidity()) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    form.classList.add('was-validated');
+                    showAlert('Vui lòng điền đầy đủ thông tin bắt buộc!');
+                    return false;
+                }
+                
+                // Check dates
+                if (ngayKetThuc.value < ngayBatDau.value) {
+                    e.preventDefault();
+                    showAlert('Ngày kết thúc phải sau hoặc bằng ngày bắt đầu!');
+                    ngayKetThuc.focus();
+                    ngayKetThuc.classList.add('is-invalid');
+                    return false;
+                }
+                
+                form.classList.add('was-validated');
+            });
+            
+            // Remove invalid class on input change
+            [ngayBatDau, ngayKetThuc].forEach(input => {
+                input.addEventListener('change', function() {
+                    this.classList.remove('is-invalid');
+                });
+            });
+        });
+    </script>
+}

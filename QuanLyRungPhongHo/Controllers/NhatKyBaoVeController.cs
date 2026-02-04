@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using QuanLyRungPhongHo.Attributes;
 using QuanLyRungPhongHo.Data;
 using QuanLyRungPhongHo.Models;
 using System.Security.Claims;
@@ -30,6 +31,7 @@ namespace QuanLyRungPhongHo.Controllers
         }
 
         // GET: NhatKyBaoVe
+        [CheckPermission("NhatKyBaoVe.View")]
         public async Task<IActionResult> Index(DateTime? fromDate, DateTime? toDate, int? maLo, int? maNV, string? loaiSuViec, string? keyword, int? pageNumber)
         {
             try
@@ -107,6 +109,7 @@ namespace QuanLyRungPhongHo.Controllers
         }
 
         // GET: NhatKyBaoVe/Create
+        [CheckPermission("NhatKyBaoVe.Create")]
         public async Task<IActionResult> Create()
         {
             await LoadDropdownsAsync();
@@ -127,6 +130,7 @@ namespace QuanLyRungPhongHo.Controllers
         // POST: NhatKyBaoVe/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [CheckPermission("NhatKyBaoVe.Create")]
         public async Task<IActionResult> Create([Bind("NgayGhi,LoaiSuViec,NoiDung,MaLo,ToaDoGPS")] NhatKyBaoVe nhatKy)
         {
             var current = await GetCurrentNhanSuAsync();
@@ -169,6 +173,7 @@ namespace QuanLyRungPhongHo.Controllers
         }
 
         // GET: NhatKyBaoVe/Edit/5
+        [CheckPermission("NhatKyBaoVe.Edit")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -196,6 +201,7 @@ namespace QuanLyRungPhongHo.Controllers
         // POST: NhatKyBaoVe/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [CheckPermission("NhatKyBaoVe.Edit")]
         public async Task<IActionResult> Edit(int id, [Bind("MaNK,NgayGhi,LoaiSuViec,NoiDung,MaLo,ToaDoGPS")] NhatKyBaoVe nhatKy)
         {
             if (id != nhatKy.MaNK)
@@ -256,6 +262,7 @@ namespace QuanLyRungPhongHo.Controllers
         }
 
         // GET: NhatKyBaoVe/Delete/5
+        [CheckPermission("NhatKyBaoVe.Delete")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -280,6 +287,7 @@ namespace QuanLyRungPhongHo.Controllers
         // POST: NhatKyBaoVe/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [CheckPermission("NhatKyBaoVe.Delete")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             try

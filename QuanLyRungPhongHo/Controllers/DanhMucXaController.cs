@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using QuanLyRungPhongHo.Data;
 using QuanLyRungPhongHo.Models;
+using QuanLyRungPhongHo.Attributes;
 
 namespace QuanLyRungPhongHo.Controllers
 {
@@ -19,6 +20,7 @@ namespace QuanLyRungPhongHo.Controllers
 
         // GET: DanhMucXa
         // Hiển thị danh sách Xã với tìm kiếm và phân trang
+        [CheckPermission("DanhMucXa.View")]
         public async Task<IActionResult> Index(string searchString, int? pageNumber)
         {
             try
@@ -61,6 +63,7 @@ namespace QuanLyRungPhongHo.Controllers
         }
 
         // GET: DanhMucXa/Create
+        [CheckPermission("DanhMucXa.Create")]
         public IActionResult Create()
         {
             return View();
@@ -69,6 +72,7 @@ namespace QuanLyRungPhongHo.Controllers
         // POST: DanhMucXa/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [CheckPermission("DanhMucXa.Create")]
         public async Task<IActionResult> Create([Bind("MaXa,TenXa")] DanhMucXa danhMucXa)
         {
             try
@@ -97,6 +101,7 @@ namespace QuanLyRungPhongHo.Controllers
         }
 
         // GET: DanhMucXa/Edit/5
+        [CheckPermission("DanhMucXa.Edit")]
         public async Task<IActionResult> Edit(string id)
         {
             if (id == null)
@@ -124,6 +129,7 @@ namespace QuanLyRungPhongHo.Controllers
         // POST: DanhMucXa/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [CheckPermission("DanhMucXa.Edit")]
         public async Task<IActionResult> Edit(string id, [Bind("MaXa,TenXa")] DanhMucXa danhMucXa)
         {
             if (id != danhMucXa.MaXa)
@@ -161,6 +167,7 @@ namespace QuanLyRungPhongHo.Controllers
         }
 
         // GET: DanhMucXa/Delete/5
+        [CheckPermission("DanhMucXa.Delete")]
         public async Task<IActionResult> Delete(string id)
         {
             if (id == null)
@@ -199,6 +206,7 @@ namespace QuanLyRungPhongHo.Controllers
         // POST: DanhMucXa/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [CheckPermission("DanhMucXa.Delete")]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
             try

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using QuanLyRungPhongHo.Attributes;
 using QuanLyRungPhongHo.Data;
 using QuanLyRungPhongHo.Models.ViewModels;
 using QuanLyRungPhongHo.Validators;
@@ -30,6 +31,7 @@ namespace QuanLyRungPhongHo.Controllers
 
         // Trang chính báo cáo thống kê với validation chuyên nghiệp
         [HttpGet]
+        [CheckPermission("BaoCaoThongKe.View")]
         public async Task<IActionResult> Index(string? maXaFilter, DateTime? tuNgay, DateTime? denNgay)
         {
             try
@@ -240,6 +242,7 @@ namespace QuanLyRungPhongHo.Controllers
 
         // Export báo cáo ra Excel với định dạng đẹp và validation nghiêm ngặt
         [HttpGet]
+        [CheckPermission("BaoCaoThongKe.View")]
         public async Task<IActionResult> ExportCsv(string? maXaFilter, DateTime? tuNgay, DateTime? denNgay)
         {
             try
@@ -722,6 +725,7 @@ namespace QuanLyRungPhongHo.Controllers
 
         // Export PDF (thực chất là HTML + In)
         [HttpGet]
+        [CheckPermission("BaoCaoThongKe.View")]
         public async Task<IActionResult> ExportPdf(string? maXaFilter, DateTime? tuNgay, DateTime? denNgay)
         {
             try
@@ -741,6 +745,7 @@ namespace QuanLyRungPhongHo.Controllers
 
         // API: Lấy dữ liệu biểu đồ theo thời gian với validation
         [HttpGet]
+        [CheckPermission("BaoCaoThongKe.View")]
         public async Task<JsonResult> GetChartData(string? maXaFilter, DateTime? tuNgay, DateTime? denNgay)
         {
             try
@@ -804,6 +809,7 @@ namespace QuanLyRungPhongHo.Controllers
 
         // API: Health check hệ thống
         [HttpGet]
+        [CheckPermission("BaoCaoThongKe.View")]
         public JsonResult HealthCheck()
         {
             try
@@ -829,6 +835,7 @@ namespace QuanLyRungPhongHo.Controllers
 
         // API: Validate tham số báo cáo trước khi export hoặc tạo báo cáo
         [HttpGet]
+        [CheckPermission("BaoCaoThongKe.View")]
         public JsonResult ValidateReportParameters(string? maXaFilter, DateTime? tuNgay, DateTime? denNgay, string? reportType)
         {
             try
@@ -881,6 +888,7 @@ namespace QuanLyRungPhongHo.Controllers
 
         // API: Search và filter báo cáo với validation
         [HttpGet]
+        [CheckPermission("BaoCaoThongKe.View")]
         public async Task<JsonResult> SearchReport(string? searchString, string? maXaFilter, DateTime? tuNgay, DateTime? denNgay)
         {
             try

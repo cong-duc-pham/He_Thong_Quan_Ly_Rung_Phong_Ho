@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using QuanLyRungPhongHo.Data;
 using QuanLyRungPhongHo.Models.ViewModels;
+using QuanLyRungPhongHo.Validators;
 using System.Text;
 using System.IO;
 using OfficeOpenXml;
@@ -27,21 +28,36 @@ namespace QuanLyRungPhongHo.Controllers
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
         }
 
-        // Trang chính báo cáo thống kê
+        // Trang chính báo cáo thống kê với validation chuyên nghiệp
         [HttpGet]
         public async Task<IActionResult> Index(string? maXaFilter, DateTime? tuNgay, DateTime? denNgay)
         {
             try
             {
-                // Validate ngày tháng
-                if (tuNgay.HasValue && denNgay.HasValue && tuNgay > denNgay)
+                // 1. VALIDATION MÃ XÃ FILTER
+                var maXaValidation = BaoCaoThongKeValidator.ValidateMaXaFilter(maXaFilter);
+                if (!maXaValidation.IsValid)
                 {
-                    TempData["ErrorMessage"] = "Từ ngày không được lớn hơn Đến ngày";
-                    tuNgay = null;
-                    denNgay = null;
+                    TempData["ErrorMessage"] = maXaValidation.ErrorMessage;
+                    maXaFilter = null;
                 }
 
-                // Mặc định 30 ngày gần nhất nếu không chọn
+                // 2. VALIDATION VÀ CHUẨN HÓA KHOẢNG THỜI GIAN
+                var dateValidation = BaoCaoThongKeValidator.ValidateAndNormalizeDateRange(tuNgay, denNgay, 30);
+                if (!dateValidation.IsValid)
+                {
+                    TempData["ErrorMessage"] = dateValidation.ErrorMessage;
+                    // Sử dụng giá trị mặc định nếu validation thất bại
+                    var defaultRange = BaoCaoThongKeValidator.GetDefaultDateRange(30);
+                    tuNgay = defaultRange.TuNgay;
+                    denNgay = defaultRange.DenNgay;
+                }
+                else
+                {
+                    tuNgay = dateValidation.TuNgay;
+                    denNgay = dateValidation.DenNgay;
+                }
+
                 DateTime defaultTuNgay = tuNgay ?? DateTime.Now.AddDays(-30);
                 DateTime defaultDenNgay = denNgay ?? DateTime.Now;
 
@@ -222,16 +238,32 @@ namespace QuanLyRungPhongHo.Controllers
             }
         }
 
-        // Export báo cáo ra Excel với định dạng đẹp
+        // Export báo cáo ra Excel với định dạng đẹp và validation nghiêm ngặt
         [HttpGet]
         public async Task<IActionResult> ExportCsv(string? maXaFilter, DateTime? tuNgay, DateTime? denNgay)
         {
             try
             {
-                _logger.LogInformation("Bắt đầu xuất báo cáo Excel");
+                // 1. VALIDATION MÃ XÃ FILTER
+                var maXaValidation = BaoCaoThongKeValidator.ValidateMaXaFilter(maXaFilter);
+                if (!maXaValidation.IsValid)
+                {
+                    TempData["ErrorMessage"] = maXaValidation.ErrorMessage;
+                    return RedirectToAction(nameof(Index));
+                }
 
-                DateTime defaultTuNgay = tuNgay ?? DateTime.Now.AddDays(-30);
-                DateTime defaultDenNgay = denNgay ?? DateTime.Now;
+                // 2. VALIDATION VÀ CHUẨN HÓA KHOẢNG THỜI GIAN
+                var dateValidation = BaoCaoThongKeValidator.ValidateAndNormalizeDateRange(tuNgay, denNgay, 30);
+                if (!dateValidation.IsValid)
+                {
+                    TempData["ErrorMessage"] = dateValidation.ErrorMessage;
+                    return RedirectToAction(nameof(Index));
+                }
+
+                DateTime defaultTuNgay = dateValidation.TuNgay;
+                DateTime defaultDenNgay = dateValidation.DenNgay;
+
+                _logger.LogInformation("Bắt đầu xuất báo cáo Excel từ {TuNgay} đến {DenNgay}", defaultTuNgay, defaultDenNgay);
 
                 // Query dữ liệu
                 var queryLoRung = _context.LoRungs
@@ -707,14 +739,28 @@ namespace QuanLyRungPhongHo.Controllers
             }
         }
 
-        // API: Lấy dữ liệu biểu đồ theo thời gian
+        // API: Lấy dữ liệu biểu đồ theo thời gian với validation
         [HttpGet]
         public async Task<JsonResult> GetChartData(string? maXaFilter, DateTime? tuNgay, DateTime? denNgay)
         {
             try
             {
-                DateTime fromDate = tuNgay ?? DateTime.Now.AddMonths(-6);
-                DateTime toDate = denNgay ?? DateTime.Now;
+                // 1. VALIDATION MÃ XÃ
+                var maXaValidation = BaoCaoThongKeValidator.ValidateMaXaFilter(maXaFilter);
+                if (!maXaValidation.IsValid)
+                {
+                    return Json(new { success = false, message = maXaValidation.ErrorMessage });
+                }
+
+                // 2. VALIDATION KHOẢNG THỜI GIAN
+                var dateValidation = BaoCaoThongKeValidator.ValidateAndNormalizeDateRange(tuNgay, denNgay, 180); // Mặc định 6 tháng
+                if (!dateValidation.IsValid)
+                {
+                    return Json(new { success = false, message = dateValidation.ErrorMessage });
+                }
+
+                DateTime fromDate = dateValidation.TuNgay;
+                DateTime toDate = dateValidation.DenNgay;
 
                 var querySuKien = _context.NhatKyBaoVes
                     .Include(nk => nk.LoRung)
@@ -781,13 +827,138 @@ namespace QuanLyRungPhongHo.Controllers
             }
         }
 
+        // API: Validate tham số báo cáo trước khi export hoặc tạo báo cáo
+        [HttpGet]
+        public JsonResult ValidateReportParameters(string? maXaFilter, DateTime? tuNgay, DateTime? denNgay, string? reportType)
+        {
+            try
+            {
+                var errors = new List<string>();
+
+                // Validate mã xã
+                if (!string.IsNullOrEmpty(maXaFilter))
+                {
+                    var maXaValidation = BaoCaoThongKeValidator.ValidateMaXaFilter(maXaFilter);
+                    if (!maXaValidation.IsValid)
+                        errors.Add(maXaValidation.ErrorMessage);
+                }
+
+                // Validate khoảng thời gian
+                var dateValidation = BaoCaoThongKeValidator.ValidateDateRange(tuNgay, denNgay);
+                if (!dateValidation.IsValid)
+                    errors.Add(dateValidation.ErrorMessage);
+
+                // Validate loại báo cáo
+                if (!string.IsNullOrEmpty(reportType))
+                {
+                    var reportTypeValidation = BaoCaoThongKeValidator.ValidateReportType(reportType);
+                    if (!reportTypeValidation.IsValid)
+                        errors.Add(reportTypeValidation.ErrorMessage);
+                }
+
+                if (errors.Any())
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        message = "Có lỗi trong tham số báo cáo",
+                        errors = errors
+                    });
+                }
+
+                return Json(new
+                {
+                    success = true,
+                    message = "Tham số báo cáo hợp lệ"
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Lỗi khi validate tham số báo cáo");
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        // API: Search và filter báo cáo với validation
+        [HttpGet]
+        public async Task<JsonResult> SearchReport(string? searchString, string? maXaFilter, DateTime? tuNgay, DateTime? denNgay)
+        {
+            try
+            {
+                // 1. VALIDATION SEARCH STRING
+                var searchValidation = BaoCaoThongKeValidator.ValidateSearchString(searchString);
+                if (!searchValidation.IsValid)
+                {
+                    return Json(new { success = false, message = searchValidation.ErrorMessage });
+                }
+
+                // 2. VALIDATION MÃ XÃ
+                var maXaValidation = BaoCaoThongKeValidator.ValidateMaXaFilter(maXaFilter);
+                if (!maXaValidation.IsValid)
+                {
+                    return Json(new { success = false, message = maXaValidation.ErrorMessage });
+                }
+
+                // 3. VALIDATION KHOẢNG THỜI GIAN
+                var dateValidation = BaoCaoThongKeValidator.ValidateAndNormalizeDateRange(tuNgay, denNgay, 30);
+                if (!dateValidation.IsValid)
+                {
+                    return Json(new { success = false, message = dateValidation.ErrorMessage });
+                }
+
+                // Thực hiện search (ví dụ đơn giản)
+                var results = await _context.DanhMucXas
+                    .Where(x => string.IsNullOrEmpty(maXaFilter) || x.MaXa == maXaFilter)
+                    .Where(x => string.IsNullOrEmpty(searchString) || x.TenXa.Contains(searchString))
+                    .Select(x => new
+                    {
+                        x.MaXa,
+                        x.TenXa,
+                        SoThon = x.DanhMucThons.Count,
+                        SoLoRung = x.DanhMucThons.SelectMany(t => t.LoRungs).Count()
+                    })
+                    .Take(50) // Giới hạn kết quả
+                    .ToListAsync();
+
+                var resultValidation = BaoCaoThongKeValidator.ValidateHasData(results.Count, "xã");
+                if (!resultValidation.IsValid)
+                {
+                    return Json(new { success = false, message = resultValidation.ErrorMessage });
+                }
+
+                return Json(new { success = true, data = results, total = results.Count });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Lỗi khi search báo cáo");
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
         #region Private Methods
 
-        // Lấy dữ liệu báo cáo (tái sử dụng cho Index và Export PDF)
+        // Lấy dữ liệu báo cáo (tái sử dụng cho Index và Export PDF) với validation
         private async Task<BaoCaoThongKeViewModel> GetBaoCaoData(string? maXaFilter, DateTime? tuNgay, DateTime? denNgay)
         {
-            DateTime defaultTuNgay = tuNgay ?? DateTime.Now.AddDays(-30);
-            DateTime defaultDenNgay = denNgay ?? DateTime.Now;
+            // Validate mã xã
+            if (!string.IsNullOrEmpty(maXaFilter))
+            {
+                var maXaValidation = BaoCaoThongKeValidator.ValidateMaXaFilter(maXaFilter);
+                if (!maXaValidation.IsValid)
+                {
+                    throw new ArgumentException(maXaValidation.ErrorMessage);
+                }
+            }
+
+            // Validate và chuẩn hóa khoảng thời gian
+            var dateValidation = BaoCaoThongKeValidator.ValidateAndNormalizeDateRange(tuNgay, denNgay, 30);
+            if (!dateValidation.IsValid)
+            {
+                throw new ArgumentException(dateValidation.ErrorMessage);
+            }
+
+            DateTime defaultTuNgay = dateValidation.TuNgay;
+            DateTime defaultDenNgay = dateValidation.DenNgay;
 
             var viewModel = new BaoCaoThongKeViewModel
             {

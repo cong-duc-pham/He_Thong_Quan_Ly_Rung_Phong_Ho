@@ -22,6 +22,7 @@ namespace QuanLyRungPhongHo.Services
             _logger = logger;
         }
 
+        /// Gửi email với nội dung HTML
         public async Task<bool> SendEmailAsync(string toEmail, string subject, string body)
         {
             try
@@ -39,7 +40,6 @@ namespace QuanLyRungPhongHo.Services
                 message.To.Add(new MailboxAddress(Encoding.UTF8, "", toEmail));
                 message.Subject = subject;
 
-                // Use TextPart with explicit UTF-8 charset
                 var bodyBuilder = new BodyBuilder
                 {
                     HtmlBody = body
@@ -54,16 +54,16 @@ namespace QuanLyRungPhongHo.Services
                     await client.DisconnectAsync(true);
                 }
 
-                _logger.LogInformation($"Email sent successfully to {toEmail}");
+                _logger.LogInformation($"Gửi email thành công tới {toEmail}");
                 return true;
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Failed to send email to {toEmail}: {ex.Message}");
+                _logger.LogError($"Gửi email thất bại tới {toEmail}: {ex.Message}");
                 return false;
             }
         }
-
+        /// Gửi email chứa mã OTP xác thực
         public async Task<bool> SendOtpEmailAsync(string toEmail, string otpCode)
         {
             var subject = "Mã OTP Đặt Lại Mật Khẩu";
@@ -71,6 +71,7 @@ namespace QuanLyRungPhongHo.Services
             return await SendEmailAsync(toEmail, subject, body);
         }
 
+        /// Tạo template HTML cho email OTP
         private string GetOtpEmailHtml(string otpCode)
         {
             var html = new StringBuilder();
@@ -85,7 +86,7 @@ namespace QuanLyRungPhongHo.Services
             html.AppendLine("</head>");
             html.AppendLine("<body style=\"margin:0;padding:0;font-family:Arial,sans-serif;background-color:#f4f4f4;\">");
 
-            // Main container
+            // Container chính
             html.AppendLine("    <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"background-color:#f4f4f4;padding:20px;\">");
             html.AppendLine("        <tr><td align=\"center\">");
             html.AppendLine("            <table width=\"600\" cellpadding=\"0\" cellspacing=\"0\" style=\"background-color:#ffffff;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.1);\">");
@@ -99,7 +100,7 @@ namespace QuanLyRungPhongHo.Services
             html.AppendLine("                    </td>");
             html.AppendLine("                </tr>");
 
-            // Content
+            // Nội dung chính
             html.AppendLine("                <tr>");
             html.AppendLine("                    <td style=\"padding:40px 30px;\">");
 
@@ -111,7 +112,7 @@ namespace QuanLyRungPhongHo.Services
             html.AppendLine("                            Bạn đã yêu cầu đặt lại mật khẩu. Mã OTP xác thực của bạn là:");
             html.AppendLine("                        </p>");
 
-            // OTP Code box
+            // Khung hiển thị mã OTP
             html.AppendLine("                        <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"margin:30px 0;\">");
             html.AppendLine("                            <tr><td align=\"center\">");
             html.AppendLine("                                <div style=\"background-color:#e8f5e9;border:2px dashed #4caf50;border-radius:8px;padding:20px;display:inline-block;\">");
@@ -128,7 +129,7 @@ namespace QuanLyRungPhongHo.Services
             html.AppendLine("                            Vui lòng nhập mã này vào trang xác nhận để tiếp tục đặt lại mật khẩu.");
             html.AppendLine("                        </p>");
 
-            // Warning box
+            // Cảnh báo bảo mật
             html.AppendLine("                        <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"background-color:#fff3cd;border-left:4px solid #ffc107;border-radius:4px;margin:25px 0;\">");
             html.AppendLine("                            <tr><td style=\"padding:15px 20px;\">");
             html.AppendLine("                                <p style=\"font-weight:bold;color:#856404;margin:0 0 10px 0;font-size:16px;\">");

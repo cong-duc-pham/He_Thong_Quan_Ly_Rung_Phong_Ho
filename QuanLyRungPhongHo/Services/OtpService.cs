@@ -31,6 +31,9 @@ namespace QuanLyRungPhongHo.Services
             public int AttemptCount { get; set; }
         }
 
+        /// <summary>
+        /// Generate and send OTP code
+        /// </summary>
         public async Task<string> GenerateOtpAsync(string identifier, bool isEmail = false)
         {
             // Tạo mã OTP 6 chữ số ngẫu nhiên
@@ -55,16 +58,16 @@ namespace QuanLyRungPhongHo.Services
             }
             else
             {
-                // TODO: Gọi SMS API để gửi OTP (Twilio, AWS SNS, Vonage, etc.)
-                // Ví dụ: SendOtpViaSms(identifier, otpCode);
-                
-                // Cho phát triển, ghi log OTP (XÓA TRONG PRODUCTION)
+                // TODO: Implement SMS service integration
                 System.Diagnostics.Debug.WriteLine($"OTP for {identifier}: {otpCode}");
             }
 
             return otpCode;
         }
 
+        /// <summary>
+        /// Verify OTP code with rate limiting (max 3 attempts)
+        /// </summary>
         public bool VerifyOtp(string identifier, string otpCode)
         {
             if (!_otpStorage.TryGetValue(identifier, out var otpData))
@@ -100,6 +103,9 @@ namespace QuanLyRungPhongHo.Services
             _otpStorage.TryRemove(identifier, out _);
         }
 
+        /// <summary>
+        /// Get remaining time in seconds before OTP expires
+        /// </summary>
         public int GetOtpRemainingTime(string identifier)
         {
             if (!_otpStorage.TryGetValue(identifier, out var otpData))

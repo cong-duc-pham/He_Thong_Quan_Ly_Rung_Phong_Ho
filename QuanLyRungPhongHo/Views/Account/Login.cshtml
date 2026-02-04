@@ -62,9 +62,9 @@
                 </div>
 
                 <div class="form-options">
-                    <label class="remember-me">
-                        <input asp-for="RememberMe" id="rememberMe" />
-                        <span>Ghi nhớ đăng nhập</span>
+                    <label class="remember-checkbox-wrapper">
+                        <input type="checkbox" name="RememberMe" id="rememberMe" value="true" class="remember-checkbox" />
+                        <span class="remember-text">Ghi nhớ đăng nhập</span>
                     </label>
                     <a href="@Url.Action("ForgotPassword", "Account")" class="forgot-password">Quên mật khẩu?</a>
                 </div>

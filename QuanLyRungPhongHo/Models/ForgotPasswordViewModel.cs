@@ -2,6 +2,7 @@
 
 namespace QuanLyRungPhongHo.Models
 {
+    /// View model cho trang quên mật khẩu
     public class ForgotPasswordViewModel
     {
         [Required(ErrorMessage = "Vui lòng nhập địa chỉ email")]
@@ -10,6 +11,7 @@ namespace QuanLyRungPhongHo.Models
         public string Email { get; set; } = null!;
     }
 
+    /// View model cho trang xác thực OTP
     public class OtpVerificationViewModel
     {
         [Required(ErrorMessage = "Vui lòng nhập mã OTP")]
@@ -22,6 +24,7 @@ namespace QuanLyRungPhongHo.Models
         public string Email { get; set; } = null!;
     }
 
+    /// View model cho trang đặt lại mật khẩu
     public class ResetPasswordViewModel
     {
         [Required(ErrorMessage = "Vui lòng nhập mật khẩu mới")]

@@ -120,6 +120,9 @@
   <data name="AppName" xml:space="preserve">
     <value>Protection Forest Management</value>
   </data>
+  <data name="Attendance" xml:space="preserve">
+    <value>Attendance</value>
+  </data>
   <data name="BoundaryManagement" xml:space="preserve">
     <value>Boundary Management</value>
   </data>
@@ -135,11 +138,17 @@
   <data name="Hello" xml:space="preserve">
     <value>Hello</value>
   </data>
+  <data name="Holidays" xml:space="preserve">
+    <value>Holidays</value>
+  </data>
   <data name="Home" xml:space="preserve">
     <value>Home</value>
   </data>
   <data name="HumanResource" xml:space="preserve">
     <value>Human Resources</value>
+  </data>
+  <data name="LeaveRequest" xml:space="preserve">
+    <value>Leave Requests</value>
   </data>
   <data name="Login" xml:space="preserve">
     <value>Login</value>
@@ -150,8 +159,14 @@
   <data name="ProtectionLog" xml:space="preserve">
     <value>Protection Log</value>
   </data>
+  <data name="ScheduleManagement" xml:space="preserve">
+    <value>Schedule Management</value>
+  </data>
   <data name="Settings" xml:space="preserve">
     <value>Settings</value>
+  </data>
+  <data name="ShiftManagement" xml:space="preserve">
+    <value>Shift Management</value>
   </data>
   <data name="Staff" xml:space="preserve">
     <value>Staff</value>
@@ -167,5 +182,8 @@
   </data>
   <data name="VillageCategory" xml:space="preserve">
     <value>Village/Hamlet Category</value>
+  </data>
+  <data name="WorkSchedule" xml:space="preserve">
+    <value>Work Schedule</value>
   </data>
 </root>

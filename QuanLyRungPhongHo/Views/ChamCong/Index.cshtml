@@ -101,12 +101,9 @@
                     <small class="text-muted">Mã nhân viên: @ViewBag.MaNV | Tên: @ViewBag.TenNV</small>
                 </div>
                 <div class="text-center">
-                    <a href="@Url.Action("CreateTestSchedule", "ChamCong")" class="btn btn-success">
-                        <i class="bi bi-calendar-plus"></i> Tạo lịch test cho hôm nay
-                    </a>
                     @if (User.IsInRole("Admin_Tinh") || User.IsInRole("QuanLy_Xa"))
                     {
-                        <a href="@Url.Action("Index", "LichLamViec")" class="btn btn-primary ms-2">
+                        <a href="@Url.Action("Index", "LichLamViec")" class="btn btn-primary">
                             <i class="bi bi-calendar-check"></i> Quản lý lịch làm việc
                         </a>
                     }
@@ -136,12 +133,12 @@
                     <table class="table table-hover table-sm align-middle mb-0">
                         <thead class="table-light">
                             <tr>
+                                <th>Mã NV</th>
                                 <th>Ngày</th>
-                                <th>Ca</th>
-                                <th>Lô rừng</th>
+                                <th>Ca làm việc</th>
                                 <th>Giờ vào</th>
                                 <th>Giờ ra</th>
-                                <th>Số giờ</th>
+                                <th>Số giờ làm</th>
                                 <th>Trạng thái</th>
                             </tr>
                         </thead>
@@ -149,9 +146,9 @@
                             @foreach (var item in ViewBag.History)
                             {
                                 <tr>
+                                    <td><strong>@item.MaNV</strong></td>
                                     <td>@item.NgayLamViec</td>
                                     <td>@item.TenCa</td>
-                                    <td>@item.TenLo</td>
                                     <td>@(item.GioVao ?? "---")</td>
                                     <td>@(item.GioRa ?? "---")</td>
                                     <td>@(item.SoGioLam ?? "---")</td>

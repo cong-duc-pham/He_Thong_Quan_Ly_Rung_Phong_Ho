@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using QuanLyRungPhongHo.Data;
 using QuanLyRungPhongHo.Models;
+using QuanLyRungPhongHo.Attributes;
 
 namespace QuanLyRungPhongHo.Controllers
 {
@@ -17,8 +18,32 @@ namespace QuanLyRungPhongHo.Controllers
             _context = context;
         }
 
+        // Tự động sinh mã xã (XA001, XA002, ...)
+        private async Task<string> GenerateMaXa()
+        {
+            var lastMaXa = await _context.DanhMucXas
+                .Where(x => x.MaXa.StartsWith("XA"))
+                .OrderByDescending(x => x.MaXa)
+                .Select(x => x.MaXa)
+                .FirstOrDefaultAsync();
+
+            if (string.IsNullOrEmpty(lastMaXa))
+            {
+                return "XA001";
+            }
+
+            // Lấy phần số từ mã cuối cùng
+            if (int.TryParse(lastMaXa.Substring(2), out int lastNumber))
+            {
+                return $"XA{(lastNumber + 1):D3}";
+            }
+
+            return "XA001";
+        }
+
         // GET: DanhMucXa
         // Hiển thị danh sách Xã với tìm kiếm và phân trang
+        [CheckPermission("DanhMucXa.View")]
         public async Task<IActionResult> Index(string searchString, int? pageNumber)
         {
             try
@@ -27,7 +52,7 @@ namespace QuanLyRungPhongHo.Controllers
                 ViewData["CurrentFilter"] = searchString;
 
                 // Query cơ bản
-                var query = _context.DanhMucXas.AsQueryable();
+                var query = _context.DanhMucXas.Include(x => x.DanhMucThons).AsQueryable();
 
                 // Tìm kiếm theo tên xã
                 if (!string.IsNullOrEmpty(searchString))
@@ -60,7 +85,58 @@ namespace QuanLyRungPhongHo.Controllers
             }
         }
 
+        // API: DanhMucXa/SearchAjax
+        // Tìm kiếm và trả về JSON cho AJAX
+        [HttpGet]
+        [CheckPermission("DanhMucXa.View")]
+        public async Task<IActionResult> SearchAjax(string searchString, int pageNumber = 1)
+        {
+            try
+            {
+                var query = _context.DanhMucXas.Include(x => x.DanhMucThons).AsQueryable();
+
+                if (!string.IsNullOrEmpty(searchString))
+                {
+                    query = query.Where(x => x.TenXa.Contains(searchString) || x.MaXa.Contains(searchString));
+                }
+
+                int totalRecords = await query.CountAsync();
+                int totalPages = (int)Math.Ceiling(totalRecords / (double)PageSize);
+
+                var pagedData = await query
+                    .OrderBy(x => x.MaXa)
+                    .Skip((pageNumber - 1) * PageSize)
+                    .Take(PageSize)
+                    .Select(x => new
+                    {
+                        x.MaXa,
+                        x.TenXa,
+                        SoThon = x.DanhMucThons.Count
+                    })
+                    .ToListAsync();
+
+                return Json(new
+                {
+                    success = true,
+                    data = pagedData,
+                    currentPage = pageNumber,
+                    totalPages = totalPages,
+                    totalRecords = totalRecords,
+                    searchString = searchString ?? ""
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = $"Lỗi tìm kiếm: {ex.Message}"
+                });
+            }
+        }
+
         // GET: DanhMucXa/Create
+        [CheckPermission("DanhMucXa.Create")]
         public IActionResult Create()
         {
             return View();
@@ -69,22 +145,22 @@ namespace QuanLyRungPhongHo.Controllers
         // POST: DanhMucXa/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("MaXa,TenXa")] DanhMucXa danhMucXa)
+        [CheckPermission("DanhMucXa.Create")]
+        public async Task<IActionResult> Create([Bind("TenXa")] DanhMucXa danhMucXa)
         {
             try
             {
-                // Kiểm tra trùng Mã Xã
-                if (await _context.DanhMucXas.AnyAsync(x => x.MaXa == danhMucXa.MaXa))
-                {
-                    ModelState.AddModelError("MaXa", "Mã xã đã tồn tại trong hệ thống");
-                    return View(danhMucXa);
-                }
+                // Tự động sinh mã xã
+                danhMucXa.MaXa = await GenerateMaXa();
+
+                // Xóa lỗi validation của MaXa vì đã tự động sinh
+                ModelState.Remove("MaXa");
 
                 if (ModelState.IsValid)
                 {
                     _context.Add(danhMucXa);
                     await _context.SaveChangesAsync();
-                    TempData["SuccessMessage"] = $"Thêm xã '{danhMucXa.TenXa}' thành công!";
+                    TempData["SuccessMessage"] = $"Thêm xã '{danhMucXa.TenXa}' (Mã: {danhMucXa.MaXa}) thành công!";
                     return RedirectToAction(nameof(Index));
                 }
             }
@@ -97,6 +173,7 @@ namespace QuanLyRungPhongHo.Controllers
         }
 
         // GET: DanhMucXa/Edit/5
+        [CheckPermission("DanhMucXa.Edit")]
         public async Task<IActionResult> Edit(string id)
         {
             if (id == null)
@@ -124,6 +201,7 @@ namespace QuanLyRungPhongHo.Controllers
         // POST: DanhMucXa/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [CheckPermission("DanhMucXa.Edit")]
         public async Task<IActionResult> Edit(string id, [Bind("MaXa,TenXa")] DanhMucXa danhMucXa)
         {
             if (id != danhMucXa.MaXa)
@@ -161,6 +239,7 @@ namespace QuanLyRungPhongHo.Controllers
         }
 
         // GET: DanhMucXa/Delete/5
+        [CheckPermission("DanhMucXa.Delete")]
         public async Task<IActionResult> Delete(string id)
         {
             if (id == null)
@@ -199,6 +278,7 @@ namespace QuanLyRungPhongHo.Controllers
         // POST: DanhMucXa/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [CheckPermission("DanhMucXa.Delete")]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
             try

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using QuanLyRungPhongHo.Attributes;
 using QuanLyRungPhongHo.Data;
 using QuanLyRungPhongHo.Models;
 using QuanLyRungPhongHo.Validators;
@@ -23,6 +24,7 @@ namespace QuanLyRungPhongHo.Controllers
         }
 
         //  Hiển thị danh sách + Search + Filter
+        [CheckPermission("NhanSu.View")]
         public async Task<IActionResult> Index(string searchString, string roleFilter, string maXaFilter)
         {
             try
@@ -78,6 +80,7 @@ namespace QuanLyRungPhongHo.Controllers
 
         // lấy chi tiết 1 nhân viên
         [HttpGet]
+        [CheckPermission("NhanSu.View")]
         public async Task<JsonResult> GetById(int id)
         {
             try
@@ -113,6 +116,7 @@ namespace QuanLyRungPhongHo.Controllers
         // Lưu (Thêm hoặc Sửa) với validation chi tiết chuyên nghiệp
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [CheckPermission("NhanSu.Create", "NhanSu.Edit")]
         public async Task<JsonResult> Save(NhanSuViewModel model)
         {
             try
@@ -308,7 +312,77 @@ namespace QuanLyRungPhongHo.Controllers
         // Khóa tài khoản (thay vì xóa)
         [HttpPost]
         [ValidateAntiForgeryToken]
+
         public async Task<JsonResult> ToggleLock(int id)
+        [CheckPermission("NhanSu.Delete")]
+        public async Task<JsonResult> Delete(int id)
+        {
+            using (var transaction = await _context.Database.BeginTransactionAsync())
+            {
+                try
+                {
+                    var ns = await _context.NhanSus.FindAsync(id);
+                    if (ns == null)
+                    {
+                        return Json(new { success = false, message = "Không tìm thấy nhân sự!" });
+                    }
+
+                    // Tìm tài khoản của nhân sự
+                    var tk = await _context.TaiKhoans.FirstOrDefaultAsync(t => t.MaNV == id);
+                    if (tk == null)
+                    {
+                        return Json(new { success = false, message = "Không tìm thấy tài khoản của nhân sự này!" });
+                    }
+
+                    // Kiểm tra xem tài khoản có dữ liệu liên quan không
+                    var hasRelatedData = await _context.NhatKyBaoVes.AnyAsync(nk => nk.MaNV_GhiNhan == id) ||
+                                        await _context.LichLamViecs.AnyAsync(ll => ll.MaNV == id);
+
+                    if (hasRelatedData)
+                    {
+                        // Nếu có dữ liệu liên quan, chỉ khóa tài khoản
+                        tk.TrangThai = false; // Khóa tài khoản
+                        _context.TaiKhoans.Update(tk);
+                        await _context.SaveChangesAsync();
+                        await transaction.CommitAsync();
+
+                        return Json(new
+                        {
+                            success = true,
+                            message = "Đã khóa tài khoản nhân sự thành công! (Không xóa do có dữ liệu liên quan)",
+                            isLocked = true
+                        });
+                    }
+                    else
+                    {
+                        // Nếu không có dữ liệu liên quan, vẫn khóa thay vì xóa (an toàn hơn)
+                        tk.TrangThai = false;
+                        _context.TaiKhoans.Update(tk);
+                        await _context.SaveChangesAsync();
+                        await transaction.CommitAsync();
+
+                        return Json(new
+                        {
+                            success = true,
+                            message = "Đã khóa tài khoản nhân sự thành công!",
+                            isLocked = true
+                        });
+                    }
+                }
+                catch (Exception ex)
+                {
+                    await transaction.RollbackAsync();
+                    return Json(new { success = false, message = "Lỗi: " + ex.Message });
+                }
+            }
+        }
+
+        // Mở khóa tài khoản
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [CheckPermission("NhanSu.Edit")]
+        public async Task<JsonResult> UnlockAccount(int id)
+
         {
             try
             {
@@ -351,6 +425,7 @@ namespace QuanLyRungPhongHo.Controllers
 
         // API Search real-time (JSON response)
         [HttpGet]
+        [CheckPermission("NhanSu.View")]
         public async Task<JsonResult> SearchRealtime(string searchString, string roleFilter, string maXaFilter)
         {
             try

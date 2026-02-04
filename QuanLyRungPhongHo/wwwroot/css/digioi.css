@@ -147,7 +147,7 @@ body .container {
 
 .digioi-table thead {
     background: linear-gradient(135deg, var(--green) 0%, var(--green-dark) 100%);
-    color: #fff;
+    color: #fff !important;
 }
 
 .digioi-table th,
@@ -157,7 +157,6 @@ body .container {
     text-align: center;
     word-break: break-word;
     vertical-align: middle;
-    color: var(--text);
 }
 
 .digioi-table th {
@@ -166,7 +165,11 @@ body .container {
     text-align: center;
     font-size: 15px;
     border: 1px solid rgba(255,255,255,0.2);
-    color: #fff;
+    color: #fff !important;
+}
+
+.digioi-table td {
+    color: var(--text);
 }
 
 .digioi-table tbody tr {
@@ -294,6 +297,19 @@ body .container {
     outline: none;
     border-color: var(--green);
     box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+}
+
+/* Dark mode: đảm bảo text hiển thị rõ ràng */
+[data-theme="dark"] .digioi-form-group input,
+[data-theme="dark"] .digioi-form-group select,
+.dark-mode .digioi-form-group input,
+.dark-mode .digioi-form-group select {
+    color: #e5e7eb !important;
+}
+
+[data-theme="dark"] .digioi-form-group input::placeholder,
+.dark-mode .digioi-form-group input::placeholder {
+    color: #94a3b8 !important;
 }
 
 /* ===== INFO BAR ===== */
@@ -839,4 +855,22 @@ body .container {
     .digioi-info-grid {
         grid-template-columns: 1fr;
     }
+}
+
+/* ===== FIX TABLE HEADER TEXT VISIBILITY ===== */
+/* Đảm bảo text trong table header luôn có màu trắng, tránh bị ẩn */
+.digioi-table thead th,
+.digioi-table thead td {
+    color: #ffffff !important;
+    background: linear-gradient(135deg, var(--green) 0%, var(--green-dark) 100%);
+}
+
+/* Fix cho dark mode */
+[data-theme="dark"] .digioi-table thead th,
+[data-theme="dark"] .digioi-table thead td,
+.dark-mode .digioi-table thead th,
+.dark-mode .digioi-table thead td,
+body.theme-dark .digioi-table thead th,
+body.theme-dark .digioi-table thead td {
+    color: #ffffff !important;
 }

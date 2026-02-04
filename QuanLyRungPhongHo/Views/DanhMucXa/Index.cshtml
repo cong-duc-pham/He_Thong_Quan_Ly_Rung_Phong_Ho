@@ -52,39 +52,36 @@
     <!-- Tìm kiếm -->
     <div class="digioi-card mb-3">
         <div class="card-body">
-            <form asp-action="Index" method="get" class="digioi-search no-ajax">
+            <div id="searchForm">
                 <div class="input-group">
                     <span class="input-group-text bg-success text-white">
                         <i class="bi bi-search"></i>
                     </span>
                     <input type="text"
-                           name="searchString"
+                           id="searchInput"
                            value="@currentFilter"
                            class="form-control"
                            placeholder="@Localizer["SearchPlaceholder"]" />
-                    <button class="btn btn-success" type="submit">
-                        @Localizer["Search"]
+                    <button class="btn btn-success" id="searchBtn" type="button">
+                        <i class="bi bi-search"></i> @Localizer["Search"]
+                    </button>
+                    <button class="btn btn-outline-secondary" id="clearBtn" type="button">
+                        <i class="bi bi-x-circle"></i> @Localizer["ClearFilter"]
                     </button>
                 </div>
-            </form>
+            </div>
         </div>
     </div>
 
     <!-- Thông tin -->
     <div class="mb-3">
-        <span class="badge bg-info text-dark">
+        <span class="badge bg-info text-dark" id="totalRecordsBadge">
             @Localizer["Total"]: @totalRecords
         </span>
 
-        @if (!string.IsNullOrEmpty(currentFilter))
-        {
-            <span class="badge bg-warning text-dark">
-                @Localizer["Filter"]: "@currentFilter"
-            </span>
-            <a asp-action="Index" class="btn btn-sm btn-outline-secondary no-ajax">
-                <i class="bi bi-x-circle"></i> @Localizer["ClearFilter"]
-            </a>
-        }
+        <span class="badge bg-warning text-dark" id="filterBadge" style="@(string.IsNullOrEmpty(currentFilter) ? "display:none;" : "")">
+            @Localizer["Filter"]: "<span id="filterText">@currentFilter</span>"
+        </span>
     </div>
 
     <!-- Bảng -->
@@ -101,7 +98,7 @@
                             <th class="text-center">@Localizer["Action"]</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="dataTableBody">
                         @if (Model.Any())
                         {
                             int stt = (currentPage - 1) * 10 + 1;
@@ -150,16 +147,12 @@
     </div>
 
     <!-- Phân trang -->
-    @if (totalPages > 1)
-    {
-        <nav class="mt-4">
+    <nav class="mt-4" id="paginationContainer">
+        @if (totalPages > 1)
+        {
             <ul class="pagination justify-content-center">
                 <li class="page-item @(currentPage == 1 ? "disabled" : "")">
-                    <a class="page-link"
-                       asp-route-pageNumber="@(currentPage - 1)"
-                       asp-route-searchString="@currentFilter">
-                        «
-                    </a>
+                    <a class="page-link" href="#" data-page="@(currentPage - 1)">«</a>
                 </li>
 
                 @for (int i = 1; i <= totalPages; i++)
@@ -173,23 +166,155 @@
                     else if (i >= currentPage - 2 && i <= currentPage + 2)
                     {
                         <li class="page-item">
-                            <a class="page-link"
-                               asp-route-pageNumber="@i"
-                               asp-route-searchString="@currentFilter">
-                                @i
-                            </a>
+                            <a class="page-link" href="#" data-page="@i">@i</a>
                         </li>
                     }
                 }
 
                 <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
-                    <a class="page-link"
-                       asp-route-pageNumber="@(currentPage + 1)"
-                       asp-route-searchString="@currentFilter">
-                        »
-                    </a>
+                    <a class="page-link" href="#" data-page="@(currentPage + 1)">»</a>
                 </li>
             </ul>
-        </nav>
-    }
+        }
+    </nav>
 </div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            let currentPage = @currentPage;
+            let currentSearch = '@currentFilter';
+
+            // Hàm tìm kiếm AJAX
+            function searchData(searchString, page) {
+                // Hiển thị loading
+                $('#dataTableBody').html('<tr><td colspan="5" class="text-center py-4"><i class="bi bi-hourglass-split spinner-border"></i> Đang tải...</td></tr>');
+
+                $.ajax({
+                    url: '@Url.Action("SearchAjax", "DanhMucXa")',
+                    type: 'GET',
+                    data: {
+                        searchString: searchString,
+                        pageNumber: page
+                    },
+                    success: function (response) {
+                        if (response.success) {
+                            currentPage = response.currentPage;
+                            currentSearch = response.searchString;
+                            
+                            // Cập nhật bảng
+                            renderTable(response.data, response.currentPage);
+                            
+                            // Cập nhật phân trang
+                            renderPagination(response.currentPage, response.totalPages);
+                            
+                            // Cập nhật thông tin
+                            $('#totalRecordsBadge').html('@Localizer["Total"]: ' + response.totalRecords);
+                            
+                            if (response.searchString) {
+                                $('#filterText').text(response.searchString);
+                                $('#filterBadge').show();
+                            } else {
+                                $('#filterBadge').hide();
+                            }
+                        } else {
+                            alert(response.message);
+                        }
+                    },
+                    error: function () {
+                        $('#dataTableBody').html('<tr><td colspan="5" class="text-center text-danger py-4"><i class="bi bi-exclamation-triangle"></i> Lỗi khi tải dữ liệu!</td></tr>');
+                    }
+                });
+            }
+
+            // Render bảng
+            function renderTable(data, page) {
+                let html = '';
+                
+                if (data.length === 0) {
+                    html = '<tr><td colspan="5" class="text-center text-muted py-4"><i class="bi bi-inbox fs-1"></i><div>@Localizer["NoData"]</div></td></tr>';
+                } else {
+                    let stt = (page - 1) * 10 + 1;
+                    data.forEach(function (item) {
+                        html += '<tr>';
+                        html += '<td>' + stt + '</td>';
+                        html += '<td><strong>' + item.maXa + '</strong></td>';
+                        html += '<td>' + item.tenXa + '</td>';
+                        html += '<td class="text-center"><span class="badge bg-secondary">' + item.soThon + '</span></td>';
+                        html += '<td class="text-center">';
+                        html += '<div class="btn-group btn-group-sm">';
+                        html += '<a href="@Url.Action("Edit", "DanhMucXa")/' + item.maXa + '" class="btn btn-warning"><i class="bi bi-pencil-square"></i></a>';
+                        html += '<a href="@Url.Action("Delete", "DanhMucXa")/' + item.maXa + '" class="btn btn-danger"><i class="bi bi-trash"></i></a>';
+                        html += '</div>';
+                        html += '</td>';
+                        html += '</tr>';
+                        stt++;
+                    });
+                }
+                
+                $('#dataTableBody').html(html);
+            }
+
+            // Render phân trang
+            function renderPagination(current, total) {
+                if (total <= 1) {
+                    $('#paginationContainer').html('');
+                    return;
+                }
+
+                let html = '<ul class="pagination justify-content-center">';
+                
+                // Previous
+                html += '<li class="page-item ' + (current === 1 ? 'disabled' : '') + '">';
+                html += '<a class="page-link" href="#" data-page="' + (current - 1) + '">«</a>';
+                html += '</li>';
+
+                // Pages
+                for (let i = 1; i <= total; i++) {
+                    if (i === current) {
+                        html += '<li class="page-item active"><span class="page-link">' + i + '</span></li>';
+                    } else if (i >= current - 2 && i <= current + 2) {
+                        html += '<li class="page-item"><a class="page-link" href="#" data-page="' + i + '">' + i + '</a></li>';
+                    }
+                }
+
+                // Next
+                html += '<li class="page-item ' + (current === total ? 'disabled' : '') + '">';
+                html += '<a class="page-link" href="#" data-page="' + (current + 1) + '">»</a>';
+                html += '</li>';
+
+                html += '</ul>';
+                $('#paginationContainer').html(html);
+            }
+
+            // Sự kiện click nút tìm kiếm
+            $('#searchBtn').click(function () {
+                let searchString = $('#searchInput').val().trim();
+                searchData(searchString, 1);
+            });
+
+            // Sự kiện nhấn Enter trong ô tìm kiếm
+            $('#searchInput').keypress(function (e) {
+                if (e.which === 13) {
+                    $('#searchBtn').click();
+                    return false;
+                }
+            });
+
+            // Sự kiện click nút xóa bộ lọc
+            $('#clearBtn').click(function () {
+                $('#searchInput').val('');
+                searchData('', 1);
+            });
+
+            // Sự kiện click phân trang
+            $(document).on('click', '#paginationContainer .page-link', function (e) {
+                e.preventDefault();
+                let page = $(this).data('page');
+                if (page && page > 0) {
+                    searchData(currentSearch, page);
+                }
+            });
+        });
+    </script>
+}

@@ -113,10 +113,13 @@
     <value>No account</value>
   </data>
   <data name="ModalTitleAdd" xml:space="preserve">
-    <value>Add Staff</value>
+    <value>Add New Staff</value>
   </data>
   <data name="ModalTitleEdit" xml:space="preserve">
     <value>Edit Staff</value>
+  </data>
+  <data name="PersonalInfo" xml:space="preserve">
+    <value>Personal Information</value>
   </data>
   <data name="Close" xml:space="preserve">
     <value>Close</value>

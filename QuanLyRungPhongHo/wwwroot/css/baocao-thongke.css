@@ -15,6 +15,23 @@
     --bc-shadow: 0.32;
 }
 
+/* Dark mode input fix */
+.theme-dark input,
+.theme-dark select,
+.theme-dark textarea,
+html.dark input,
+html.dark select,
+html.dark textarea {
+    color: #e5e7eb !important;
+}
+
+.theme-dark input::placeholder,
+html.dark input::placeholder,
+.theme-dark textarea::placeholder,
+html.dark textarea::placeholder {
+    color: #9ca3af !important;
+}
+
 /* Stats Grid - Thống kê tổng quan */
 .stats-grid {
     display: grid;
@@ -222,6 +239,11 @@
     position: sticky;
     top: 0;
     z-index: 10;
+}
+
+.table-compact thead th,
+.table-compact thead td {
+    color: #ffffff !important;
 }
 
 .table-compact tfoot {

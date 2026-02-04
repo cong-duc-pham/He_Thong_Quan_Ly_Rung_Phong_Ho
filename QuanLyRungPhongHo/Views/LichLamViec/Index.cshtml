@@ -30,11 +30,16 @@
             </button>
         </div>
         <div class="action-buttons">
+            <button class="btn btn-emergency" id="emergencyBtn" onclick="toggleEmergencyMode()" title="Bật để vượt giới hạn số lượng nhân viên trong trường hợp khẩn cấp">
+                <i class="fas fa-shield-alt"></i>
+                Khẩn cấp: TẮT
+            </button>
+
             <button class="btn btn-secondary" onclick="clearSchedule()">
                 <i class="fas fa-eraser"></i>
                 Xóa lịch
             </button>
-            
+
             <button class="btn btn-primary" onclick="saveSchedule()">
                 <i class="fas fa-save"></i>
                 Lưu lịch
@@ -201,27 +206,7 @@
         </div>
     </div>
 </div>
+
 @section Scripts {
     <script src="~/js/lichlamviec.js" asp-append-version="true"></script>
-    <script>
-        // Cách khắc phục: Dùng setInterval để kiểm tra định kỳ cho đến khi script tải xong
-        document.addEventListener("DOMContentLoaded", function() {
-            var attempts = 0;
-            var maxAttempts = 50; // Thử tối đa 5 giây (50 * 100ms)
-
-            var initInterval = setInterval(function() {
-                if (typeof window.initLichLamViec === 'function') {
-                    // Script đã tải xong -> Chạy ngay và hủy interval
-                    clearInterval(initInterval);
-                    window.initLichLamViec();
-                } else {
-                    attempts++;
-                    if (attempts >= maxAttempts) {
-                        clearInterval(initInterval);
-                        console.error("❌ Quá thời gian chờ tải lichlamviec.js");
-                    }
-                }
-            }, 100); // Kiểm tra mỗi 100ms
-        });
-    </script>
 }

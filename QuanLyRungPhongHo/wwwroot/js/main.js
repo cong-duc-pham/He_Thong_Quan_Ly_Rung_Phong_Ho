@@ -244,7 +244,8 @@
                     document.body.appendChild(newScript);
                     document.body.removeChild(newScript);
                 } catch (e) {
-                    console.error('Lỗi:', e);
+                    console.error('Lỗi khi thực thi inline script:', e);
+                    // Không throw error để không chặn các script khác
                 }
             }
         });

@@ -175,7 +175,7 @@
                         </a>
                     </li>
 
-                    <!-- MENU MỚI: QUẢN LÝ CA LÀM VIỆC -->
+                    <!-- MENU: QUẢN LÝ CA LÀM VIỆC -->
                     <li class="menu-item has-submenu">
                         <a href="javascript:void(0)">
                             <i class="fas fa-calendar-alt"></i>
@@ -220,13 +220,6 @@
                         </a>
                     </li>
 
-                    <li class="menu-item">
-                        <a href="@Url.Action("Index", "Settings")">
-                            <i class="fas fa-gear"></i>
-                            <span>@Localizer["Settings"]</span>
-                        </a>
-                    </li>
-
                     @if (User.IsInRole("Admin") || User.IsInRole("Admin_Tinh"))
                     {
                         <li class="menu-item admin-only">
@@ -243,6 +236,13 @@
                             </a>
                         </li>
                     }
+
+                    <li class="menu-item">
+                        <a href="@Url.Action("Index", "Settings")">
+                            <i class="fas fa-gear"></i>
+                            <span>@Localizer["Settings"]</span>
+                        </a>
+                    </li>
                 </ul>
             </nav>
         </aside>
@@ -285,6 +285,19 @@
                     console.log('Theme changed to:', e.detail.theme, '(effective:', e.detail.effectiveTheme + ')');
                 });
             }
+
+            // Xử lý chuyển đổi ngôn ngữ - đảm bảo reload trang
+            const languageLinks = document.querySelectorAll('.language-selector .dropdown-item');
+            languageLinks.forEach(function(link) {
+                link.addEventListener('click', function(e) {
+                    // Không cần preventDefault, để link hoạt động bình thường
+                    // Nhưng đảm bảo trang sẽ được reload
+                    const href = this.getAttribute('href');
+                    if (href) {
+                        window.location.href = href;
+                    }
+                });
+            });
         });
     </script>
     

@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using QuanLyRungPhongHo.Data;
 using QuanLyRungPhongHo.Models;
 using QuanLyRungPhongHo.Models;
+using QuanLyRungPhongHo.Attributes;
 
 namespace QuanLyRungPhongHo.Controllers
 {
@@ -18,6 +19,7 @@ namespace QuanLyRungPhongHo.Controllers
         }
 
         // GET: ChamCong/Index - Hiển thị lịch làm việc và chấm công
+        [CheckPermission("ChamCong.View")]
         public async Task<IActionResult> Index()
         {
             try
@@ -120,6 +122,7 @@ namespace QuanLyRungPhongHo.Controllers
         // POST: Vào ca đơn giản
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [CheckPermission("ChamCong.Create")]
         public async Task<IActionResult> CheckInSimple(int maLich)
         {
             try
@@ -188,6 +191,7 @@ namespace QuanLyRungPhongHo.Controllers
         // POST: Tan ca đơn giản
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [CheckPermission("ChamCong.Edit")]
         public async Task<IActionResult> CheckOutSimple(int maLich)
         {
             try
@@ -322,6 +326,7 @@ namespace QuanLyRungPhongHo.Controllers
 
         // API: Lấy lịch làm việc của nhân viên hôm nay
         [HttpGet]
+        [CheckPermission("ChamCong.View")]
         public async Task<JsonResult> GetMyScheduleToday()
         {
             try
@@ -402,6 +407,7 @@ namespace QuanLyRungPhongHo.Controllers
         // API: Check-in (Vào ca)
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [CheckPermission("ChamCong.Create")]
         public async Task<JsonResult> CheckIn(int maLich, string? toaDoGPS, string? ghiChu)
         {
             try
@@ -489,6 +495,7 @@ namespace QuanLyRungPhongHo.Controllers
         // API: Check-out (Tan ca)
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [CheckPermission("ChamCong.Edit")]
         public async Task<JsonResult> CheckOut(int maLich, string? toaDoGPS, string? ghiChu)
         {
             try
@@ -573,6 +580,7 @@ namespace QuanLyRungPhongHo.Controllers
 
         // API: Lấy lịch sử chấm công (7 ngày gần nhất)
         [HttpGet]
+        [CheckPermission("ChamCong.View")]
         public async Task<JsonResult> GetHistory(int days = 7)
         {
             try
@@ -643,8 +651,8 @@ namespace QuanLyRungPhongHo.Controllers
             }
         }
 
-        // Trang quản lý chấm công (chỉ dành cho Quản lý)
-        [Authorize(Roles = "Admin_Tinh,QuanLy_Xa")]
+        // Trang quản lý chấm công (quyền được kiểm tra bởi CheckPermission)
+        [CheckPermission("ChamCong.View")]
         public async Task<IActionResult> QuanLy()
         {
             try
@@ -658,9 +666,9 @@ namespace QuanLyRungPhongHo.Controllers
             }
         }
 
-        // API: Lấy tất cả lịch sử chấm công (cho Quản lý)
+        // API: Lấy tất cả lịch sử chấm công (quyền được kiểm tra bởi CheckPermission)
         [HttpGet]
-        [Authorize(Roles = "Admin_Tinh,QuanLy_Xa")]
+        [CheckPermission("ChamCong.View")]
         public async Task<JsonResult> GetAllAttendance(DateTime? fromDate, DateTime? toDate, int? maNV, string? trangThai)
         {
             try
@@ -754,9 +762,9 @@ namespace QuanLyRungPhongHo.Controllers
             }
         }
 
-        // API: Lấy danh sách nhân viên (cho filter)
+        // API: Lấy danh sách nhân viên (quyền được kiểm tra bởi CheckPermission)
         [HttpGet]
-        [Authorize(Roles = "Admin_Tinh,QuanLy_Xa")]
+        [CheckPermission("ChamCong.View")]
         public async Task<JsonResult> GetNhanVienList()
         {
             try

@@ -1,0 +1,51 @@
+@{
+    ViewData["Title"] = "Từ chối truy cập";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Từ chối truy cập
+                    </h4>
+                </div>
+                <div class="card-body text-center py-5">
+                    <i class="fas fa-ban fa-5x text-danger mb-4"></i>
+                    <h3 class="mb-3">Bạn không có quyền truy cập trang này!</h3>
+                    <p class="text-muted mb-4">
+                        Tài khoản của bạn không được cấp quyền để thực hiện hành động này.<br />
+                        Vui lòng liên hệ quản trị viên để được cấp quyền.
+                    </p>
+                    <div class="mt-4">
+                        <a href="@Url.Action("Index", "Home")" class="btn btn-primary">
+                            <i class="fas fa-home"></i> Về trang chủ
+                        </a>
+                        <a href="javascript:history.back()" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Quay lại
+                        </a>
+                    </div>
+                    
+                    @if (User.Identity?.IsAuthenticated == true)
+                    {
+                        <div class="mt-4 p-3 bg-light rounded">
+                            <small class="text-muted">
+                                <strong>Người dùng:</strong> @User.Identity.Name<br />
+                                <strong>Vai trò:</strong> @string.Join(", ", User.Claims.Where(c => c.Type == System.Security.Claims.ClaimTypes.Role).Select(c => c.Value))
+                            </small>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .fa-ban {
+        opacity: 0.3;
+    }
+</style>

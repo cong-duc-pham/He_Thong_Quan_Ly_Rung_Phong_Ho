@@ -75,8 +75,9 @@
             <div class="card-body">
                 <div class="mb-3">
                     <label class="form-label">@Localizer["NotifyEmail"]</label>
-                    <input type="email" id="setting-contact-email" class="form-control" placeholder="email@example.com" />
-                    <div class="form-text">@Localizer["LocalOnlyNote"]</div>
+                    <input type="email" id="setting-contact-email" class="form-control" 
+                           placeholder="email@example.com" value="@(Model.Email ?? "")" />
+                    <div class="form-text">Chỉ lưu trên trình duyệt, chưa đồng bộ về máy chủ.</div>
                 </div>
 
                 <div class="mb-3">
@@ -87,7 +88,7 @@
                 <div class="mb-3">
                     <label class="form-label">@Localizer["InternalNote"]</label>
                     <textarea id="setting-contact-note" class="form-control" rows="3"
-                              placeholder="@Localizer["InternalNotePlaceholder"]"></textarea>
+                              placeholder="@Localizer["InternalNotePlaceholder"]">@(Model.GhiChuNoiBo ?? "")</textarea>
                 </div>
 
                 <button type="button" class="btn btn-primary w-100" id="btn-save-contact">
@@ -112,10 +113,10 @@
                 <div class="row gy-3 gx-4">
                     <div class="col-lg-5">
                         <label class="form-label">@Localizer["Theme"]</label>
-                        <select class="form-select">
-                            <option>@Localizer["ThemeLight"]</option>
-                            <option>@Localizer["ThemeDark"]</option>
-                            <option>@Localizer["ThemeAuto"]</option>
+                        <select id="setting-theme" class="form-select">
+                            <option value="light">@Localizer["ThemeLight"]</option>
+                            <option value="dark">@Localizer["ThemeDark"]</option>
+                            <option value="auto">@Localizer["ThemeAuto"]</option>
                         </select>
                     </div>
                     <div class="col-lg-5">
@@ -151,9 +152,12 @@
                 <p class="text-muted small">@Localizer["SecurityNote"]</p>
 
                 <div class="d-flex gap-2">
-                    <a class="btn btn-outline-danger" asp-controller="Account" asp-action="Logout">
-                        <i class="fa-solid fa-right-from-bracket me-2"></i>@Localizer["Logout"]
-                    </a>
+                    <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-outline-danger">
+                            <i class="fa-solid fa-right-from-bracket me-2"></i>@Localizer["Logout"]
+                        </button>
+                    </form>
                     <a class="btn btn-outline-secondary" asp-controller="Home" asp-action="Index">
                         <i class="fa-solid fa-house me-2"></i>@Localizer["Home"]
                     </a>
@@ -170,4 +174,64 @@
 
 @section Scripts {
     <script src="~/js/settings.js" asp-append-version="true"></script>
+    <script>
+        // Theme toggle giống như ở header - lấy từ themeManager
+        (function initThemeDropdown() {
+            const themeSelect = document.getElementById('setting-theme');
+            
+            if (!themeSelect) {
+                console.warn('Không tìm thấy setting-theme dropdown');
+                return;
+            }
+            
+            // Hàm setup theme dropdown
+            function setupThemeDropdown() {
+                if (!window.themeManager) {
+                    console.warn('themeManager chưa sẵn sàng, đợi...');
+                    setTimeout(setupThemeDropdown, 100);
+                    return;
+                }
+                
+                console.log('themeManager đã sẵn sàng, setup dropdown');
+                
+                // Khởi tạo giá trị ban đầu từ themeManager
+                themeSelect.value = window.themeManager.getTheme();
+                
+                // Xóa event listeners cũ nếu có
+                const newSelect = themeSelect.cloneNode(true);
+                themeSelect.parentNode.replaceChild(newSelect, themeSelect);
+                
+                // Xử lý khi thay đổi dropdown
+                newSelect.addEventListener('change', function(e) {
+                    const selectedTheme = e.target.value;
+                    console.log('Đổi theme sang:', selectedTheme);
+                    
+                    // Sử dụng setTheme từ themeManager (giống header)
+                    window.themeManager.setTheme(selectedTheme);
+                    
+                    // Hiển thị thông báo
+                    const alert = document.getElementById('settings-alert');
+                    if (alert) {
+                        alert.classList.remove('d-none');
+                        alert.textContent = 'Đã thay đổi chủ đề giao diện thành công!';
+                        setTimeout(() => alert.classList.add('d-none'), 3000);
+                    }
+                });
+                
+                // Lắng nghe sự kiện thay đổi theme từ nơi khác (ví dụ: header)
+                window.addEventListener('themechange', function(e) {
+                    console.log('Theme changed from elsewhere:', e.detail.theme);
+                    // Cập nhật dropdown khi theme thay đổi từ nơi khác
+                    newSelect.value = e.detail.theme;
+                });
+            }
+            
+            // Bắt đầu setup
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', setupThemeDropdown);
+            } else {
+                setupThemeDropdown();
+            }
+        })();
+    </script>
 }

@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using QuanLyRungPhongHo.Attributes;
 using QuanLyRungPhongHo.Data;
 using QuanLyRungPhongHo.Models;
 
@@ -18,8 +19,33 @@ namespace QuanLyRungPhongHo.Controllers
             _context = context;
         }
 
+        // Tự động sinh mã thôn (T_<MaXa>_001, T_<MaXa>_002, ...)
+        private async Task<string> GenerateMaThon(string maXa)
+        {
+            var lastMaThon = await _context.DanhMucThons
+                .Where(t => t.MaXa == maXa && t.MaThon.StartsWith($"T_{maXa}_"))
+                .OrderByDescending(t => t.MaThon)
+                .Select(t => t.MaThon)
+                .FirstOrDefaultAsync();
+
+            if (string.IsNullOrEmpty(lastMaThon))
+            {
+                return $"T_{maXa}_001";
+            }
+
+            // Lấy phần số từ mã cuối cùng
+            var parts = lastMaThon.Split('_');
+            if (parts.Length == 3 && int.TryParse(parts[2], out int lastNumber))
+            {
+                return $"T_{maXa}_{(lastNumber + 1):D3}";
+            }
+
+            return $"T_{maXa}_001";
+        }
+
         // GET: DanhMucThon
         // Hiển thị danh sách Thôn với tìm kiếm theo Xã/Tên và phân trang
+        [CheckPermission("DanhMucThon.View")]
         public async Task<IActionResult> Index(string searchXa, string searchString, int? pageNumber)
         {
             try
@@ -76,6 +102,7 @@ namespace QuanLyRungPhongHo.Controllers
         }
 
         // GET: DanhMucThon/Create
+        [CheckPermission("DanhMucThon.Create")]
         public async Task<IActionResult> Create()
         {
             // Load danh sách xã cho dropdown
@@ -90,21 +117,22 @@ namespace QuanLyRungPhongHo.Controllers
         // POST: DanhMucThon/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("MaThon,TenThon,MaXa")] DanhMucThon danhMucThon)
+        [CheckPermission("DanhMucThon.Create")]
+        public async Task<IActionResult> Create([Bind("TenThon,MaXa")] DanhMucThon danhMucThon)
         {
             try
             {
-                // Kiểm tra trùng Mã Thôn
-                if (await _context.DanhMucThons.AnyAsync(t => t.MaThon == danhMucThon.MaThon))
-                {
-                    ModelState.AddModelError("MaThon", "Mã thôn đã tồn tại trong hệ thống");
-                }
+                // Tự động sinh mã thôn
+                danhMucThon.MaThon = await GenerateMaThon(danhMucThon.MaXa);
+
+                // Xóa lỗi validation của MaThon vì đã tự động sinh
+                ModelState.Remove("MaThon");
 
                 if (ModelState.IsValid)
                 {
                     _context.Add(danhMucThon);
                     await _context.SaveChangesAsync();
-                    TempData["SuccessMessage"] = $"Thêm thôn '{danhMucThon.TenThon}' thành công!";
+                    TempData["SuccessMessage"] = $"Thêm thôn '{danhMucThon.TenThon}' (Mã: {danhMucThon.MaThon}) thành công!";
                     return RedirectToAction(nameof(Index));
                 }
             }
@@ -124,6 +152,7 @@ namespace QuanLyRungPhongHo.Controllers
         }
 
         // GET: DanhMucThon/Edit/5
+        [CheckPermission("DanhMucThon.Edit")]
         public async Task<IActionResult> Edit(string id)
         {
             if (id == null)
@@ -158,6 +187,7 @@ namespace QuanLyRungPhongHo.Controllers
         // POST: DanhMucThon/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [CheckPermission("DanhMucThon.Edit")]
         public async Task<IActionResult> Edit(string id, [Bind("MaThon,TenThon,MaXa")] DanhMucThon danhMucThon)
         {
             if (id != danhMucThon.MaThon)
@@ -202,6 +232,7 @@ namespace QuanLyRungPhongHo.Controllers
         }
 
         // GET: DanhMucThon/Delete/5
+        [CheckPermission("DanhMucThon.Delete")]
         public async Task<IActionResult> Delete(string id)
         {
             if (id == null)
@@ -241,6 +272,7 @@ namespace QuanLyRungPhongHo.Controllers
         // POST: DanhMucThon/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [CheckPermission("DanhMucThon.Delete")]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
             try
@@ -282,6 +314,7 @@ namespace QuanLyRungPhongHo.Controllers
 
         // API: Lấy danh sách phân trang phục vụ AJAX
         [HttpGet]
+        [CheckPermission("DanhMucThon.View")]
         public async Task<JsonResult> GetPaged(string? searchXa, string? searchString, int pageNumber = 1, int pageSize = PageSize)
         {
             try
@@ -341,6 +374,7 @@ namespace QuanLyRungPhongHo.Controllers
 
         // API: Lấy danh sách thôn (dùng cho AJAX)
         [HttpGet]
+        [CheckPermission("DanhMucThon.View")]
         public async Task<JsonResult> GetAll(string? maXa)
         {
             try
@@ -374,6 +408,7 @@ namespace QuanLyRungPhongHo.Controllers
 
         // API: Lấy danh sách thôn theo Xã (cho dropdown cascade)
         [HttpGet]
+        [CheckPermission("DanhMucThon.View")]
         public async Task<JsonResult> GetByXa(string maXa)
         {
             try

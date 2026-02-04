@@ -178,6 +178,13 @@ namespace QuanLyRungPhongHo.Controllers
             return View();
         }
 
+        // GET: Home/Forbidden - Trang từ chối truy cập
+        [AllowAnonymous]
+        public IActionResult Forbidden()
+        {
+            return View();
+        }
+
         // GET: Home/Error
         [AllowAnonymous]
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

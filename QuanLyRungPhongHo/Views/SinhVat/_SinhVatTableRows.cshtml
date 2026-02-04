@@ -1,0 +1,84 @@
+@model IEnumerable<SinhVat>
+@inject Microsoft.AspNetCore.Mvc.Localization.IViewLocalizer Localizer
+
+@if (!Model.Any())
+{
+    <tr>
+        <td colspan="5" class="empty">
+            <i class="fas fa-seedling"></i> @Localizer["NoData"]
+        </td>
+    </tr>
+}
+else
+{
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>@item.TenLoai</td>
+            <td>
+                <span class="badge badge-type">
+                    @if (item.LoaiSV == "Thực vật")
+                    {
+                        <i class="fas fa-leaf"></i>
+                        @Localizer["TypePlant"]
+                    }
+                    else if (item.LoaiSV == "Động vật")
+                    {
+                        <i class="fas fa-paw"></i>
+                        @Localizer["TypeAnimal"]
+                    }
+                    else
+                    {
+                        <i class="fas fa-bacteria"></i>
+                        @Localizer["TypeMicrobe"]
+                    }
+                </span>
+            </td>
+            <td>
+                <span class="badge badge-level">
+                    @if (item.MucDoQuyHiem == "Nguy cấp")
+                    {
+                        <i class="fas fa-exclamation-triangle"></i>
+                        @Localizer["RareCritical"]
+                    }
+                    else if (item.MucDoQuyHiem == "Rất hiếm")
+                    {
+                        <i class="fas fa-star"></i>
+                        @Localizer["RareVeryRare"]
+                    }
+                    else if (item.MucDoQuyHiem == "Hiếm")
+                    {
+                        <i class="fas fa-star-half-alt"></i>
+                        @Localizer["RareRare"]
+                    }
+                    else
+                    {
+                        <i class="fas fa-circle"></i>
+                        @Localizer["RareCommon"]
+                    }
+                </span>
+            </td>
+            <td>
+                @if (item.LoRung != null)
+                {
+                    <span>TK @item.LoRung.SoTieuKhu - K @item.LoRung.SoKhoanh - L @item.LoRung.SoLo</span>
+                }
+                else
+                {
+                    <span class="text-muted">-</span>
+                }
+            </td>
+            <td class="text-center">
+                <a asp-action="Edit" asp-route-id="@item.MaSV"
+                   class="btn-icon edit" title="@Localizer["Edit"]">
+                    <i class="fas fa-edit"></i>
+                </a>
+                <a asp-action="Delete" asp-route-id="@item.MaSV"
+                   onclick="return confirm('@Localizer["DeleteConfirm"]')"
+                   class="btn-icon delete" title="@Localizer["Delete"]">
+                    <i class="fas fa-trash-alt"></i>
+                </a>
+            </td>
+        </tr>
+    }
+}

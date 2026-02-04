@@ -633,6 +633,33 @@ textarea:focus,
     box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.25);
     outline: none;
 }
+
+/* Dark mode: đảm bảo text hiển thị rõ ràng trong input */
+html.dark input,
+html.dark select,
+html.dark textarea,
+html.dark .form-control,
+html.dark .form-select {
+    color: #e2e8f0 !important;
+    background: var(--surface) !important;
+    border-color: var(--border);
+}
+
+html.dark input::placeholder,
+html.dark select::placeholder,
+html.dark textarea::placeholder,
+html.dark .form-control::placeholder,
+html.dark .form-select::placeholder {
+    color: #94a3b8 !important;
+}
+
+html.dark input:-webkit-autofill,
+html.dark input:-webkit-autofill:hover,
+html.dark input:-webkit-autofill:focus {
+    -webkit-text-fill-color: #e2e8f0 !important;
+    -webkit-box-shadow: 0 0 0px 1000px var(--surface) inset !important;
+    box-shadow: 0 0 0px 1000px var(--surface) inset !important;
+}
 .form-label,
 .form-text,
 .text-muted,
@@ -743,4 +770,95 @@ button[type="submit"].btn-primary:hover,
         height: 36px;
         font-size: 16px;
     }
+}
+
+/* ===== FIX TABLE HEADER TEXT COLOR ===== */
+/* Đảm bảo text trong thead luôn hiển thị rõ ràng trong cả light và dark mode */
+.table thead th,
+.table thead td,
+.digioi-table thead th,
+.digioi-table thead td,
+thead th,
+thead td {
+    color: #ffffff !important;
+}
+
+/* Fix cho các class Bootstrap màu xanh */
+.bg-primary,
+.bg-info,
+.bg-success,
+.bg-danger,
+.badge.bg-info,
+.badge.bg-primary {
+    color: #ffffff !important;
+}
+
+/* Fix cho các button và input có background xanh */
+.input-group-text.bg-success,
+.input-group-text.bg-primary,
+.input-group-text.bg-info,
+.input-group-text.bg-danger {
+    color: #ffffff !important;
+}
+
+/* Dark mode specific fixes */
+html.dark .table thead th,
+html.dark .table thead td,
+html.dark .digioi-table thead th,
+html.dark .digioi-table thead td,
+html.dark thead th,
+html.dark thead td {
+    color: #ffffff !important;
+}
+
+/* Fix cho card header với background màu xanh */
+.card-header.bg-success,
+.card-header.bg-primary,
+.card-header.bg-info,
+.card-header.bg-danger {
+    color: #ffffff !important;
+}
+
+/* Fix cho welcome banner và các gradient background */
+.bg-success.bg-gradient,
+.bg-primary.bg-gradient,
+.bg-info.bg-gradient {
+    color: #ffffff !important;
+}
+
+/* ===== UNIVERSAL DARK MODE INPUT FIX ===== */
+/* Đảm bảo tất cả input, select, textarea hiển thị rõ ràng trong dark mode */
+html.dark input:not([type="checkbox"]):not([type="radio"]),
+html.dark select,
+html.dark textarea {
+    color: #e2e8f0 !important;
+}
+
+html.dark input::placeholder,
+html.dark textarea::placeholder {
+    color: #94a3b8 !important;
+    opacity: 1;
+}
+
+/* Fix cho autofill trong dark mode */
+html.dark input:-webkit-autofill,
+html.dark input:-webkit-autofill:hover,
+html.dark input:-webkit-autofill:focus,
+html.dark input:-webkit-autofill:active {
+    -webkit-text-fill-color: #e2e8f0 !important;
+}
+
+/* Fix cho badge có text-dark */
+.badge.bg-info.text-dark {
+    color: #000000 !important;
+}
+
+/* Đảm bảo text trong table header với các class Bootstrap */
+.table thead.bg-success th,
+.table thead.bg-success td,
+.table thead.bg-primary th,
+.table thead.bg-danger th,
+.table thead.bg-danger td,
+.table thead.bg-primary td {
+    color: #ffffff !important;
 }

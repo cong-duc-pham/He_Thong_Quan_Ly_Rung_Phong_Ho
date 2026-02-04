@@ -63,6 +63,7 @@
     font-weight: 600;
     border-bottom: 2px solid var(--pq-border);
     padding: 12px 15px;
+    color: var(--pq-text) !important;
 }
 
 .permission-table tbody tr:hover {
@@ -96,6 +97,24 @@
 .form-check-input.permission-toggle:disabled:checked {
     background-color: var(--pq-warning);
     border-color: var(--pq-warning);
+}
+
+/* Dark mode input fix */
+.theme-dark input,
+.theme-dark select,
+.theme-dark textarea,
+html.dark input,
+html.dark select,
+html.dark textarea {
+    color: #e5e7eb !important;
+    background: #0f172a !important;
+}
+
+.theme-dark input::placeholder,
+html.dark input::placeholder,
+.theme-dark textarea::placeholder,
+html.dark textarea::placeholder {
+    color: #9ca3af !important;
 }
 
 /* Icon Colors */

@@ -3,7 +3,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace QLRungPhongHo.Models
+namespace QuanLyRungPhongHo.Models
 {
     [Table("ChamCongs")]
     public class ChamCong

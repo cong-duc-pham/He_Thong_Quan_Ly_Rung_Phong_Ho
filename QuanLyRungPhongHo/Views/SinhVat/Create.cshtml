@@ -1,10 +1,11 @@
-﻿@section Styles {
+﻿@inject IViewLocalizer Localizer
+@section Styles {
     <link rel="stylesheet" href="~/css/sinhvat.css" />
 }
 @model SinhVat
 
 <div class="page-header">
-    <h2><i class="fas fa-seedling"></i> Thêm sinh vật mới</h2>
+    <h2><i class="fas fa-seedling"></i> @Localizer["PageTitle"]</h2>
 </div>
 
 <div class="card-box">
@@ -13,55 +14,55 @@
 
         <div class="form-group">
             <label asp-for="TenLoai" class="form-label">
-                <i class="fas fa-tag"></i> Tên loài
+                <i class="fas fa-tag"></i> @Localizer["SpeciesName"]
             </label>
-            <input asp-for="TenLoai" class="form-control" placeholder="Nhập tên loài..." />
+            <input asp-for="TenLoai" class="form-control" placeholder="@Localizer["SpeciesNamePlaceholder"]" />
             <span asp-validation-for="TenLoai" class="text-danger"></span>
         </div>
 
         <div class="form-group">
             <label asp-for="LoaiSV" class="form-label">
-                <i class="fas fa-list"></i> Loại sinh vật
+                <i class="fas fa-list"></i> @Localizer["WildlifeType"]
             </label>
             <select asp-for="LoaiSV" class="form-control">
-                <option value="">-- Chọn loại --</option>
-                <option value="Thực vật">🌿 Thực vật</option>
-                <option value="Động vật">🐾 Động vật</option>
-                <option value="Vi sinh vật">🦠 Vi sinh vật</option>
+                <option value="">@Localizer["SelectType"]</option>
+                <option value="Thực vật">🌿 @Localizer["TypePlant"]</option>
+                <option value="Động vật">🐾 @Localizer["TypeAnimal"]</option>
+                <option value="Vi sinh vật">🦠 @Localizer["TypeMicrobe"]</option>
             </select>
             <span asp-validation-for="LoaiSV" class="text-danger"></span>
         </div>
 
         <div class="form-group">
             <label asp-for="MucDoQuyHiem" class="form-label">
-                <i class="fas fa-star"></i> Mức độ quý hiếm
+                <i class="fas fa-star"></i> @Localizer["RarityLevel"]
             </label>
             <select asp-for="MucDoQuyHiem" class="form-control">
-                <option value="">-- Chọn mức độ --</option>
-                <option value="Thường">Thường</option>
-                <option value="Hiếm">Hiếm</option>
-                <option value="Rất hiếm">Rất hiếm</option>
-                <option value="Nguy cấp">Nguy cấp</option>
+                <option value="">@Localizer["SelectRarity"]</option>
+                <option value="Thường">@Localizer["RareCommon"]</option>
+                <option value="Hiếm">@Localizer["RareRare"]</option>
+                <option value="Rất hiếm">@Localizer["RareVeryRare"]</option>
+                <option value="Nguy cấp">@Localizer["RareCritical"]</option>
             </select>
             <span asp-validation-for="MucDoQuyHiem" class="text-danger"></span>
         </div>
 
         <div class="form-group">
             <label asp-for="MaLo" class="form-label">
-                <i class="fas fa-map-marked-alt"></i> Lô rừng
+                <i class="fas fa-map-marked-alt"></i> @Localizer["ForestLot"]
             </label>
             <select asp-for="MaLo" class="form-control" asp-items="ViewBag.MaLo">
-                <option value="">-- Chọn lô rừng --</option>
+                <option value="">@Localizer["SelectForestLot"]</option>
             </select>
             <span asp-validation-for="MaLo" class="text-danger"></span>
         </div>
 
         <div class="form-actions">
             <button type="submit" class="btn btn-success">
-                <i class="fas fa-save"></i> Lưu
+                <i class="fas fa-save"></i> @Localizer["Save"]
             </button>
             <a asp-action="Index" class="btn btn-secondary">
-                <i class="fas fa-arrow-left"></i> Quay lại
+                <i class="fas fa-arrow-left"></i> @Localizer["Back"]
             </a>
         </div>
     </form>

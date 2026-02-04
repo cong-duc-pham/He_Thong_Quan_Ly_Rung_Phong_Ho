@@ -1,4 +1,77 @@
 ﻿/* ========================================
+   CSS VARIABLES - LIGHT & DARK THEME
+   ======================================== */
+:root {
+    /* Light Theme Colors */
+    --llv-bg: #f5f7fa;
+    --llv-surface: #ffffff;
+    --llv-surface-2: #f9fafb;
+    --llv-text: #1a1a1a;
+    --llv-text-muted: #6b7280;
+    --llv-border: #e5e7eb;
+    --llv-border-dark: #d1d5db;
+    
+    /* Primary Colors */
+    --llv-primary: #16a34a;
+    --llv-primary-hover: #15803d;
+    --llv-primary-light: #f0fdf4;
+    
+    /* Shift Colors */
+    --llv-morning: #ea580c;
+    --llv-afternoon: #16a34a;
+    --llv-evening: #2563eb;
+    
+    /* Status Colors */
+    --llv-today: #dcfce7;
+    --llv-weekend: #fef3c7;
+    --llv-cell-weekend: #fffbeb;
+    
+    /* Shadow */
+    --llv-shadow-sm: 0 2px 8px rgba(0,0,0,0.08);
+    --llv-shadow-md: 0 4px 12px rgba(0,0,0,0.12);
+    --llv-shadow-lg: 0 8px 24px rgba(0,0,0,0.15);
+    
+    /* Employee Card */
+    --llv-employee-bg: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+    --llv-employee-shadow: rgba(22, 163, 74, 0.4);
+}
+
+html.dark {
+    /* Dark Theme Colors */
+    --llv-bg: #0b1220;
+    --llv-surface: #0f172a;
+    --llv-surface-2: #1e293b;
+    --llv-text: #e2e8f0;
+    --llv-text-muted: #94a3b8;
+    --llv-border: #1f2937;
+    --llv-border-dark: #374151;
+    
+    /* Primary Colors */
+    --llv-primary: #34d399;
+    --llv-primary-hover: #22d3aa;
+    --llv-primary-light: rgba(52, 211, 153, 0.1);
+    
+    /* Shift Colors */
+    --llv-morning: #fb923c;
+    --llv-afternoon: #34d399;
+    --llv-evening: #60a5fa;
+    
+    /* Status Colors */
+    --llv-today: rgba(52, 211, 153, 0.15);
+    --llv-weekend: rgba(251, 191, 36, 0.15);
+    --llv-cell-weekend: rgba(251, 191, 36, 0.08);
+    
+    /* Shadow */
+    --llv-shadow-sm: 0 2px 12px rgba(0,0,0,0.3);
+    --llv-shadow-md: 0 4px 16px rgba(0,0,0,0.4);
+    --llv-shadow-lg: 0 8px 32px rgba(0,0,0,0.5);
+    
+    /* Employee Card */
+    --llv-employee-bg: linear-gradient(135deg, #059669 0%, #047857 100%);
+    --llv-employee-shadow: rgba(52, 211, 153, 0.4);
+}
+
+/* ========================================
    RESET & BASE STYLES
    ======================================== */
 * {
@@ -9,7 +82,8 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: #f5f7fa;
+    background: var(--llv-bg);
+    transition: background-color 0.3s ease;
 }
 
 /* Override container styles from layout */
@@ -30,46 +104,53 @@ body {
    PAGE HEADER
    ======================================== */
 .page-header {
-    background: white;
+    background: var(--llv-surface);
     padding: 24px;
     border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    box-shadow: var(--llv-shadow-sm);
     margin-bottom: 24px;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    border: 1px solid var(--llv-border);
 }
 
     .page-header h1 {
         font-size: 28px;
-        color: #1a1a1a;
+        color: var(--llv-text);
         display: flex;
         align-items: center;
         gap: 12px;
         margin-bottom: 8px;
+        transition: color 0.3s ease;
     }
 
         .page-header h1 i {
-            color: #16a34a;
+            color: var(--llv-primary);
+            transition: color 0.3s ease;
         }
 
     .page-header p {
-        color: #6b7280;
+        color: var(--llv-text-muted);
         font-size: 14px;
         margin: 0;
+        transition: color 0.3s ease;
     }
 
 /* ========================================
    CONTROLS BAR
    ======================================== */
 .controls {
-    background: white;
+    background: var(--llv-surface);
     padding: 20px;
     border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    box-shadow: var(--llv-shadow-sm);
     margin-bottom: 24px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
     gap: 16px;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    border: 1px solid var(--llv-border);
 }
 
 .week-selector {
@@ -81,20 +162,21 @@ body {
 .week-nav-btn {
     width: 36px;
     height: 36px;
-    border: 1px solid #e5e7eb;
-    background: white;
+    border: 1px solid var(--llv-border);
+    background: var(--llv-surface);
     border-radius: 8px;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: all 0.2s;
+    color: var(--llv-text);
 }
 
     .week-nav-btn:hover {
-        background: #f0fdf4;
-        border-color: #16a34a;
-        color: #16a34a;
+        background: var(--llv-primary-light);
+        border-color: var(--llv-primary);
+        color: var(--llv-primary);
         transform: scale(1.05);
     }
 
@@ -105,10 +187,11 @@ body {
 .week-info {
     font-size: 16px;
     font-weight: 600;
-    color: #1a1a1a;
+    color: var(--llv-text);
     padding: 0 16px;
     min-width: 260px;
     text-align: center;
+    transition: color 0.3s ease;
 }
 
 .action-buttons {
@@ -138,30 +221,32 @@ body {
     }
 
 .btn-primary {
-    background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+    background: linear-gradient(135deg, var(--llv-primary) 0%, var(--llv-primary-hover) 100%);
     color: white;
+    border: 1px solid transparent;
 }
 
     .btn-primary:hover {
-        background: linear-gradient(135deg, #15803d 0%, #166534 100%);
+        filter: brightness(1.1);
         transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(22, 163, 74, 0.4);
+        box-shadow: 0 4px 12px var(--llv-employee-shadow);
     }
 
 .btn-secondary {
-    background: white;
-    color: #374151;
-    border: 1px solid #e5e7eb;
+    background: var(--llv-surface);
+    color: var(--llv-text);
+    border: 1px solid var(--llv-border);
+    transition: all 0.3s ease;
 }
 
     .btn-secondary:hover {
-        background: #f0fdf4;
-        border-color: #16a34a;
-        color: #16a34a;
+        background: var(--llv-primary-light);
+        border-color: var(--llv-primary);
+        color: var(--llv-primary);
     }
 
 /* ========================================
-   MAIN LAYOUT - ✅ FIX
+   MAIN LAYOUT
    ======================================== */
 .main-layout {
     display: flex;
@@ -171,36 +256,45 @@ body {
 }
 
 /* ========================================
-   EMPLOYEES PANEL (SIDEBAR) - ✅ FIX
+   EMPLOYEES PANEL (SIDEBAR)
    ======================================== */
 .employees-panel {
     width: 320px;
     min-width: 320px;
     max-width: 320px;
     flex-shrink: 0;
-    background: white;
+    background: var(--llv-surface);
     border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    box-shadow: var(--llv-shadow-sm);
     height: fit-content;
     position: sticky;
     top: 20px;
     display: flex;
     flex-direction: column;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    border: 1px solid var(--llv-border);
 }
 
 .panel-header {
     padding: 20px;
-    border-bottom: 1px solid #f3f4f6;
+    border-bottom: 1px solid var(--llv-border);
+    transition: border-color 0.3s ease;
 }
 
     .panel-header h3 {
         font-size: 16px;
-        color: #1a1a1a;
+        color: var(--llv-text);
         margin-bottom: 12px;
         display: flex;
         align-items: center;
         gap: 8px;
+        transition: color 0.3s ease;
     }
+
+        .panel-header h3 i {
+            color: var(--llv-primary);
+            transition: color 0.3s ease;
+        }
 
 .search-box {
     position: relative;
@@ -209,16 +303,23 @@ body {
     .search-box input {
         width: 100%;
         padding: 10px 12px 10px 36px;
-        border: 1px solid #e5e7eb;
+        border: 1px solid var(--llv-border);
         border-radius: 8px;
         font-size: 14px;
         transition: all 0.2s;
+        background: var(--llv-surface-2);
+        color: var(--llv-text);
     }
+
+        .search-box input::placeholder {
+            color: var(--llv-text-muted);
+        }
 
         .search-box input:focus {
             outline: none;
-            border-color: #16a34a;
+            border-color: var(--llv-primary);
             box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
+            background: var(--llv-surface);
         }
 
     .search-box i {
@@ -226,8 +327,9 @@ body {
         left: 12px;
         top: 50%;
         transform: translateY(-50%);
-        color: #9ca3af;
+        color: var(--llv-text-muted);
         font-size: 14px;
+        transition: color 0.3s ease;
     }
 
 /* ========================================
@@ -242,20 +344,26 @@ body {
 
 .stat-card {
     flex: 1;
-    background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+    background: var(--llv-employee-bg);
     color: white;
     padding: 14px;
     border-radius: 8px;
     text-align: center;
     transition: transform 0.2s;
+    border: 1px solid transparent;
 }
 
     .stat-card:hover {
         transform: translateY(-2px);
+        box-shadow: 0 4px 12px var(--llv-employee-shadow);
     }
 
 .stat-card-assigned {
     background: linear-gradient(135deg, #059669 0%, #047857 100%);
+}
+
+html.dark .stat-card-assigned {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
 }
 
 .stat-label {
@@ -272,7 +380,7 @@ body {
 }
 
 /* ========================================
-   EMPLOYEES LIST - ✅ FIX
+   EMPLOYEES LIST
    ======================================== */
 .employees-list {
     padding: 16px;
@@ -286,7 +394,7 @@ body {
 }
 
 .employee-card {
-    background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+    background: var(--llv-employee-bg);
     color: white;
     padding: 12px;
     border-radius: 8px;
@@ -297,11 +405,12 @@ body {
     gap: 10px;
     user-select: none;
     flex-shrink: 0;
+    border: 1px solid transparent;
 }
 
     .employee-card:hover {
         transform: translateX(4px);
-        box-shadow: 0 4px 12px rgba(22, 163, 74, 0.4);
+        box-shadow: 0 4px 12px var(--llv-employee-shadow);
     }
 
     .employee-card.dragging {
@@ -347,30 +456,39 @@ body {
 }
 
 /* ========================================
-   SCHEDULE PANEL - ✅ FIX
+   SCHEDULE PANEL
    ======================================== */
 .schedule-panel {
     flex: 1;
     min-width: 0;
-    background: white;
+    background: var(--llv-surface);
     border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    box-shadow: var(--llv-shadow-sm);
     overflow: hidden;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    border: 1px solid var(--llv-border);
 }
 
 .schedule-header {
     padding: 20px;
-    border-bottom: 2px solid #f3f4f6;
+    border-bottom: 2px solid var(--llv-border);
+    transition: border-color 0.3s ease;
 }
 
     .schedule-header h3 {
         font-size: 18px;
-        color: #1a1a1a;
+        color: var(--llv-text);
         display: flex;
         align-items: center;
         gap: 8px;
         margin: 0;
+        transition: color 0.3s ease;
     }
+
+        .schedule-header h3 i {
+            color: var(--llv-primary);
+            transition: color 0.3s ease;
+        }
 
 .schedule-grid {
     padding: 20px;
@@ -388,13 +506,14 @@ body {
 }
 
     .schedule-table th {
-        background: #f9fafb;
+        background: var(--llv-surface-2);
         padding: 16px 12px;
         text-align: center;
         font-weight: 600;
         font-size: 14px;
-        color: #374151;
-        border-bottom: 2px solid #e5e7eb;
+        color: var(--llv-text);
+        border-bottom: 2px solid var(--llv-border);
+        transition: background-color 0.3s ease, color 0.3s ease;
     }
 
         .schedule-table th:first-child {
@@ -409,10 +528,11 @@ body {
     padding: 16px 20px;
     font-weight: 600;
     font-size: 14px;
-    color: #374151;
-    background: #f9fafb;
-    border-right: 2px solid #e5e7eb;
+    color: var(--llv-text);
+    background: var(--llv-surface-2);
+    border-right: 2px solid var(--llv-border);
     white-space: nowrap;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
     .shift-label i {
@@ -420,15 +540,15 @@ body {
     }
 
     .shift-label.morning {
-        color: #ea580c;
+        color: var(--llv-morning);
     }
 
     .shift-label.afternoon {
-        color: #16a34a;
+        color: var(--llv-afternoon);
     }
 
     .shift-label.evening {
-        color: #2563eb;
+        color: var(--llv-evening);
     }
 
 /* ========================================
@@ -436,33 +556,35 @@ body {
    ======================================== */
 .day-header {
     text-align: center;
-    transition: background-color 0.2s;
+    transition: background-color 0.3s ease;
 }
 
 .day-name {
     font-size: 13px;
-    color: #6b7280;
+    color: var(--llv-text-muted);
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    transition: color 0.3s ease;
 }
 
 .day-date {
     font-size: 18px;
-    color: #1a1a1a;
+    color: var(--llv-text);
     margin-top: 4px;
     font-weight: 600;
+    transition: color 0.3s ease;
 }
 
 .day-header.weekend {
-    background: #fef3c7;
+    background: var(--llv-weekend);
 }
 
 .day-header.today {
-    background: #dcfce7;
+    background: var(--llv-today);
 }
 
     .day-header.today .day-date {
-        color: #16a34a;
+        color: var(--llv-primary);
     }
 
 /* ========================================
@@ -471,20 +593,20 @@ body {
 .schedule-cell {
     padding: 8px;
     min-height: 120px;
-    border: 1px solid #e5e7eb;
-    background: white;
+    border: 1px solid var(--llv-border);
+    background: var(--llv-surface);
     position: relative;
     vertical-align: top;
     transition: all 0.2s;
 }
 
     .schedule-cell.weekend {
-        background: #fffbeb;
+        background: var(--llv-cell-weekend);
     }
 
     .schedule-cell.drag-over {
-        background: #f0fdf4;
-        border: 2px dashed #16a34a;
+        background: var(--llv-primary-light);
+        border: 2px dashed var(--llv-primary);
         box-shadow: inset 0 0 0 2px rgba(22, 163, 74, 0.1);
     }
 
@@ -492,7 +614,7 @@ body {
    ASSIGNED EMPLOYEES
    ======================================== */
 .assigned-employee {
-    background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+    background: var(--llv-employee-bg);
     color: white;
     padding: 8px 10px;
     border-radius: 6px;
@@ -506,11 +628,12 @@ body {
     opacity: 0;
     transform: translateY(10px);
     user-select: none;
+    border: 1px solid transparent;
 }
 
     .assigned-employee:hover {
         transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(22, 163, 74, 0.3);
+        box-shadow: 0 4px 8px var(--llv-employee-shadow);
     }
 
     .assigned-employee.dragging {
@@ -581,7 +704,7 @@ body {
     position: absolute;
     top: 4px;
     right: 4px;
-    background: #16a34a;
+    background: var(--llv-primary);
     color: white;
     width: 24px;
     height: 24px;
@@ -592,6 +715,7 @@ body {
     font-size: 11px;
     font-weight: 700;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: background-color 0.3s ease;
 }
 
 /* ========================================
@@ -601,9 +725,10 @@ body {
     display: flex;
     gap: 20px;
     padding: 16px 20px;
-    background: #f9fafb;
-    border-top: 1px solid #e5e7eb;
+    background: var(--llv-surface-2);
+    border-top: 1px solid var(--llv-border);
     flex-wrap: wrap;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .legend-item {
@@ -611,13 +736,15 @@ body {
     align-items: center;
     gap: 8px;
     font-size: 13px;
-    color: #6b7280;
+    color: var(--llv-text-muted);
+    transition: color 0.3s ease;
 }
 
 .legend-color {
     width: 16px;
     height: 16px;
     border-radius: 4px;
+    border: 1px solid var(--llv-border);
 }
 
 /* ========================================
@@ -627,10 +754,10 @@ body {
     position: fixed;
     top: 80px;
     right: 20px;
-    background: white;
+    background: var(--llv-surface);
     padding: 16px 20px;
     border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    box-shadow: var(--llv-shadow-md);
     display: flex;
     align-items: center;
     gap: 12px;
@@ -639,6 +766,7 @@ body {
     transform: translateX(400px);
     transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
     max-width: 400px;
+    border: 1px solid var(--llv-border);
 }
 
     .toast-notification.show {
@@ -654,15 +782,15 @@ body {
     .toast-notification span {
         flex: 1;
         font-size: 14px;
-        color: #1a1a1a;
+        color: var(--llv-text);
     }
 
 .toast-success {
-    border-left: 4px solid #16a34a;
+    border-left: 4px solid var(--llv-primary);
 }
 
     .toast-success i {
-        color: #16a34a;
+        color: var(--llv-primary);
     }
 
 .toast-error {
@@ -690,7 +818,7 @@ body {
     }
 
 /* ========================================
-   SCROLLBAR
+   SCROLLBAR - DARK THEME AWARE
    ======================================== */
 .employees-list::-webkit-scrollbar,
 .schedule-grid::-webkit-scrollbar {
@@ -700,19 +828,37 @@ body {
 
 .employees-list::-webkit-scrollbar-track,
 .schedule-grid::-webkit-scrollbar-track {
-    background: #f3f4f6;
+    background: var(--llv-surface-2);
 }
 
 .employees-list::-webkit-scrollbar-thumb,
 .schedule-grid::-webkit-scrollbar-thumb {
-    background: #d1d5db;
+    background: var(--llv-border-dark);
     border-radius: 3px;
 }
 
     .employees-list::-webkit-scrollbar-thumb:hover,
     .schedule-grid::-webkit-scrollbar-thumb:hover {
-        background: #9ca3af;
+        background: var(--llv-text-muted);
     }
+
+/* ========================================
+   LOADING ANIMATION
+   ======================================== */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.assigned-employee {
+    animation: fadeInUp 0.3s ease forwards;
+}
 
 /* ========================================
    RESPONSIVE DESIGN

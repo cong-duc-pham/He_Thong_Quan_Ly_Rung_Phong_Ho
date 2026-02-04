@@ -1,7 +1,8 @@
+@inject Microsoft.AspNetCore.Mvc.Localization.IViewLocalizer Localizer
 @model QuanLyRungPhongHo.Models.LoRung
 
 @{
-    ViewData["Title"] = "Thêm Lô Rừng";
+    ViewData["Title"] = Localizer["PageTitle"];
     var danhMucXa = ViewBag.DanhMucXa as List<QuanLyRungPhongHo.Models.DanhMucXa>;
 }
 
@@ -13,7 +14,7 @@
     <div class="digioi-card">
         <div class="digioi-card-header">
             <h4>
-                <i class="bi bi-plus-circle"></i> Thêm Lô Rừng Mới
+                <i class="bi bi-plus-circle"></i> @Localizer["PageHeader"]
             </h4>
         </div>
 
@@ -23,17 +24,17 @@
 
                 <!-- Thông tin kỹ thuật -->
                 <h5 class="digioi-section-title">
-                    <i class="bi bi-info-circle"></i> Thông Tin Kỹ Thuật
+                    <i class="bi bi-info-circle"></i> @Localizer["TechnicalInfo"]
                 </h5>
 
                 <div class="digioi-form-row">
                     <div class="digioi-form-col">
                         <div class="digioi-form-group">
                             <label asp-for="SoTieuKhu">
-                                <i class="bi bi-123"></i> Số Tiểu Khu
+                                <i class="bi bi-123"></i> @Localizer["SubCompartment"]
                             </label>
                             <input asp-for="SoTieuKhu" type="number"
-                                   placeholder="Ví dụ: 121" min="1" max="999" />
+                                   placeholder="@Localizer["SubCompartmentPlaceholder"]" min="1" max="999" />
                             <span asp-validation-for="SoTieuKhu" class="digioi-text-danger"></span>
                         </div>
                     </div>
@@ -41,10 +42,10 @@
                     <div class="digioi-form-col">
                         <div class="digioi-form-group">
                             <label asp-for="SoKhoanh">
-                                <i class="bi bi-123"></i> Số Khoảnh
+                                <i class="bi bi-123"></i> @Localizer["Compartment"]
                             </label>
                             <input asp-for="SoKhoanh" type="number"
-                                   placeholder="Ví dụ: 2" min="1" max="999" />
+                                   placeholder="@Localizer["CompartmentPlaceholder"]" min="1" max="999" />
                             <span asp-validation-for="SoKhoanh" class="digioi-text-danger"></span>
                         </div>
                     </div>
@@ -52,10 +53,10 @@
                     <div class="digioi-form-col">
                         <div class="digioi-form-group">
                             <label asp-for="SoLo">
-                                <i class="bi bi-123"></i> Số Lô
+                                <i class="bi bi-123"></i> @Localizer["Lot"]
                             </label>
                             <input asp-for="SoLo" type="number"
-                                   placeholder="Ví dụ: 1" min="1" max="999" />
+                                   placeholder="@Localizer["LotPlaceholder"]" min="1" max="999" />
                             <span asp-validation-for="SoLo" class="digioi-text-danger"></span>
                         </div>
                     </div>
@@ -63,17 +64,17 @@
 
                 <!-- Vị trí địa lý -->
                 <h5 class="digioi-section-title">
-                    <i class="bi bi-geo-alt"></i> Vị Trí Địa Lý
+                    <i class="bi bi-geo-alt"></i> @Localizer["GeographicalLocation"]
                 </h5>
 
                 <div class="digioi-form-row">
                     <div class="digioi-form-col">
                         <div class="digioi-form-group">
                             <label>
-                                <i class="bi bi-building"></i> Xã <span class="text-danger">*</span>
+                                <i class="bi bi-building"></i> @Localizer["Commune"] <span class="text-danger">@Localizer["Required"]</span>
                             </label>
                             <select id="selectXa">
-                                <option value="">-- Chọn xã --</option>
+                                <option value="">@Localizer["SelectCommune"]</option>
                                 @foreach (var xa in danhMucXa)
                                 {
                                     <option value="@xa.MaXa">@xa.TenXa</option>
@@ -85,10 +86,10 @@
                     <div class="digioi-form-col">
                         <div class="digioi-form-group">
                             <label asp-for="MaThon">
-                                <i class="bi bi-geo-alt"></i> Thôn/Bản
+                                <i class="bi bi-geo-alt"></i> @Localizer["BelongsToVillage"]
                             </label>
                             <select asp-for="MaThon" id="selectThon">
-                                <option value="">-- Chọn xã trước --</option>
+                                <option value="">@Localizer["SelectVillageFirst"]</option>
                             </select>
                             <span asp-validation-for="MaThon" class="digioi-text-danger"></span>
                         </div>
@@ -97,17 +98,17 @@
 
                 <!-- Thông tin rừng -->
                 <h5 class="digioi-section-title">
-                    <i class="bi bi-tree-fill"></i> Thông Tin Rừng
+                    <i class="bi bi-tree-fill"></i> @Localizer["ForestInfo"]
                 </h5>
 
                 <div class="digioi-form-row">
                     <div class="digioi-form-col">
                         <div class="digioi-form-group">
                             <label asp-for="DienTich">
-                                <i class="bi bi-rulers"></i> Diện Tích (ha)
+                                <i class="bi bi-rulers"></i> @Localizer["Area"]
                             </label>
                             <input asp-for="DienTich" type="number"
-                                   step="0.01" placeholder="Ví dụ: 15.5" />
+                                   step="0.01" placeholder="@Localizer["AreaPlaceholder"]" />
                             <span asp-validation-for="DienTich" class="digioi-text-danger"></span>
                         </div>
                     </div>
@@ -115,10 +116,10 @@
                     <div class="digioi-form-col">
                         <div class="digioi-form-group">
                             <label asp-for="LoaiRung">
-                                <i class="bi bi-tree"></i> Loại Rừng
+                                <i class="bi bi-tree"></i> @Localizer["ForestType"]
                             </label>
                             <select asp-for="LoaiRung" asp-items="ViewBag.LoaiRung">
-                                <option value="">-- Chọn loại --</option>
+                                <option value="">@Localizer["SelectForestType"]</option>
                             </select>
                             <span asp-validation-for="LoaiRung" class="digioi-text-danger"></span>
                         </div>
@@ -127,10 +128,10 @@
                     <div class="digioi-form-col">
                         <div class="digioi-form-group">
                             <label asp-for="TrangThai">
-                                <i class="bi bi-info-circle"></i> Trạng Thái
+                                <i class="bi bi-info-circle"></i> @Localizer["Status"]
                             </label>
                             <select asp-for="TrangThai" asp-items="ViewBag.TrangThai">
-                                <option value="">-- Chọn trạng thái --</option>
+                                <option value="">@Localizer["SelectStatus"]</option>
                             </select>
                             <span asp-validation-for="TrangThai" class="digioi-text-danger"></span>
                         </div>
@@ -139,10 +140,10 @@
 
                 <div class="digioi-form-actions">
                     <a asp-action="Index" class="digioi-btn digioi-btn-secondary digioi-btn-lg">
-                        <i class="bi bi-x-circle"></i> Hủy
+                        <i class="bi bi-x-circle"></i> @Localizer["Cancel"]
                     </a>
                     <button type="submit" class="digioi-btn digioi-btn-success digioi-btn-lg">
-                        <i class="bi bi-check-circle"></i> Lưu
+                        <i class="bi bi-check-circle"></i> @Localizer["Save"]
                     </button>
                 </div>
             </form>
@@ -151,7 +152,7 @@
 
     <div class="digioi-back-link">
         <a asp-action="Index">
-            <i class="bi bi-arrow-left"></i> Quay lại danh sách
+            <i class="bi bi-arrow-left"></i> @Localizer["BackToList"]
         </a>
     </div>
 </div>

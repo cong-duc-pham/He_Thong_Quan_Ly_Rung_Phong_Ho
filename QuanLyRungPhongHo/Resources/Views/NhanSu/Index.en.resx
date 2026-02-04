@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="PageTitle" xml:space="preserve">
+    <value>Human Resource Management</value>
+  </data>
+  <data name="PageHeader" xml:space="preserve">
+    <value>Human Resource Management</value>
+  </data>
+  <data name="AddNew" xml:space="preserve">
+    <value>Add New</value>
+  </data>
+  <data name="SearchPlaceholder" xml:space="preserve">
+    <value>Search by name or phone...</value>
+  </data>
+  <data name="AllArea" xml:space="preserve">
+    <value>--- All areas ---</value>
+  </data>
+  <data name="AllPositions" xml:space="preserve">
+    <value>-- All positions --</value>
+  </data>
+  <data name="TotalCount" xml:space="preserve">
+    <value>Total</value>
+  </data>
+  <data name="StaffUnit" xml:space="preserve">
+    <value>staff</value>
+  </data>
+  <data name="FullName" xml:space="preserve">
+    <value>Full Name</value>
+  </data>
+  <data name="Position" xml:space="preserve">
+    <value>Position</value>
+  </data>
+  <data name="Contact" xml:space="preserve">
+    <value>Contact</value>
+  </data>
+  <data name="Area" xml:space="preserve">
+    <value>Area</value>
+  </data>
+  <data name="Account" xml:space="preserve">
+    <value>Account (Role)</value>
+  </data>
+  <data name="Actions" xml:space="preserve">
+    <value>Actions</value>
+  </data>
+  <data name="NoData" xml:space="preserve">
+    <value>No data</value>
+  </data>
+  <data name="Edit" xml:space="preserve">
+    <value>Edit</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="NoAccount" xml:space="preserve">
+    <value>No account</value>
+  </data>
+  <data name="ModalTitleAdd" xml:space="preserve">
+    <value>Add Staff</value>
+  </data>
+  <data name="ModalTitleEdit" xml:space="preserve">
+    <value>Edit Staff</value>
+  </data>
+  <data name="Close" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="NameLabel" xml:space="preserve">
+    <value>Full Name</value>
+  </data>
+  <data name="NameRequired" xml:space="preserve">
+    <value>Please enter full name</value>
+  </data>
+  <data name="PositionLabel" xml:space="preserve">
+    <value>Position</value>
+  </data>
+  <data name="ChoosePosition" xml:space="preserve">
+    <value>-- Select --</value>
+  </data>
+  <data name="PositionRequired" xml:space="preserve">
+    <value>Please select position</value>
+  </data>
+  <data name="PhoneLabel" xml:space="preserve">
+    <value>Phone</value>
+  </data>
+  <data name="PhoneInvalid" xml:space="preserve">
+    <value>Invalid phone (e.g: 0912345678)</value>
+  </data>
+  <data name="EmailLabel" xml:space="preserve">
+    <value>Email</value>
+  </data>
+  <data name="EmailInvalid" xml:space="preserve">
+    <value>Invalid email</value>
+  </data>
+  <data name="EmailNote" xml:space="preserve">
+    <value>Email for password recovery</value>
+  </data>
+  <data name="AreaLabel" xml:space="preserve">
+    <value>Managed Area</value>
+  </data>
+  <data name="ChooseArea" xml:space="preserve">
+    <value>-- Select area --</value>
+  </data>
+  <data name="AreaRequired" xml:space="preserve">
+    <value>Please select area</value>
+  </data>
+  <data name="AccountInfo" xml:space="preserve">
+    <value>Account Information</value>
+  </data>
+  <data name="UsernameLabel" xml:space="preserve">
+    <value>Username</value>
+  </data>
+  <data name="UsernameInvalid" xml:space="preserve">
+    <value>5-50 characters, letters, numbers and underscore only</value>
+  </data>
+  <data name="PasswordLabel" xml:space="preserve">
+    <value>Password</value>
+  </data>
+  <data name="PasswordPlaceholder" xml:space="preserve">
+    <value>Minimum 6 characters</value>
+  </data>
+  <data name="PasswordInvalid" xml:space="preserve">
+    <value>Password minimum 6 characters</value>
+  </data>
+  <data name="PasswordNote" xml:space="preserve">
+    <value>Leave blank if not changing</value>
+  </data>
+  <data name="RoleLabel" xml:space="preserve">
+    <value>Role</value>
+  </data>
+  <data name="RoleStaff" xml:space="preserve">
+    <value>Staff</value>
+  </data>
+  <data name="RoleManager" xml:space="preserve">
+    <value>Manager</value>
+  </data>
+  <data name="RoleAdmin" xml:space="preserve">
+    <value>Admin</value>
+  </data>
+  <data name="PositionForester" xml:space="preserve">
+    <value>Forester</value>
+  </data>
+  <data name="PositionStationChief" xml:space="preserve">
+    <value>Station Chief</value>
+  </data>
+  <data name="PositionForestGuard" xml:space="preserve">
+    <value>Forest Guard</value>
+  </data>
+</root>

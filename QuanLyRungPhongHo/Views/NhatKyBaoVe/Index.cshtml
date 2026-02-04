@@ -1,3 +1,4 @@
+@inject IViewLocalizer Localizer
 @model IEnumerable<QuanLyRungPhongHo.Models.NhatKyBaoVe>
 @using QuanLyRungPhongHo.Models
 @using Microsoft.AspNetCore.Mvc.Rendering
@@ -16,9 +17,9 @@
 
 <div class="digioi-page">
     <div class="digioi-header">
-        <h2><i class="bi bi-journal-check"></i> Nhật Ký Bảo Vệ</h2>
+        <h2><i class="bi bi-journal-check"></i> @Localizer["PageTitle"]</h2>
         <a asp-action="Create" class="digioi-btn digioi-btn-success">
-            <i class="bi bi-plus-circle"></i> Thêm Nhật Ký
+            <i class="bi bi-plus-circle"></i> @Localizer["AddLog"]
         </a>
     </div>
 
@@ -38,17 +39,17 @@
     <div class="digioi-card digioi-filter-card">
         <form asp-action="Index" method="get" class="digioi-filter-form">
             <div class="digioi-form-group">
-                <label><i class="bi bi-calendar-date"></i> Từ ngày</label>
+                <label><i class="bi bi-calendar-date"></i> @Localizer["FromDate"]</label>
                 <input type="date" name="fromDate" value="@ViewData["FromDate"]" />
             </div>
             <div class="digioi-form-group">
-                <label><i class="bi bi-calendar-date"></i> Đến ngày</label>
+                <label><i class="bi bi-calendar-date"></i> @Localizer["ToDate"]</label>
                 <input type="date" name="toDate" value="@ViewData["ToDate"]" />
             </div>
             <div class="digioi-form-group">
-                <label><i class="bi bi-tree"></i> Lô rừng</label>
+                <label><i class="bi bi-tree"></i> @Localizer["ForestLot"]</label>
                 <select name="maLo" id="filterMaLo">
-                    <option value="">-- Tất cả --</option>
+                    <option value="">-- @Localizer["AllOption"] --</option>
                     @foreach (var lo in loRungs)
                     {
                         <option value="@lo.Value" selected="@(ViewData["MaLo"]?.ToString() == lo.Value)">@lo.Text</option>
@@ -56,9 +57,9 @@
                 </select>
             </div>
             <div class="digioi-form-group">
-                <label><i class="bi bi-person-badge"></i> Người ghi</label>
+                <label><i class="bi bi-person-badge"></i> @Localizer["Recorder"]</label>
                 <select name="maNV">
-                    <option value="">-- Tất cả --</option>
+                    <option value="">-- @Localizer["AllOption"] --</option>
                     @foreach (var ns in nhanSus)
                     {
                         <option value="@ns.MaNV" selected="@(ViewData["MaNV"]?.ToString() == ns.MaNV.ToString())">@ns.HoTen</option>
@@ -66,9 +67,9 @@
                 </select>
             </div>
             <div class="digioi-form-group">
-                <label><i class="bi bi-flag"></i> Loại sự việc</label>
+                <label><i class="bi bi-flag"></i> @Localizer["IncidentType"]</label>
                 <select name="loaiSuViec">
-                    <option value="">-- Tất cả --</option>
+                    <option value="">-- @Localizer["AllOption"] --</option>
                     @foreach (var l in loaiSuViec)
                     {
                         <option value="@l" selected="@(ViewData["LoaiSuViec"]?.ToString() == l)">@l</option>
@@ -76,21 +77,21 @@
                 </select>
             </div>
             <div class="digioi-form-group">
-                <label><i class="bi bi-search"></i> Từ khóa</label>
-                <input type="text" name="keyword" value="@ViewData["Keyword"]" placeholder="Nội dung, loại sự việc..." />
+                <label><i class="bi bi-search"></i> @Localizer["Keyword"]</label>
+                <input type="text" name="keyword" value="@ViewData["Keyword"]" placeholder="@Localizer["KeywordPlaceholder"]" />
             </div>
             <div class="digioi-form-group">
                 <label>&nbsp;</label>
                 <div class="digioi-btn-group">
-                    <button type="submit" class="digioi-btn digioi-btn-success"><i class="bi bi-filter"></i> Lọc</button>
-                    <a asp-action="Index" class="digioi-btn digioi-btn-outline"><i class="bi bi-x-circle"></i> Xóa lọc</a>
+                    <button type="submit" class="digioi-btn digioi-btn-success"><i class="bi bi-filter"></i> @Localizer["Filter"]</button>
+                    <a asp-action="Index" class="digioi-btn digioi-btn-outline"><i class="bi bi-x-circle"></i> @Localizer["ClearFilter"]</a>
                 </div>
             </div>
         </form>
     </div>
 
     <div class="digioi-info-bar">
-        <span class="digioi-badge digioi-badge-info">Tổng: @ViewData["TotalRecords"] bản ghi</span>
+        <span class="digioi-badge digioi-badge-info">@Localizer["Total"]: @ViewData["TotalRecords"] @Localizer["Records"]</span>
     </div>
 
     <div class="digioi-card">
@@ -99,14 +100,14 @@
                 <thead>
                     <tr>
                         <th>#</th>
-                        <th>Ngày ghi</th>
-                        <th>Loại sự việc</th>
-                        <th>Nội dung</th>
-                        <th>Lô rừng</th>
-                        <th>Địa bàn</th>
-                        <th>Người ghi</th>
-                        <th>Tọa độ</th>
-                        <th>Thao tác</th>
+                        <th>@Localizer["DateRecorded"]</th>
+                        <th>@Localizer["IncidentType"]</th>
+                        <th>@Localizer["Content"]</th>
+                        <th>@Localizer["ForestLot"]</th>
+                        <th>@Localizer["Location"]</th>
+                        <th>@Localizer["Recorder"]</th>
+                        <th>@Localizer["Coordinates"]</th>
+                        <th>@Localizer["Actions"]</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -123,7 +124,7 @@
                                 <td>
                                     @if (item.LoRung != null)
                                     {
-                                        <div><strong>TK @item.LoRung.SoTieuKhu</strong> - Khoảnh @item.LoRung.SoKhoanh - Lô @item.LoRung.SoLo</div>
+                                        <div><strong>@Localizer["SubCompartment"] @item.LoRung.SoTieuKhu</strong> - @Localizer["Compartment"] @item.LoRung.SoKhoanh - @Localizer["Lot"] @item.LoRung.SoLo</div>
                                     }
                                 </td>
                                 <td>
@@ -134,8 +135,8 @@
                                 <td>@(string.IsNullOrWhiteSpace(item.ToaDoGPS) ? "—" : item.ToaDoGPS)</td>
                                 <td>
                                     <div class="digioi-btn-group">
-                                        <a asp-action="Edit" asp-route-id="@item.MaNK" class="digioi-btn digioi-btn-warning" title="Sửa"><i class="bi bi-pencil-square"></i></a>
-                                        <a asp-action="Delete" asp-route-id="@item.MaNK" class="digioi-btn digioi-btn-danger" title="Xóa"><i class="bi bi-trash"></i></a>
+                                        <a asp-action="Edit" asp-route-id="@item.MaNK" class="digioi-btn digioi-btn-warning" title="@Localizer["Edit"]"><i class="bi bi-pencil-square"></i></a>
+                                        <a asp-action="Delete" asp-route-id="@item.MaNK" class="digioi-btn digioi-btn-danger" title="@Localizer["Delete"]"><i class="bi bi-trash"></i></a>
                                     </div>
                                 </td>
                             </tr>
@@ -147,7 +148,7 @@
                         <tr>
                             <td colspan="9" class="digioi-empty">
                                 <i class="bi bi-inbox"></i>
-                                <p>Không có dữ liệu.</p>
+                                <p>@Localizer["NoData"]</p>
                             </td>
                         </tr>
                     }
@@ -160,7 +161,7 @@
                 <li class="@(currentPage <= 1 ? "disabled" : "")">
                     <a asp-action="Index" asp-route-pageNumber="@(currentPage - 1)" asp-route-fromDate="@ViewData["FromDate"]" asp-route-toDate="@ViewData["ToDate"]" asp-route-maLo="@ViewData["MaLo"]" asp-route-maNV="@ViewData["MaNV"]" asp-route-loaiSuViec="@ViewData["LoaiSuViec"]" asp-route-keyword="@ViewData["Keyword"]">«</a>
                 </li>
-                <li class="active"><span>Trang @currentPage / @totalPages</span></li>
+                <li class="active"><span>@Localizer["Page"] @currentPage / @totalPages</span></li>
                 <li class="@(currentPage >= totalPages ? "disabled" : "")">
                     <a asp-action="Index" asp-route-pageNumber="@(currentPage + 1)" asp-route-fromDate="@ViewData["FromDate"]" asp-route-toDate="@ViewData["ToDate"]" asp-route-maLo="@ViewData["MaLo"]" asp-route-maNV="@ViewData["MaNV"]" asp-route-loaiSuViec="@ViewData["LoaiSuViec"]" asp-route-keyword="@ViewData["Keyword"]">»</a>
                 </li>

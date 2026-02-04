@@ -249,8 +249,21 @@
             }
         });
 
-        // Re-init BaoCaoThongKe nếu đang ở trang báo cáo thống kê
+        // Re-init LichLamViec nếu đang ở trang lịch làm việc
         const currentPath = window.location.pathname.toLowerCase();
+        if (currentPath.includes('/lichlamviec')) {
+            if (typeof window.initLichLamViec === 'function') {
+                console.log('🔄 [AJAX] Re-initializing LichLamViec after AJAX navigation');
+                // Reset flag to allow re-initialization
+                window.isLichLamViecInitialized = false;
+                // Small delay to ensure DOM is ready
+                setTimeout(() => {
+                    window.initLichLamViec();
+                }, 100);
+            }
+        }
+
+        // Re-init BaoCaoThongKe nếu đang ở trang báo cáo thống kê
         if (currentPath.includes('/baocaothongke')) {
             if (typeof BaoCaoThongKe !== 'undefined' && BaoCaoThongKe.init) {
                 BaoCaoThongKe.init();
@@ -300,13 +313,15 @@
             [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]')).map(el => new bootstrap.Popover(el));
         }
 
-        $('.btn-delete, .delete-button').off('click').on('click', function (e) {
-            if (!confirm('Bạn có chắc chắn muốn xóa không?')) {
-                e.preventDefault();
-                e.stopPropagation();
-                return false;
-            }
-        });
+        if (typeof $ !== 'undefined') {
+            $('.btn-delete, .delete-button').off('click').on('click', function (e) {
+                if (!confirm('Bạn có chắc chắn muốn xóa không?')) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
+                }
+            });
+        }
     }
 
     // Xử lý back/forward button

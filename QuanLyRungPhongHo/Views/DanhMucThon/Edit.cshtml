@@ -1,7 +1,8 @@
 @model QuanLyRungPhongHo.Models.DanhMucThon
+@inject Microsoft.AspNetCore.Mvc.Localization.IViewLocalizer Localizer
 
 @{
-    ViewData["Title"] = "Sửa Thôn/Bản";
+    ViewData["Title"] = Localizer["PageTitle"];
 }
 @section Styles {
     <link rel="stylesheet" href="~/css/digioi.css" asp-append-version="true" />
@@ -10,7 +11,7 @@
     <div class="digioi-card">
         <div class="digioi-card-header">
             <h4>
-                <i class="bi bi-pencil-square"></i> Sửa Thông Tin Thôn/Bản
+                <i class="bi bi-pencil-square"></i> @Localizer["PageHeader"]
             </h4>
         </div>
 
@@ -20,41 +21,41 @@
 
                 <div class="digioi-form-group">
                     <label asp-for="MaThon">
-                        <i class="bi bi-tag"></i> Mã Thôn/Bản
+                        <i class="bi bi-tag"></i> @Localizer["MaThon"]
                     </label>
                     <input asp-for="MaThon"
                            readonly />
-                    <div class="digioi-form-text">Mã thôn không thể thay đổi.</div>
+                    <div class="digioi-form-text">@Localizer["MaThonReadonly"]</div>
                 </div>
 
                 <div class="digioi-form-group">
                     <label asp-for="TenThon">
-                        <i class="bi bi-geo-alt"></i> Tên Thôn/Bản <span class="text-danger">*</span>
+                        <i class="bi bi-geo-alt"></i> @Localizer["TenThon"] <span class="text-danger">*</span>
                     </label>
                     <input asp-for="TenThon"
-                           placeholder="Nhập tên thôn/bản"
+                           placeholder="@Localizer["TenThonPlaceholder"]"
                            maxlength="100" />
                     <span asp-validation-for="TenThon" class="digioi-text-danger"></span>
                 </div>
 
                 <div class="digioi-form-group">
                     <label asp-for="MaXa">
-                        <i class="bi bi-building"></i> Thuộc Xã <span class="text-danger">*</span>
+                        <i class="bi bi-building"></i> @Localizer["BelongToCommune"] <span class="text-danger">*</span>
                     </label>
                     <select asp-for="MaXa"
                             asp-items="ViewBag.MaXa">
-                        <option value="">-- Chọn xã --</option>
+                        <option value="">@Localizer["SelectCommune"]</option>
                     </select>
                     <span asp-validation-for="MaXa" class="digioi-text-danger"></span>
                 </div>
 
                 <div class="digioi-form-actions">
                     <a asp-action="Index" class="digioi-btn digioi-btn-secondary">
-                        <i class="bi bi-x-circle"></i> Hủy
+                        <i class="bi bi-x-circle"></i> @Localizer["Cancel"]
                     </a>
 
                     <button type="submit" class="digioi-btn digioi-btn-warning">
-                        <i class="bi bi-check-circle"></i> Cập nhật
+                        <i class="bi bi-check-circle"></i> @Localizer["Update"]
                     </button>
                 </div>
             </form>
@@ -63,7 +64,7 @@
 
     <div class="digioi-back-link">
         <a asp-action="Index">
-            <i class="bi bi-arrow-left"></i> Quay lại danh sách
+            <i class="bi bi-arrow-left"></i> @Localizer["BackToList"]
         </a>
     </div>
 </div>

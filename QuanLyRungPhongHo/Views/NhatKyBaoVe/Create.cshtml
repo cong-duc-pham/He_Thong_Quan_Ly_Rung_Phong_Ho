@@ -1,3 +1,4 @@
+@inject IViewLocalizer Localizer
 @model QuanLyRungPhongHo.Models.NhatKyBaoVe
 @using QuanLyRungPhongHo.Models
 @using Microsoft.AspNetCore.Mvc.Rendering
@@ -15,7 +16,7 @@
 <div class="digioi-form-container">
     <div class="digioi-card">
         <div class="digioi-card-header">
-            <h4><i class="bi bi-plus-circle"></i> Thêm Nhật Ký Bảo Vệ</h4>
+            <h4><i class="bi bi-plus-circle"></i> @Localizer["PageTitle"]</h4>
         </div>
         <div class="digioi-card-body">
             <form asp-action="Create" method="post">
@@ -23,22 +24,22 @@
 
                 <div class="digioi-info-box">
                     <i class="bi bi-person-badge"></i>
-                    Người ghi nhận: <strong>@(currentUser ?? "—")</strong>
+                    @Localizer["RecorderLabel"]: <strong>@(currentUser ?? "—")</strong>
                 </div>
 
                 <div class="digioi-form-row">
                     <div class="digioi-form-col">
                         <div class="digioi-form-group">
-                            <label asp-for="NgayGhi"><i class="bi bi-calendar-event"></i> Ngày ghi</label>
+                            <label asp-for="NgayGhi"><i class="bi bi-calendar-event"></i> @Localizer["DateRecorded"]</label>
                             <input asp-for="NgayGhi" type="datetime-local" value="@Model.NgayGhi.ToString("yyyy-MM-ddTHH:mm")" />
                             <span asp-validation-for="NgayGhi" class="digioi-text-danger"></span>
                         </div>
                     </div>
                     <div class="digioi-form-col">
                         <div class="digioi-form-group">
-                            <label asp-for="LoaiSuViec"><i class="bi bi-flag"></i> Loại sự việc</label>
+                            <label asp-for="LoaiSuViec"><i class="bi bi-flag"></i> @Localizer["IncidentType"]</label>
                             <select asp-for="LoaiSuViec">
-                                <option value="">-- Chọn loại --</option>
+                                <option value="">-- @Localizer["SelectType"] --</option>
                                 @foreach (var l in loaiSuViec)
                                 {
                                     <option value="@l">@l</option>
@@ -52,9 +53,9 @@
                 <div class="digioi-form-row">
                     <div class="digioi-form-col">
                         <div class="digioi-form-group">
-                            <label asp-for="MaLo"><i class="bi bi-tree"></i> Lô rừng</label>
+                            <label asp-for="MaLo"><i class="bi bi-tree"></i> @Localizer["ForestLot"]</label>
                             <select asp-for="MaLo">
-                                <option value="">-- Chọn lô rừng --</option>
+                                <option value="">-- @Localizer["SelectForestLot"] --</option>
                                 @foreach (var lo in loRungs)
                                 {
                                     <option value="@lo.Value">@lo.Text</option>
@@ -65,7 +66,7 @@
                     </div>
                     <div class="digioi-form-col">
                         <div class="digioi-form-group">
-                            <label asp-for="ToaDoGPS"><i class="bi bi-geo-alt"></i> Tọa độ GPS</label>
+                            <label asp-for="ToaDoGPS"><i class="bi bi-geo-alt"></i> @Localizer["GPSCoordinates"]</label>
                             <div class="d-flex gap-2">
                                 <input asp-for="ToaDoGPS" placeholder="Lat,Lng" />
                                 <button type="button" class="digioi-btn digioi-btn-outline" id="btnGetGps"><i class="bi bi-crosshair"></i></button>
@@ -76,21 +77,21 @@
                 </div>
 
                 <div class="digioi-form-group">
-                    <label asp-for="NoiDung"><i class="bi bi-journal-text"></i> Nội dung</label>
-                    <textarea asp-for="NoiDung" rows="4" placeholder="Mô tả sự việc, hành động xử lý..."></textarea>
+                    <label asp-for="NoiDung"><i class="bi bi-journal-text"></i> @Localizer["Content"]</label>
+                    <textarea asp-for="NoiDung" rows="4" placeholder="@Localizer["ContentPlaceholder"]"></textarea>
                     <span asp-validation-for="NoiDung" class="digioi-text-danger"></span>
                 </div>
 
                 <div class="digioi-form-actions">
-                    <a asp-action="Index" class="digioi-btn digioi-btn-secondary digioi-btn-lg"><i class="bi bi-x-circle"></i> Hủy</a>
-                    <button type="submit" class="digioi-btn digioi-btn-success digioi-btn-lg"><i class="bi bi-check-circle"></i> Lưu</button>
+                    <a asp-action="Index" class="digioi-btn digioi-btn-secondary digioi-btn-lg"><i class="bi bi-x-circle"></i> @Localizer["Cancel"]</a>
+                    <button type="submit" class="digioi-btn digioi-btn-success digioi-btn-lg"><i class="bi bi-check-circle"></i> @Localizer["Save"]</button>
                 </div>
             </form>
         </div>
     </div>
 
     <div class="digioi-back-link">
-        <a asp-action="Index"><i class="bi bi-arrow-left"></i> Quay lại danh sách</a>
+        <a asp-action="Index"><i class="bi bi-arrow-left"></i> @Localizer["BackToList"]</a>
     </div>
 </div>
 

@@ -1,4 +1,5 @@
-﻿@model QuanLyRungPhongHo.Models.ViewModels.BaoCaoThongKeViewModel
+﻿@inject IViewLocalizer Localizer
+@model QuanLyRungPhongHo.Models.ViewModels.BaoCaoThongKeViewModel
 
 @{
     ViewData["Title"] = "Báo cáo Thống kê";
@@ -12,14 +13,14 @@
     <!-- HEADER -->
     <div class="digioi-header">
         <h2>
-            <i class="bi bi-graph-up-arrow"></i> Báo Cáo Thống Kê
+            <i class="bi bi-graph-up-arrow"></i> @Localizer["PageTitle"]
         </h2>
         <div style="display: flex; gap: 12px;">
-            <button type="button" class="digioi-btn digioi-btn-success" data-bs-toggle="modal" data-bs-target="#exportExcelModal" title="Xuất dữ liệu ra file Excel">
-                <i class="bi bi-file-earmark-spreadsheet"></i> Xuất Excel
+            <button type="button" class="digioi-btn digioi-btn-success" data-bs-toggle="modal" data-bs-target="#exportExcelModal" title="@Localizer["ExportExcelTooltip"]">
+                <i class="bi bi-file-earmark-spreadsheet"></i> @Localizer["ExportExcel"]
             </button>
-            <button type="button" class="digioi-btn digioi-btn-danger" data-bs-toggle="modal" data-bs-target="#exportPdfModal" title="Xuất báo cáo PDF">
-                <i class="bi bi-file-earmark-pdf"></i> Xuất PDF
+            <button type="button" class="digioi-btn digioi-btn-danger" data-bs-toggle="modal" data-bs-target="#exportPdfModal" title="@Localizer["ExportPDFTooltip"]">
+                <i class="bi bi-file-earmark-pdf"></i> @Localizer["ExportPDF"]
             </button>
         </div>
     </div>
@@ -43,10 +44,10 @@
         <form asp-action="Index" method="get" class="digioi-filter-form">
             <div class="digioi-form-group">
                 <label>
-                    <i class="bi bi-building"></i> Xã
+                    <i class="bi bi-building"></i> @Localizer["Commune"]
                 </label>
                 <select name="maXaFilter" class="form-select">
-                    <option value="">-- Tất cả các xã --</option>
+                    <option value="">-- @Localizer["AllCommunes"] --</option>
                     @foreach (var xa in Model.DanhSachXa)
                     {
                         <option value="@xa.MaXa" selected="@(Model.MaXaFilter == xa.MaXa)">
@@ -58,30 +59,30 @@
 
             <div class="digioi-form-group">
                 <label>
-                    <i class="bi bi-calendar"></i> Từ ngày
+                    <i class="bi bi-calendar"></i> @Localizer["FromDate"]
                 </label>
                 <input type="date"
                        name="tuNgay"
                        value="@Model.TuNgay?.ToString("yyyy-MM-dd")"
                        class="form-control"
-                       title="Chọn ngày bắt đầu thống kê" />
+                       title="@Localizer["FromDateTooltip"]" />
             </div>
 
             <div class="digioi-form-group">
                 <label>
-                    <i class="bi bi-calendar-check"></i> Đến ngày
+                    <i class="bi bi-calendar-check"></i> @Localizer["ToDate"]
                 </label>
                 <input type="date"
                        name="denNgay"
                        value="@Model.DenNgay?.ToString("yyyy-MM-dd")"
                        class="form-control"
-                       title="Chọn ngày kết thúc thống kê" />
+                       title="@Localizer["ToDateTooltip"]" />
             </div>
 
             <div class="digioi-form-group">
                 <label>&nbsp;</label>
                 <button type="submit" class="digioi-btn digioi-btn-success">
-                    <i class="bi bi-search"></i> Lọc
+                    <i class="bi bi-search"></i> @Localizer["Filter"]
                 </button>
             </div>
         </form>
@@ -89,62 +90,62 @@
 
     <!-- THỐNG KÊ TỔNG QUAN -->
     <div class="stats-grid">
-        <div class="stat-card" title="Tổng số xã được quản lý">
+        <div class="stat-card" title="@Localizer["TotalCommunesTooltip"]">
             <div class="stat-icon">
                 <i class="bi bi-building"></i>
             </div>
-            <div class="stat-label">Tổng số Xã</div>
+            <div class="stat-label">@Localizer["TotalCommunes"]</div>
             <div class="stat-value">@Model.TongSoXa</div>
         </div>
 
-        <div class="stat-card" title="Tổng số thôn/bản trong các xã">
+        <div class="stat-card" title="@Localizer["TotalVillagesTooltip"]">
             <div class="stat-icon">
                 <i class="bi bi-geo-alt"></i>
             </div>
-            <div class="stat-label">Tổng số Thôn/Bản</div>
+            <div class="stat-label">@Localizer["TotalVillages"]</div>
             <div class="stat-value">@Model.TongSoThon</div>
         </div>
 
-        <div class="stat-card" title="Tổng số lô rừng được quản lý">
+        <div class="stat-card" title="@Localizer["TotalForestLotsTooltip"]">
             <div class="stat-icon">
                 <i class="bi bi-tree"></i>
             </div>
-            <div class="stat-label">Tổng số Lô rừng</div>
+            <div class="stat-label">@Localizer["TotalForestLots"]</div>
             <div class="stat-value">@Model.TongSoLoRung</div>
         </div>
 
-        <div class="stat-card" title="Tổng diện tích rừng (hecta)">
+        <div class="stat-card" title="@Localizer["TotalAreaTooltip"]">
             <div class="stat-icon">
                 <i class="bi bi-badge-3d"></i>
             </div>
-            <div class="stat-label">Tổng diện tích</div>
+            <div class="stat-label">@Localizer["TotalArea"]</div>
             <div class="stat-value">
                 @Model.TongDienTichRung.ToString("N2")
                 <span class="stat-unit">ha</span>
             </div>
         </div>
 
-        <div class="stat-card" title="Tổng số nhân sự tham gia quản lý">
+        <div class="stat-card" title="@Localizer["TotalPersonnelTooltip"]">
             <div class="stat-icon">
                 <i class="bi bi-people"></i>
             </div>
-            <div class="stat-label">Tổng nhân sự</div>
+            <div class="stat-label">@Localizer["TotalPersonnel"]</div>
             <div class="stat-value">@Model.TongSoNhanSu</div>
         </div>
 
-        <div class="stat-card" title="Tổng số sinh vật được ghi nhận">
+        <div class="stat-card" title="@Localizer["WildlifeRecordedTooltip"]">
             <div class="stat-icon">
                 <i class="bi bi-bug"></i>
             </div>
-            <div class="stat-label">Sinh vật ghi nhận</div>
+            <div class="stat-label">@Localizer["WildlifeRecorded"]</div>
             <div class="stat-value">@Model.TongSoSinhVat</div>
         </div>
 
-        <div class="stat-card" title="Tổng số sự kiện bảo vệ rừng">
+        <div class="stat-card" title="@Localizer["ProtectionEventsTooltip"]">
             <div class="stat-icon">
                 <i class="bi bi-exclamation-triangle"></i>
             </div>
-            <div class="stat-label">Sự kiện bảo vệ</div>
+            <div class="stat-label">@Localizer["ProtectionEvents"]</div>
             <div class="stat-value">@Model.TongSoSuKien</div>
         </div>
     </div>
@@ -155,7 +156,7 @@
         <div class="chart-container">
             <div class="chart-title">
                 <i class="bi bi-bar-chart-fill"></i>
-                Thống kê theo Loại Rừng
+                @Localizer["StatsByForestType"]
             </div>
 
             @foreach (var item in Model.ThongKeTheoLoaiRung)
@@ -185,7 +186,7 @@
         <div class="chart-container">
             <div class="chart-title">
                 <i class="bi bi-pie-chart-fill"></i>
-                Thống kê theo Trạng thái Rừng
+                @Localizer["StatsByStatus"]
             </div>
 
             @foreach (var item in Model.ThongKeTheoTrangThai)
@@ -205,7 +206,7 @@
                             <span class="badge-custom @badgeClass">@item.TrangThai</span>
                         </span>
                         <span class="progress-label-value">
-                            @item.SoLuongLo lô | @item.TongDienTich.ToString("N2") ha | @item.TyLe%
+                            @item.SoLuongLo @Localizer["Lots"] | @item.TongDienTich.ToString("N2") ha | @item.TyLe%
                         </span>
                     </div>
                     <div class="progress-bar-custom">
@@ -224,20 +225,20 @@
         <div class="chart-container">
             <div class="chart-title">
                 <i class="bi bi-table"></i>
-                Thống kê theo Xã
+                @Localizer["StatsByCommune"]
             </div>
 
             <div class="digioi-table-wrap">
                 <table class="digioi-table table-compact">
                     <thead>
                         <tr>
-                            <th>STT</th>
-                            <th>Tên Xã</th>
-                            <th>Số Thôn</th>
-                            <th>Số Lô Rừng</th>
-                            <th>Tổng Diện Tích (ha)</th>
-                            <th>Nhân Sự</th>
-                            <th>Sự Kiện</th>
+                            <th>@Localizer["OrderNumber"]</th>
+                            <th>@Localizer["CommuneName"]</th>
+                            <th>@Localizer["VillageCount"]</th>
+                            <th>@Localizer["ForestLotCount"]</th>
+                            <th>@Localizer["TotalAreaHa"]</th>
+                            <th>@Localizer["Personnel"]</th>
+                            <th>@Localizer["Events"]</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -260,7 +261,7 @@
                     </tbody>
                     <tfoot>
                         <tr>
-                            <td colspan="2">TỔNG CỘNG</td>
+                            <td colspan="2">@Localizer["GrandTotal"]</td>
                             <td>@Model.ThongKeTheoXa.Sum(x => x.SoThon)</td>
                             <td>@Model.ThongKeTheoXa.Sum(x => x.SoLoRung)</td>
                             <td>@Model.ThongKeTheoXa.Sum(x => x.TongDienTich).ToString("N2")</td>
@@ -279,7 +280,7 @@
         <div class="chart-container">
             <div class="chart-title">
                 <i class="bi bi-shield-check"></i>
-                Thống kê Sự kiện Bảo vệ
+                @Localizer["ProtectionEventStats"]
                 @if (Model.TuNgay.HasValue || Model.DenNgay.HasValue)
                 {
                     <span style="font-size: 14px; color: #6c757d; font-weight: normal;">
@@ -292,9 +293,9 @@
                 <table class="digioi-table table-compact">
                     <thead>
                         <tr>
-                            <th>Loại Sự Việc</th>
-                            <th>Số Lượng</th>
-                            <th>Tỷ Lệ</th>
+                            <th>@Localizer["EventType"]</th>
+                            <th>@Localizer["Quantity"]</th>
+                            <th>@Localizer["Ratio"]</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -318,24 +319,24 @@
     <div class="chart-container">
         <div class="chart-title">
             <i class="bi bi-bug-fill"></i>
-            Thống kê Sinh vật
+            @Localizer["WildlifeStats"]
         </div>
 
         <div class="stats-grid sinh-vat" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-bottom: 20px;">
             <div class="stat-card" style="border-left-color: #0dcaf0;">
-                <div class="stat-label">Tổng Động vật</div>
+                <div class="stat-label">@Localizer["TotalAnimals"]</div>
                 <div class="stat-value" style="color: #0dcaf0;">@Model.TongDongVat</div>
             </div>
             <div class="stat-card" style="border-left-color: #198754;">
-                <div class="stat-label">Tổng Thực vật</div>
+                <div class="stat-label">@Localizer["TotalPlants"]</div>
                 <div class="stat-value" style="color: #198754;">@Model.TongThucVat</div>
             </div>
             <div class="stat-card" style="border-left-color: #ffc107;">
-                <div class="stat-label">Loài Quý hiếm</div>
+                <div class="stat-label">@Localizer["RareSpecies"]</div>
                 <div class="stat-value" style="color: #ffc107;">@Model.SoLoaiQuyHiem</div>
             </div>
             <div class="stat-card" style="border-left-color: #dc3545;">
-                <div class="stat-label">Loài Nguy cấp</div>
+                <div class="stat-label">@Localizer["EndangeredSpecies"]</div>
                 <div class="stat-value" style="color: #dc3545;">@Model.SoLoaiNguyCap</div>
             </div>
         </div>
@@ -343,18 +344,18 @@
         @if (Model.Top10SinhVat.Any())
         {
             <h6 style="font-weight: 600; color: var(--green); margin-bottom: 16px;">
-                <i class="bi bi-trophy"></i> Top 10 Sinh vật được ghi nhận nhiều nhất
+                <i class="bi bi-trophy"></i> @Localizer["Top10Wildlife"]
             </h6>
 
             <div class="digioi-table-wrap">
                 <table class="digioi-table table-compact">
                     <thead>
                         <tr>
-                            <th>Hạng</th>
-                            <th>Tên Loài</th>
-                            <th>Loại</th>
-                            <th>Mức Độ Quý Hiếm</th>
-                            <th>Số Lần Ghi Nhận</th>
+                            <th>@Localizer["Rank"]</th>
+                            <th>@Localizer["SpeciesName"]</th>
+                            <th>@Localizer["Type"]</th>
+                            <th>@Localizer["RarityLevel"]</th>
+                            <th>@Localizer["RecordCount"]</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -398,10 +399,10 @@
     <div class="report-footer">
         <p>
             <i class="bi bi-info-circle"></i>
-            Báo cáo được tạo tự động bởi Hệ thống Quản lý Rừng Phòng Hộ
+            @Localizer["AutoGeneratedNote"]
         </p>
         <p>
-            Thời gian: @DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss")
+            @Localizer["GeneratedTime"]: @DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss")
         </p>
     </div>
 </div>
@@ -412,7 +413,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="exportExcelModalLabel">
-                    <i class="bi bi-file-earmark-spreadsheet"></i> Xuất Báo Cáo Excel
+                    <i class="bi bi-file-earmark-spreadsheet"></i> @Localizer["ExportExcelTitle"]
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -421,10 +422,10 @@
                     <!-- Chọn phạm vi xuất -->
                     <div class="mb-3">
                         <label class="form-label fw-bold">
-                            <i class="bi bi-geo-alt"></i> Phạm vi báo cáo
+                            <i class="bi bi-geo-alt"></i> @Localizer["ReportScope"]
                         </label>
                         <select class="form-select" id="exportMaXaFilter" name="maXaFilter">
-                            <option value="">Toàn tỉnh</option>
+                            <option value="">@Localizer["ProvinceWide"]</option>
                             @foreach (var xa in Model.DanhSachXa)
                             {
                                 <option value="@xa.MaXa" selected="@(Model.MaXaFilter == xa.MaXa)">@xa.TenXa</option>
@@ -436,7 +437,7 @@
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label class="form-label fw-bold">
-                                <i class="bi bi-calendar"></i> Từ ngày
+                                <i class="bi bi-calendar"></i> @Localizer["FromDate"]
                             </label>
                             <input type="date" class="form-control" id="exportTuNgay" name="tuNgay" value="@Model.TuNgay?.ToString("yyyy-MM-dd")">
                             <small class="text-danger d-none" id="exportTuNgayError">
@@ -445,7 +446,7 @@
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-bold">
-                                <i class="bi bi-calendar-check"></i> Đến ngày
+                                <i class="bi bi-calendar-check"></i> @Localizer["ToDate"]
                             </label>
                             <input type="date" class="form-control" id="exportDenNgay" name="denNgay" value="@Model.DenNgay?.ToString("yyyy-MM-dd")">
                             <small class="text-danger d-none" id="exportDenNgayError">
@@ -457,36 +458,36 @@
                     <!-- Chọn nội dung xuất -->
                     <div class="mb-3">
                         <label class="form-label fw-bold">
-                            <i class="bi bi-list-check"></i> Nội dung xuất
+                            <i class="bi bi-list-check"></i> @Localizer["ExportContent"]
                         </label>
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" id="exportTongQuan" checked>
                             <label class="form-check-label" for="exportTongQuan">
-                                Thống kê tổng quan
+                                @Localizer["OverviewStats"]
                             </label>
                         </div>
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" id="exportLoaiRung" checked>
                             <label class="form-check-label" for="exportLoaiRung">
-                                Thống kê theo loại rừng
+                                @Localizer["ForestTypeStats"]
                             </label>
                         </div>
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" id="exportTrangThai" checked>
                             <label class="form-check-label" for="exportTrangThai">
-                                Thống kê theo trạng thái rừng
+                                @Localizer["ForestStatusStats"]
                             </label>
                         </div>
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" id="exportTheoXa" checked>
                             <label class="form-check-label" for="exportTheoXa">
-                                Thống kê theo đơn vị hành chính
+                                @Localizer["AdministrativeStats"]
                             </label>
                         </div>
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" id="exportSuKien" checked>
                             <label class="form-check-label" for="exportSuKien">
-                                Thống kê sự kiện bảo vệ rừng
+                                @Localizer["ProtectionEventStats2"]
                             </label>
                         </div>
                     </div>
@@ -494,20 +495,20 @@
                     <!-- Tên file tự động -->
                     <div class="mb-3">
                         <label class="form-label fw-bold">
-                            <i class="bi bi-file-text"></i> Tên file (tự động)
+                            <i class="bi bi-file-text"></i> @Localizer["AutoFileName"]
                         </label>
                         <input type="text" class="form-control" id="exportFileName" readonly 
                                placeholder="BaoCao_ToanTinh_20250203_084530.xlsx">
-                        <small class="text-muted">Tên file sẽ được tự động tạo theo quy tắc: BaoCao_{TenXa}_{TuNgay}_{DenNgay}_{ThoiGian}.xlsx</small>
+                        <small class="text-muted">@Localizer["FileNameHelp"]</small>
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                    <i class="bi bi-x-circle"></i> Hủy
+                    <i class="bi bi-x-circle"></i> @Localizer["Cancel"]
                 </button>
                 <button type="button" class="btn btn-success" id="btnConfirmExportExcel">
-                    <i class="bi bi-download"></i> Xuất Excel
+                    <i class="bi bi-download"></i> @Localizer["ExportExcelButton"]
                 </button>
             </div>
         </div>
@@ -520,7 +521,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="exportPdfModalLabel">
-                    <i class="bi bi-file-earmark-pdf"></i> Xuất Báo Cáo PDF
+                    <i class="bi bi-file-earmark-pdf"></i> @Localizer["ExportPDFTitle"]
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -529,10 +530,10 @@
                     <!-- Chọn phạm vi xuất -->
                     <div class="mb-3">
                         <label class="form-label fw-bold">
-                            <i class="bi bi-geo-alt"></i> Phạm vi báo cáo
+                            <i class="bi bi-geo-alt"></i> @Localizer["ReportScope"]
                         </label>
                         <select class="form-select" id="pdfMaXaFilter" name="maXaFilter">
-                            <option value="">Toàn tỉnh</option>
+                            <option value="">@Localizer["ProvinceWide"]</option>
                             @foreach (var xa in Model.DanhSachXa)
                             {
                                 <option value="@xa.MaXa" selected="@(Model.MaXaFilter == xa.MaXa)">@xa.TenXa</option>
@@ -544,7 +545,7 @@
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label class="form-label fw-bold">
-                                <i class="bi bi-calendar"></i> Từ ngày
+                                <i class="bi bi-calendar"></i> @Localizer["FromDate"]
                             </label>
                             <input type="date" class="form-control" id="pdfTuNgay" name="tuNgay" value="@Model.TuNgay?.ToString("yyyy-MM-dd")">
                             <small class="text-danger d-none" id="pdfTuNgayError">
@@ -553,7 +554,7 @@
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-bold">
-                                <i class="bi bi-calendar-check"></i> Đến ngày
+                                <i class="bi bi-calendar-check"></i> @Localizer["ToDate"]
                             </label>
                             <input type="date" class="form-control" id="pdfDenNgay" name="denNgay" value="@Model.DenNgay?.ToString("yyyy-MM-dd")">
                             <small class="text-danger d-none" id="pdfDenNgayError">
@@ -565,20 +566,20 @@
                     <!-- Tên file tự động -->
                     <div class="mb-3">
                         <label class="form-label fw-bold">
-                            <i class="bi bi-file-text"></i> Tên file (tự động)
+                            <i class="bi bi-file-text"></i> @Localizer["AutoFileName"]
                         </label>
                         <input type="text" class="form-control" id="pdfFileName" readonly 
                                placeholder="BaoCao_ToanTinh_20250203_084530.pdf">
-                        <small class="text-muted">Browser sẽ tự động mở dialog Print để bạn chọn nơi lưu file PDF</small>
+                        <small class="text-muted">@Localizer["PDFFileNameHelp"]</small>
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                    <i class="bi bi-x-circle"></i> Hủy
+                    <i class="bi bi-x-circle"></i> @Localizer["Cancel"]
                 </button>
                 <button type="button" class="btn btn-danger" id="btnConfirmExportPdf">
-                    <i class="bi bi-file-pdf"></i> Xuất PDF
+                    <i class="bi bi-file-pdf"></i> @Localizer["ExportPDFButton"]
                 </button>
             </div>
         </div>

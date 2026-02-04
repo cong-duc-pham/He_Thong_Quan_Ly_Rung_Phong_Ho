@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="PageTitle" xml:space="preserve">
+    <value>Thêm Lô Rừng</value>
+  </data>
+  <data name="PageHeader" xml:space="preserve">
+    <value>Thêm Lô Rừng Mới</value>
+  </data>
+  <data name="SubCompartment" xml:space="preserve">
+    <value>Số Tiểu Khu</value>
+  </data>
+  <data name="SubCompartmentPlaceholder" xml:space="preserve">
+    <value>Ví dụ: 121</value>
+  </data>
+  <data name="Compartment" xml:space="preserve">
+    <value>Số Khoảnh</value>
+  </data>
+  <data name="CompartmentPlaceholder" xml:space="preserve">
+    <value>Ví dụ: 2</value>
+  </data>
+  <data name="Lot" xml:space="preserve">
+    <value>Số Lô</value>
+  </data>
+  <data name="LotPlaceholder" xml:space="preserve">
+    <value>Ví dụ: 1</value>
+  </data>
+  <data name="BelongsToVillage" xml:space="preserve">
+    <value>Thuộc Thôn/Bản</value>
+  </data>
+  <data name="SelectVillage" xml:space="preserve">
+    <value>-- Chọn thôn/bản --</value>
+  </data>
+  <data name="Area" xml:space="preserve">
+    <value>Diện Tích (ha)</value>
+  </data>
+  <data name="AreaPlaceholder" xml:space="preserve">
+    <value>Ví dụ: 15.5</value>
+  </data>
+  <data name="ForestType" xml:space="preserve">
+    <value>Loại Rừng</value>
+  </data>
+  <data name="SelectForestType" xml:space="preserve">
+    <value>-- Chọn loại --</value>
+  </data>
+  <data name="Status" xml:space="preserve">
+    <value>Trạng Thái</value>
+  </data>
+  <data name="SelectStatus" xml:space="preserve">
+    <value>-- Chọn trạng thái --</value>
+  </data>
+  <data name="Required" xml:space="preserve">
+    <value>*</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Hủy</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Lưu</value>
+  </data>
+  <data name="BackToList" xml:space="preserve">
+    <value>Quay lại danh sách</value>
+  </data>
+  <data name="TechnicalInfo" xml:space="preserve">
+    <value>Thông Tin Kỹ Thuật</value>
+  </data>
+  <data name="GeographicalLocation" xml:space="preserve">
+    <value>Vị Trí Địa Lý</value>
+  </data>
+  <data name="ForestInfo" xml:space="preserve">
+    <value>Thông Tin Rừng</value>
+  </data>
+  <data name="Commune" xml:space="preserve">
+    <value>Xã</value>
+  </data>
+  <data name="SelectCommune" xml:space="preserve">
+    <value>-- Chọn xã --</value>
+  </data>
+  <data name="SelectVillageFirst" xml:space="preserve">
+    <value>-- Chọn xã trước --</value>
+  </data>
+</root>

@@ -186,4 +186,22 @@
   <data name="WorkSchedule" xml:space="preserve">
     <value>Quản lý ca làm việc</value>
   </data>
+  <data name="Commune" xml:space="preserve">
+    <value>Danh mục Xã</value>
+  </data>
+  <data name="Village" xml:space="preserve">
+    <value>Danh mục Thôn</value>
+  </data>
+  <data name="ForestLot" xml:space="preserve">
+    <value>Lô Rừng</value>
+  </data>
+  <data name="Wildlife" xml:space="preserve">
+    <value>Sinh vật rừng</value>
+  </data>
+  <data name="Authorization" xml:space="preserve">
+    <value>Phân quyền</value>
+  </data>
+  <data name="Report" xml:space="preserve">
+    <value>Báo cáo thống kê</value>
+  </data>
 </root>

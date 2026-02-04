@@ -190,7 +190,7 @@ namespace QuanLyRungPhongHo.Controllers
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> VerifyOtp(OtpVerificationViewModel model)
+        public IActionResult VerifyOtp(OtpVerificationViewModel model)
         {
             if (!ModelState.IsValid)
             {

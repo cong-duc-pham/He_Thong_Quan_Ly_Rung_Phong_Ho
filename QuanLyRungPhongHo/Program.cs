@@ -65,24 +65,23 @@ var app = builder.Build();
 // Localization (PHẢI sau Build, trước Routing)
 var supportedCultures = new[]
 {
+    new CultureInfo("vi"),
+    new CultureInfo("en"),
     new CultureInfo("vi-VN"),
     new CultureInfo("en-US")
 };
 
-
-
 var localizationOptions = new RequestLocalizationOptions
 {
-    DefaultRequestCulture = new RequestCulture("vi-VN"),
+    DefaultRequestCulture = new RequestCulture("vi"),
     SupportedCultures = supportedCultures,
     SupportedUICultures = supportedCultures
 };
 
-// 🔥 QUAN TRỌNG NHẤT: đọc culture từ COOKIE
-localizationOptions.RequestCultureProviders = new List<IRequestCultureProvider>
-{
-    new CookieRequestCultureProvider()
-};
+// Thứ tự ưu tiên: Cookie trước, rồi Query String, cuối cùng Accept-Language
+localizationOptions.RequestCultureProviders.Clear();
+localizationOptions.RequestCultureProviders.Add(new CookieRequestCultureProvider());
+localizationOptions.RequestCultureProviders.Add(new QueryStringRequestCultureProvider());
 
 app.UseRequestLocalization(localizationOptions);
 

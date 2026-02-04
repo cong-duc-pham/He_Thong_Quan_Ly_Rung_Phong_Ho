@@ -2,25 +2,31 @@
     <link rel="stylesheet" href="~/css/sinhvat.css" />
 }
 @model IEnumerable<SinhVat>
+@inject Microsoft.AspNetCore.Mvc.Localization.IViewLocalizer Localizer
+
+@{
+    ViewBag.Title = Localizer["PageTitle"];
+}
+
 <div class="page-header">
-    <h2><i class="fas fa-tree"></i> Danh sách sinh vật rừng</h2>
+    <h2><i class="fas fa-tree"></i> @Localizer["PageHeader"]</h2>
 </div>
 <div class="card-box">
     <div class="toolbar">
         <input type="text" id="searchInput" class="form-control"
-               placeholder="Tìm theo tên loài..." />
+               placeholder="@Localizer["SearchPlaceholder"]" />
         <a asp-action="Create" class="btn btn-success">
-            <i class="fas fa-plus"></i> Thêm sinh vật
+            <i class="fas fa-plus"></i> @Localizer["AddNew"]
         </a>
     </div>
     <table class="table-custom" id="sinhVatTable">
         <thead>
             <tr>
-                <th>Tên loài</th>
-                <th>Loại</th>
-                <th>Mức độ quý hiếm</th>
-                <th>Lô rừng</th>
-                <th class="text-center">Tác vụ</th>
+                <th>@Localizer["SpeciesName"]</th>
+                <th>@Localizer["Type"]</th>
+                <th>@Localizer["RarityLevel"]</th>
+                <th>@Localizer["ForestLot"]</th>
+                <th class="text-center">@Localizer["Actions"]</th>
             </tr>
         </thead>
         <tbody>
@@ -28,7 +34,7 @@
             {
                 <tr>
                     <td colspan="5" class="empty">
-                        <i class="fas fa-seedling"></i> Chưa có sinh vật nào được ghi nhận
+                        <i class="fas fa-seedling"></i> @Localizer["NoData"]
                     </td>
                 </tr>
             }
@@ -43,16 +49,18 @@
                                 @if (item.LoaiSV == "Thực vật")
                                 {
                                     <i class="fas fa-leaf"></i>
+                                    @Localizer["TypePlant"]
                                 }
                                 else if (item.LoaiSV == "Động vật")
                                 {
                                     <i class="fas fa-paw"></i>
+                                    @Localizer["TypeAnimal"]
                                 }
                                 else
                                 {
                                     <i class="fas fa-bacteria"></i>
+                                    @Localizer["TypeMicrobe"]
                                 }
-                                @item.LoaiSV
                             </span>
                         </td>
                         <td>
@@ -60,20 +68,23 @@
                                 @if (item.MucDoQuyHiem == "Nguy cấp")
                                 {
                                     <i class="fas fa-exclamation-triangle"></i>
+                                    @Localizer["RareCritical"]
                                 }
                                 else if (item.MucDoQuyHiem == "Rất hiếm")
                                 {
                                     <i class="fas fa-star"></i>
+                                    @Localizer["RareVeryRare"]
                                 }
                                 else if (item.MucDoQuyHiem == "Hiếm")
                                 {
                                     <i class="fas fa-star-half-alt"></i>
+                                    @Localizer["RareRare"]
                                 }
                                 else
                                 {
                                     <i class="fas fa-circle"></i>
+                                    @Localizer["RareCommon"]
                                 }
-                                @item.MucDoQuyHiem
                             </span>
                         </td>
                         <td>
@@ -84,12 +95,12 @@
                         </td>
                         <td class="text-center">
                             <a asp-action="Edit" asp-route-id="@item.MaSV"
-                               class="btn-icon edit" title="Sửa">
+                               class="btn-icon edit" title="@Localizer["Edit"]">
                                 <i class="fas fa-edit"></i>
                             </a>
                             <a asp-action="Delete" asp-route-id="@item.MaSV"
-                               onclick="return confirm('Xóa sinh vật này?')"
-                               class="btn-icon delete" title="Xóa">
+                               onclick="return confirm('@Localizer["DeleteConfirm"]')"
+                               class="btn-icon delete" title="@Localizer["Delete"]">
                                 <i class="fas fa-trash-alt"></i>
                             </a>
                         </td>

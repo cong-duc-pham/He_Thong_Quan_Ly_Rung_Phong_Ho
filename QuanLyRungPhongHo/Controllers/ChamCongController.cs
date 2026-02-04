@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using QuanLyRungPhongHo.Data;
 using QuanLyRungPhongHo.Models;
-using QLRungPhongHo.Models;
+using QuanLyRungPhongHo.Models;
 
 namespace QuanLyRungPhongHo.Controllers
 {

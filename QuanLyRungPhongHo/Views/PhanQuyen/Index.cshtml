@@ -1,3 +1,4 @@
+@inject IViewLocalizer Localizer
 @model List<QuanLyRungPhongHo.Models.PhanQuyenViewModel>
 @{
     ViewData["Title"] = "Quản lý Phân quyền";
@@ -12,17 +13,16 @@
         <div class="card-header bg-primary text-white">
             <div class="d-flex justify-content-between align-items-center">
                 <h4 class="mb-0">
-                    <i class="fas fa-shield-alt me-2"></i>Quản lý Phân quyền Hệ thống
+                    <i class="fas fa-shield-alt me-2"></i>@Localizer["PageTitle"]
                 </h4>
-                <small class="badge bg-light text-dark">Admin tỉnh</small>
+                <small class="badge bg-light text-dark">@Localizer["ProvinceAdmin"]</small>
             </div>
         </div>
 
         <div class="card-body">
             <div class="alert alert-info">
                 <i class="fas fa-info-circle me-2"></i>
-                <strong>Hướng dẫn:</strong> Bật/tắt checkbox để cấp hoặc thu hồi quyền cho từng vai trò. 
-                Thay đổi sẽ được lưu tự động.
+                <strong>@Localizer["GuideTitle"]:</strong> @Localizer["GuideText"]
             </div>
 
             @foreach (var roleVM in Model)
@@ -46,7 +46,7 @@
                             <span class="badge bg-secondary ms-2">@roleVM.RoleName</span>
                             @if (roleVM.RoleName == "Admin_Tinh")
                             {
-                                <span class="badge bg-warning text-dark ms-2">Luôn có full quyền - Không thể thay đổi</span>
+                                <span class="badge bg-warning text-dark ms-2">@Localizer["FullAccess"]</span>
                             }
                         </h5>
                     </div>
@@ -55,9 +55,9 @@
                         <table class="table table-hover table-bordered permission-table">
                             <thead class="table-light">
                                 <tr>
-                                    <th width="20%">Module</th>
-                                    <th width="70%">Quyền</th>
-                                    <th width="10%" class="text-center">Trạng thái</th>
+                                    <th width="20%">@Localizer["Module"]</th>
+                                    <th width="70%">@Localizer["Permission"]</th>
+                                    <th width="10%" class="text-center">@Localizer["Status"]</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -149,7 +149,7 @@
                         console.error('Error:', status, error);
                         // Rollback checkbox nếu lỗi
                         checkbox.prop('checked', !isGranted);
-                        showToast('error', 'Có lỗi xảy ra khi cập nhật quyền');
+                        showToast('error', '@Localizer["UpdateError"]');
                     },
                     complete: function () {
                         // Enable lại checkbox

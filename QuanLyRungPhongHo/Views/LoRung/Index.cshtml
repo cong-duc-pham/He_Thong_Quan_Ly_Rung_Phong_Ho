@@ -1,7 +1,8 @@
+@inject Microsoft.AspNetCore.Mvc.Localization.IViewLocalizer Localizer
 @model IEnumerable<QuanLyRungPhongHo.Models.LoRung>
 
 @{
-    ViewData["Title"] = "Quản lý Lô Rừng";
+    ViewData["Title"] = Localizer["PageTitle"];
     var danhMucXa = ViewBag.DanhMucXa as List<QuanLyRungPhongHo.Models.DanhMucXa>;
     var loaiRung = ViewBag.LoaiRung as List<string>;
     var trangThai = ViewBag.TrangThai as List<string>;
@@ -31,10 +32,10 @@
     <!-- Header -->
     <div class="digioi-header">
         <h2>
-            <i class="bi bi-tree"></i> Quản Lý Lô Rừng
+            <i class="bi bi-tree"></i> @Localizer["PageHeader"]
         </h2>
         <a asp-action="Create" class="digioi-btn digioi-btn-success">
-            <i class="bi bi-plus-circle"></i> Thêm Lô Rừng
+            <i class="bi bi-plus-circle"></i> @Localizer["AddForestLot"]
         </a>
     </div>
 
@@ -57,10 +58,10 @@
         <form asp-action="Index" method="get" class="digioi-filter-form no-ajax" id="lorung-filter-form">
             <div class="digioi-form-group">
                 <label>
-                    <i class="bi bi-building"></i> Xã
+                    <i class="bi bi-building"></i> @Localizer["FilterCommune"]
                 </label>
                 <select name="searchXa" id="filterXa">
-                    <option value="">-- Tất cả các xã --</option>
+                    <option value="">@Localizer["AllCommunes"]</option>
                     @foreach (var xa in danhMucXa)
                     {
                         <option value="@xa.MaXa" selected="@(ViewData["CurrentFilterXa"]?.ToString() == xa.MaXa)">
@@ -72,19 +73,19 @@
 
             <div class="digioi-form-group">
                 <label>
-                    <i class="bi bi-geo-alt"></i> Thôn/Bản
+                    <i class="bi bi-geo-alt"></i> @Localizer["FilterVillage"]
                 </label>
                 <select name="searchThon" id="filterThon" data-selected="@ViewData["CurrentFilterThon"]">
-                    <option value="">-- Tất cả thôn/bản --</option>
+                    <option value="">@Localizer["AllVillages"]</option>
                 </select>
             </div>
 
             <div class="digioi-form-group">
                 <label>
-                    <i class="bi bi-tree-fill"></i> Loại Rừng
+                    <i class="bi bi-tree-fill"></i> @Localizer["FilterForestType"]
                 </label>
                 <select name="searchLoai" id="filterLoai">
-                    <option value="">-- Tất cả loại --</option>
+                    <option value="">@Localizer["AllTypes"]</option>
                     @foreach (var loai in loaiRung)
                     {
                         <option value="@loai" selected="@(ViewData["CurrentFilterLoai"]?.ToString() == loai)">
@@ -96,10 +97,10 @@
 
             <div class="digioi-form-group">
                 <label>
-                    <i class="bi bi-info-circle"></i> Trạng Thái
+                    <i class="bi bi-info-circle"></i> @Localizer["FilterStatus"]
                 </label>
                 <select name="searchTrangThai" id="filterTrangThai">
-                    <option value="">-- Tất cả trạng thái --</option>
+                    <option value="">@Localizer["AllStatuses"]</option>
                     @foreach (var tt in trangThai)
                     {
                         <option value="@tt" selected="@(ViewData["CurrentFilterTrangThai"]?.ToString() == tt)">
@@ -112,7 +113,7 @@
             <div class="digioi-form-group">
                 <label>&nbsp;</label>
                 <button type="submit" class="digioi-btn digioi-btn-success">
-                    <i class="bi bi-search"></i> Lọc
+                    <i class="bi bi-search"></i> @Localizer["Filter"]
                 </button>
             </div>
         </form>
@@ -121,10 +122,10 @@
     <!-- Kết quả -->
     <div class="digioi-info-bar">
         <span class="digioi-badge digioi-badge-info" id="lorung-total">
-            Tổng số: @ViewData["TotalRecords"] lô rừng
+            @Localizer["Total"]: @ViewData["TotalRecords"] @Localizer["ForestLots"]
         </span>
         <a asp-action="Index" id="lorung-reset-filters" class="digioi-btn digioi-btn-outline">
-            <i class="bi bi-x-circle"></i> Xóa bộ lọc
+            <i class="bi bi-x-circle"></i> @Localizer["ClearFilter"]
         </a>
     </div>
 
@@ -134,16 +135,16 @@
             <table class="digioi-table">
                 <thead>
                     <tr>
-                        <th>STT</th>
-                        <th>Tiểu khu</th>
-                        <th>Khoảnh</th>
-                        <th>Lô</th>
-                        <th>Thôn/Bản</th>
-                        <th>Xã</th>
-                        <th>Diện tích (ha)</th>
-                        <th>Loại Rừng</th>
-                        <th>Trạng Thái</th>
-                        <th>Thao tác</th>
+                        <th>@Localizer["Index"]</th>
+                        <th>@Localizer["SubCompartment"]</th>
+                        <th>@Localizer["Compartment"]</th>
+                        <th>@Localizer["Lot"]</th>
+                        <th>@Localizer["Village"]</th>
+                        <th>@Localizer["Commune"]</th>
+                        <th>@Localizer["Area"]</th>
+                        <th>@Localizer["ForestType"]</th>
+                        <th>@Localizer["Status"]</th>
+                        <th>@Localizer["Action"]</th>
                     </tr>
                 </thead>
                 <tbody id="lorung-table-body">
@@ -197,7 +198,7 @@
                         <tr>
                             <td colspan="10" class="digioi-empty">
                                 <i class="bi bi-inbox"></i>
-                                <p>Không tìm thấy dữ liệu</p>
+                                <p>@Localizer["NoData"]</p>
                             </td>
                         </tr>
                     }
@@ -247,7 +248,7 @@
         </div>
 
         <div class="digioi-page-info">
-            Trang @currentPage / @totalPages
+            @Localizer["Page"] @currentPage / @totalPages
         </div>
     }
 </div>

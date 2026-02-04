@@ -73,6 +73,33 @@
         </div>
 
         <div class="header-right">
+            <!-- Language Selector -->
+            <div class="language-selector dropdown">
+                <button class="language-toggle-btn dropdown-toggle" type="button" id="languageDropdown" data-bs-toggle="dropdown" aria-expanded="false" title="Chọn ngôn ngữ / Select language">
+                    @{
+                        var currentCulture = System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+                        var flagIcon = currentCulture == "vi" ? "🇻🇳" : "🇬🇧";
+                        var langText = currentCulture == "vi" ? "VI" : "EN";
+                    }
+                    <span class="flag-icon">@flagIcon</span>
+                    <span class="lang-text">@langText</span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="languageDropdown">
+                    <li>
+                        <a class="dropdown-item @(currentCulture == "vi" ? "active" : "")" 
+                           href="@Url.Action("SetLanguage", "Localization", new { culture = "vi", returnUrl = Context.Request.Path + Context.Request.QueryString })">
+                            <span class="flag-icon">🇻🇳</span> Tiếng Việt
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item @(currentCulture == "en" ? "active" : "")" 
+                           href="@Url.Action("SetLanguage", "Localization", new { culture = "en", returnUrl = Context.Request.Path + Context.Request.QueryString })">
+                            <span class="flag-icon">🇬🇧</span> English
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
             <!-- Theme Toggle Button -->
             <button id="themeToggle" class="theme-toggle-btn" type="button" title="Đổi theme">
                 <i class="fas fa-sun"></i>
@@ -223,7 +250,7 @@
                         </li>
 
                         <li class="menu-item admin-only">
-                            <a href="@Url.Action("Index", "BaoCaoThongKe")">
+                            <a href="@Url.Action("Index", "BaoCaoThongKe")" class="no-ajax">
                                 <i class="fas fa-chart-bar"></i>
                                 <span>@Localizer["Report"]</span>
                             </a>
@@ -238,12 +265,10 @@
         </main>
     </div>
 
-    <script src="~/js/lichlamviec.js" asp-append-version="true"></script>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-
+    
     <script src="~/js/theme-manager.js" asp-append-version="true"></script>
 
 

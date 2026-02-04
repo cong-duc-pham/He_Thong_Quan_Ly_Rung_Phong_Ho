@@ -1,3 +1,4 @@
+@inject IViewLocalizer Localizer
 @model QuanLyRungPhongHo.Models.Permission
 @{
     ViewData["Title"] = "Thêm chức năng mới";
@@ -6,7 +7,7 @@
 <div class="container mt-4">
     <div class="card shadow-sm">
         <div class="card-header bg-success text-white">
-            <h4 class="mb-0"><i class="fas fa-plus-circle me-2"></i>Thêm chức năng mới</h4>
+            <h4 class="mb-0"><i class="fas fa-plus-circle me-2"></i>@Localizer["PageTitle"]</h4>
         </div>
         <div class="card-body">
             <form asp-action="Create" method="post">
@@ -14,42 +15,42 @@
                 
                 <div class="row mb-3">
                     <div class="col-md-6">
-                        <label asp-for="ModuleName" class="form-label">Tên Module</label>
-                        <input asp-for="ModuleName" class="form-control" placeholder="VD: Quản Lý Thiết Bị" />
+                        <label asp-for="ModuleName" class="form-label">@Localizer["ModuleName"]</label>
+                        <input asp-for="ModuleName" class="form-control" placeholder="@Localizer["ModuleNamePlaceholder"]" />
                         <span asp-validation-for="ModuleName" class="text-danger"></span>
-                        <small class="text-muted">Module nhóm các quyền liên quan (VD: Lô Rừng, Nhân Sự...)</small>
+                        <small class="text-muted">@Localizer["ModuleNameHelp"]</small>
                     </div>
                     
                     <div class="col-md-6">
-                        <label asp-for="PermissionCode" class="form-label">Mã quyền</label>
-                        <input asp-for="PermissionCode" class="form-control" placeholder="VD: ThietBi.Create" />
+                        <label asp-for="PermissionCode" class="form-label">@Localizer["PermissionCode"]</label>
+                        <input asp-for="PermissionCode" class="form-control" placeholder="@Localizer["PermissionCodePlaceholder"]" />
                         <span asp-validation-for="PermissionCode" class="text-danger"></span>
-                        <small class="text-muted">Định dạng: Module.Action (VD: LoRung.Create)</small>
+                        <small class="text-muted">@Localizer["PermissionCodeHelp"]</small>
                     </div>
                 </div>
 
                 <div class="mb-3">
-                    <label asp-for="PermissionName" class="form-label">Tên quyền</label>
-                    <input asp-for="PermissionName" class="form-control" placeholder="VD: Tạo mới Thiết bị" />
+                    <label asp-for="PermissionName" class="form-label">@Localizer["PermissionName"]</label>
+                    <input asp-for="PermissionName" class="form-control" placeholder="@Localizer["PermissionNamePlaceholder"]" />
                     <span asp-validation-for="PermissionName" class="text-danger"></span>
                 </div>
 
                 <div class="mb-3">
-                    <label asp-for="Description" class="form-label">Mô tả (tùy chọn)</label>
+                    <label asp-for="Description" class="form-label">@Localizer["Description"]</label>
                     <textarea asp-for="Description" class="form-control" rows="3"></textarea>
                 </div>
 
                 <div class="form-check mb-3">
                     <input asp-for="IsActive" class="form-check-input" type="checkbox" checked />
-                    <label asp-for="IsActive" class="form-check-label">Kích hoạt ngay</label>
+                    <label asp-for="IsActive" class="form-check-label">@Localizer["IsActive"]</label>
                 </div>
 
                 <div class="d-flex justify-content-between">
                     <a asp-action="Index" class="btn btn-secondary">
-                        <i class="fas fa-arrow-left me-1"></i>Quay lại
+                        <i class="fas fa-arrow-left me-1"></i>@Localizer["Back"]
                     </a>
                     <button type="submit" class="btn btn-success">
-                        <i class="fas fa-save me-1"></i>Lưu lại
+                        <i class="fas fa-save me-1"></i>@Localizer["Save"]
                     </button>
                 </div>
             </form>

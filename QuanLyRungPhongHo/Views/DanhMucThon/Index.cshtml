@@ -1,7 +1,8 @@
 @model IEnumerable<QuanLyRungPhongHo.Models.DanhMucThon>
+@inject Microsoft.AspNetCore.Mvc.Localization.IViewLocalizer Localizer
 
 @{
-    ViewData["Title"] = "Danh mục Thôn/Bản";
+    ViewData["Title"] = Localizer["PageTitle"];
     var danhMucXa = ViewBag.DanhMucXa as List<QuanLyRungPhongHo.Models.DanhMucXa>;
     var currentPage = (int)ViewData["PageNumber"];
     var totalPages = (int)ViewData["TotalPages"];
@@ -25,10 +26,10 @@
     <!-- HEADER -->
     <div class="digioi-header">
         <h2>
-            <i class="bi bi-geo-alt"></i> Danh mục Thôn/Bản
+            <i class="bi bi-geo-alt"></i> @Localizer["PageHeader"]
         </h2>
         <a asp-action="Create" class="digioi-btn digioi-btn-success">
-            <i class="bi bi-plus-circle"></i> Thêm Thôn/Bản
+            <i class="bi bi-plus-circle"></i> @Localizer["AddVillage"]
         </a>
     </div>
 
@@ -52,10 +53,10 @@
 
             <div class="digioi-form-group">
                 <label>
-                    <i class="bi bi-filter"></i> Lọc theo Xã
+                    <i class="bi bi-filter"></i> @Localizer["FilterByCommune"]
                 </label>
                 <select name="searchXa" id="thon-filter-xa">
-                    <option value="">-- Tất cả các xã --</option>
+                    <option value="">@Localizer["AllCommunes"]</option>
                     @foreach (var xa in danhMucXa)
                     {
                         <option value="@xa.MaXa"
@@ -68,19 +69,19 @@
 
             <div class="digioi-form-group">
                 <label>
-                    <i class="bi bi-search"></i> Tìm kiếm
+                    <i class="bi bi-search"></i> @Localizer["Search"]
                 </label>
                 <input type="text"
                        name="searchString"
                        id="thon-filter-search"
                        value="@ViewData["CurrentFilter"]"
-                       placeholder="Tìm theo Mã hoặc Tên thôn..." />
+                       placeholder="@Localizer["SearchPlaceholder"]" />
             </div>
 
             <div class="digioi-form-group">
                 <label>&nbsp;</label>
                 <button type="submit" class="digioi-btn digioi-btn-success">
-                    <i class="bi bi-search"></i> Lọc
+                    <i class="bi bi-search"></i> @Localizer["Filter"]
                 </button>
             </div>
         </form>
@@ -89,14 +90,14 @@
     <!-- THỐNG KÊ -->
     <div class="digioi-info-bar">
         <span class="digioi-badge digioi-badge-info" id="thon-total">
-            Tổng số: @ViewData["TotalRecords"] thôn/bản
+            @Localizer["TotalCount"]: @ViewData["TotalRecords"] @Localizer["VillageUnit"]
         </span>
 
         @if (!string.IsNullOrEmpty(ViewData["CurrentFilterXa"]?.ToString())
         || !string.IsNullOrEmpty(ViewData["CurrentFilter"]?.ToString()))
         {
             <a asp-action="Index" class="digioi-btn digioi-btn-outline no-ajax">
-                <i class="bi bi-x-circle"></i> Xóa bộ lọc
+                <i class="bi bi-x-circle"></i> @Localizer["ClearFilter"]
             </a>
         }
     </div>
@@ -107,12 +108,12 @@
             <table class="digioi-table">
                 <thead>
                     <tr>
-                        <th>STT</th>
-                        <th>Mã Thôn</th>
-                        <th>Tên Thôn/Bản</th>
-                        <th>Thuộc Xã</th>
-                        <th class="text-center">Số Lô</th>
-                        <th class="text-center">Thao tác</th>
+                        <th>@Localizer["No"]</th>
+                        <th>@Localizer["MaThon"]</th>
+                        <th>@Localizer["TenThon"]</th>
+                        <th>@Localizer["BelongToCommune"]</th>
+                        <th class="text-center">@Localizer["NumberOfLots"]</th>
+                        <th class="text-center">@Localizer["Actions"]</th>
                     </tr>
                 </thead>
                 <tbody id="thon-table-body">
@@ -158,7 +159,7 @@
                         <tr>
                             <td colspan="6" class="digioi-empty">
                                 <i class="bi bi-inbox"></i>
-                                <p>Không tìm thấy dữ liệu</p>
+                                <p>@Localizer["NoDataFound"]</p>
                             </td>
                         </tr>
                     }
@@ -203,7 +204,7 @@
         </div>
 
         <div class="digioi-page-info">
-            Trang @currentPage / @totalPages
+            @Localizer["Page"] @currentPage / @totalPages
         </div>
     }
 

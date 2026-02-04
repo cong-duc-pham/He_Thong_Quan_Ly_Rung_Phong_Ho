@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="PageTitle" xml:space="preserve">
+    <value>Quản lý Lô Rừng</value>
+  </data>
+  <data name="PageHeader" xml:space="preserve">
+    <value>Quản Lý Lô Rừng</value>
+  </data>
+  <data name="AddForestLot" xml:space="preserve">
+    <value>Thêm Lô Rừng</value>
+  </data>
+  <data name="FilterCommune" xml:space="preserve">
+    <value>Xã</value>
+  </data>
+  <data name="FilterVillage" xml:space="preserve">
+    <value>Thôn/Bản</value>
+  </data>
+  <data name="FilterForestType" xml:space="preserve">
+    <value>Loại Rừng</value>
+  </data>
+  <data name="FilterStatus" xml:space="preserve">
+    <value>Trạng Thái</value>
+  </data>
+  <data name="AllCommunes" xml:space="preserve">
+    <value>-- Tất cả các xã --</value>
+  </data>
+  <data name="AllVillages" xml:space="preserve">
+    <value>-- Tất cả thôn/bản --</value>
+  </data>
+  <data name="AllTypes" xml:space="preserve">
+    <value>-- Tất cả loại --</value>
+  </data>
+  <data name="AllStatuses" xml:space="preserve">
+    <value>-- Tất cả trạng thái --</value>
+  </data>
+  <data name="Filter" xml:space="preserve">
+    <value>Lọc</value>
+  </data>
+  <data name="Total" xml:space="preserve">
+    <value>Tổng số</value>
+  </data>
+  <data name="ForestLots" xml:space="preserve">
+    <value>lô rừng</value>
+  </data>
+  <data name="ClearFilter" xml:space="preserve">
+    <value>Xóa bộ lọc</value>
+  </data>
+  <data name="Index" xml:space="preserve">
+    <value>STT</value>
+  </data>
+  <data name="SubCompartment" xml:space="preserve">
+    <value>Tiểu khu</value>
+  </data>
+  <data name="Compartment" xml:space="preserve">
+    <value>Khoảnh</value>
+  </data>
+  <data name="Lot" xml:space="preserve">
+    <value>Lô</value>
+  </data>
+  <data name="Village" xml:space="preserve">
+    <value>Thôn/Bản</value>
+  </data>
+  <data name="Commune" xml:space="preserve">
+    <value>Xã</value>
+  </data>
+  <data name="Area" xml:space="preserve">
+    <value>Diện tích (ha)</value>
+  </data>
+  <data name="ForestType" xml:space="preserve">
+    <value>Loại Rừng</value>
+  </data>
+  <data name="Status" xml:space="preserve">
+    <value>Trạng Thái</value>
+  </data>
+  <data name="Action" xml:space="preserve">
+    <value>Thao tác</value>
+  </data>
+  <data name="Edit" xml:space="preserve">
+    <value>Sửa</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Xóa</value>
+  </data>
+  <data name="NoData" xml:space="preserve">
+    <value>Không tìm thấy dữ liệu</value>
+  </data>
+  <data name="Page" xml:space="preserve">
+    <value>Trang</value>
+  </data>
+</root>

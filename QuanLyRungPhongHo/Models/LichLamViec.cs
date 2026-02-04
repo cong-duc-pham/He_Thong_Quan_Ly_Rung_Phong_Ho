@@ -1,9 +1,8 @@
-﻿using QuanLyRungPhongHo.Models;
-using System;
+﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace QLRungPhongHo.Models
+namespace QuanLyRungPhongHo.Models
 {
     [Table("LichLamViecs")]
     public class LichLamViec

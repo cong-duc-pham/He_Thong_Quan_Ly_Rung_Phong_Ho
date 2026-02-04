@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="PageTitle">
+    <value>Manage Functions &amp; Permissions</value>
+  </data>
+  <data name="AddNew">
+    <value>Add New Function</value>
+  </data>
+  <data name="SuccessMessage">
+    <value>Success Message</value>
+  </data>
+  <data name="Function">
+    <value>Function</value>
+  </data>
+  <data name="PermissionName">
+    <value>Permission Name</value>
+  </data>
+  <data name="PermissionCode">
+    <value>Permission Code</value>
+  </data>
+  <data name="Status">
+    <value>Status</value>
+  </data>
+  <data name="Actions">
+    <value>Actions</value>
+  </data>
+  <data name="Active">
+    <value>Active</value>
+  </data>
+  <data name="Inactive">
+    <value>Inactive</value>
+  </data>
+  <data name="Edit">
+    <value>Edit</value>
+  </data>
+  <data name="Delete">
+    <value>Delete</value>
+  </data>
+  <data name="DeleteConfirm">
+    <value>Are you sure you want to delete this permission?</value>
+  </data>
+  <data name="Module">
+    <value>Module</value>
+  </data>
+  <data name="Description">
+    <value>Description</value>
+  </data>
+  <data name="CreatedDate">
+    <value>Created Date</value>
+  </data>
+  <data name="UpdatedDate">
+    <value>Updated Date</value>
+  </data>
+  <data name="Search">
+    <value>Search</value>
+  </data>
+  <data name="SearchPlaceholder">
+    <value>Search by name or permission code...</value>
+  </data>
+  <data name="NoData">
+    <value>No data available</value>
+  </data>
+  <data name="Loading">
+    <value>Loading...</value>
+  </data>
+  <data name="DeleteSuccess">
+    <value>Permission deleted successfully</value>
+  </data>
+  <data name="DeleteError">
+    <value>An error occurred while deleting permission</value>
+  </data>
+</root>

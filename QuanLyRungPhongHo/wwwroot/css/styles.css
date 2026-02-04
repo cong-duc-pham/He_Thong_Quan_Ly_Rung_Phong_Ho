@@ -15,6 +15,9 @@
     --primary-hover: #276749;
     --sidebar-bg: #1b4332;
     --sidebar-text: #e2f3e9;
+    --header-bg: #ffffff;
+    --header-text: #0f172a;
+    --header-shadow: rgba(0, 0, 0, 0.1);
     --danger: #ef4444;
     --warning: #f59e0b;
     --success: #10b981;
@@ -31,6 +34,9 @@ html.dark {
     --primary-hover: #22b983;
     --sidebar-bg: #0b1220;
     --sidebar-text: #d1fae5;
+    --header-bg: #0f172a;
+    --header-text: #e2e8f0;
+    --header-shadow: rgba(0, 0, 0, 0.35);
     --danger: #f87171;
     --warning: #fbbf24;
     --success: #22d3ee;
@@ -46,8 +52,8 @@ body {
 
 .header {
     height: 60px;
-    background: linear-gradient(135deg, #0f172a 0%, #0b1220 100%);
-    color: #e2e8f0;
+    background: var(--header-bg);
+    color: var(--header-text);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -57,7 +63,9 @@ body {
     left: 0;
     right: 0;
     z-index: 1000;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+    box-shadow: 0 2px 8px var(--header-shadow);
+    border-bottom: 1px solid var(--border);
+    transition: background-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease;
 }
 
 .header-left {
@@ -95,6 +103,38 @@ body {
     gap: 20px;
 }
 
+/* Theme Toggle Button */
+.theme-toggle-btn {
+    background: transparent;
+    border: 2px solid var(--border);
+    color: var(--header-text);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 18px;
+    padding: 0;
+}
+
+.theme-toggle-btn:hover {
+    background: var(--surface-2);
+    border-color: var(--primary);
+    color: var(--primary);
+    transform: rotate(20deg) scale(1.1);
+}
+
+.theme-toggle-btn:active {
+    transform: rotate(20deg) scale(0.95);
+}
+
+.theme-toggle-btn i {
+    transition: transform 0.3s ease;
+}
+
 .user-info {
     text-align: right;
 }
@@ -105,7 +145,7 @@ body {
 }
 
 .logout {
-    color: white;
+    color: var(--header-text);
     text-decoration: none;
     font-size: 14px;
     transition: opacity 0.3s;
@@ -120,22 +160,23 @@ body {
     display: flex;
     margin-top: 60px;
     min-height: calc(100vh - 60px);
-    background-color: #0f172a;
+    background-color: var(--bg);
+    transition: background-color 0.25s ease;
 }
 
 .sidebar {
     width: 260px;
-    background: #0f172a;
-    color: #e2e8f0;
+    background: var(--sidebar-bg);
+    color: var(--sidebar-text);
     position: fixed;
     top: 60px;
     bottom: 0;
     left: 0;
-    transition: width 0.3s ease;
+    transition: width 0.3s ease, background-color 0.25s ease, color 0.25s ease;
     overflow-y: auto;
     overflow-x: hidden;
     z-index: 999;
-    border-right: 1px solid #1f2d44;
+    border-right: 1px solid var(--border);
 }
 
     .sidebar.collapsed {
@@ -192,7 +233,7 @@ body {
     display: flex;
     align-items: center;
     padding: 15px 20px;
-    color: #e2e8f0;
+    color: var(--sidebar-text);
     text-decoration: none;
     transition: all 0.3s;
     position: relative;
@@ -200,12 +241,12 @@ body {
 }
 
     .menu-item > a:hover {
-        background: #15253c;
+        background: rgba(255, 255, 255, 0.08);
     }
 
 .menu-item.active > a {
-    background: #16243c;
-    border-left: 4px solid #22d3ee;
+    background: rgba(255, 255, 255, 0.12);
+    border-left: 4px solid var(--primary);
     padding-left: 16px;
 }
 
@@ -245,7 +286,7 @@ body {
 
 
 .submenu {
-    background: #101c30;
+    background: rgba(0, 0, 0, 0.15);
     max-height: 0;
     overflow: hidden;
     transition: max-height 0.4s ease;
@@ -259,7 +300,7 @@ body {
     display: flex;
     align-items: center;
     padding: 12px 20px;
-    color: white;
+    color: var(--sidebar-text);
     text-decoration: none;
     font-size: 15px;
     transition: all 0.3s;
@@ -267,14 +308,14 @@ body {
 }
 
     .submenu li a:hover {
-        background: #15253c;
+        background: rgba(255, 255, 255, 0.08);
         padding-left: 25px;
     }
 
     .submenu li a.active {
-        background: rgba(255,255,255,0.3);
+        background: rgba(255, 255, 255, 0.15);
         font-weight: bold;
-        border-left: 3px solid white;
+        border-left: 3px solid var(--primary);
         padding-left: 17px;
     }
 
@@ -307,7 +348,7 @@ main {
 
 .content-header h2 {
     margin-bottom: 10px;
-    color: #1e7e34;
+    color: var(--primary);
 }
 
 .dashboard-cards {
@@ -318,12 +359,12 @@ main {
 }
 
 .card {
-    background: white;
+    background: var(--surface);
     padding: 25px;
     border-radius: 10px;
     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     text-align: center;
-    transition: transform 0.3s, box-shadow 0.3s;
+    transition: transform 0.3s, box-shadow 0.3s, background-color 0.25s ease;
 }
 
     .card:hover {
@@ -333,17 +374,18 @@ main {
 
     .card i {
         font-size: 40px;
-        color: #1e7e34;
+        color: var(--primary);
         margin-bottom: 15px;
     }
 
     .card h3 {
         font-size: 28px;
         margin-bottom: 5px;
+        color: var(--text);
     }
 
     .card p {
-        color: #666;
+        color: var(--text-muted);
         font-size: 14px;
     }
 
@@ -381,7 +423,7 @@ main {
 }
 
 .card-header-success {
-    background-color: #2d8c47;
+    background-color: var(--primary);
     color: #fff;
 }
 
@@ -400,20 +442,20 @@ main {
 }
 
 .form-section-title {
-    color: #2d8c47;
-    border-bottom: 2px solid #e9ecef;
+    color: var(--primary);
+    border-bottom: 2px solid var(--border);
     padding-bottom: 0.5rem;
     font-weight: 600;
 }
 
 /* ===== TABLE ===== */
 .table-main thead {
-    background-color: #2d8c47;
+    background-color: var(--primary);
     color: #fff;
 }
 
 .table-main tbody tr:hover {
-    background-color: #f0f8f4;
+    background-color: rgba(47, 133, 90, 0.05);
 }
 
 /* ===== THEME SYSTEM (applies when html has .dark) ===== */
@@ -611,5 +653,11 @@ button[type="submit"].btn-primary:hover,
 
     .user-info {
         display: none;
+    }
+
+    .theme-toggle-btn {
+        width: 36px;
+        height: 36px;
+        font-size: 16px;
     }
 }

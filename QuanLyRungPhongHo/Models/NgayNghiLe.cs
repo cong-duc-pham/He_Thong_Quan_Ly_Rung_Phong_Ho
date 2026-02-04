@@ -12,20 +12,20 @@ namespace QuanLyRungPhongHo.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int MaNgayNghi { get; set; }
 
-        [Required]
-        [MaxLength(200)]
+        [Required(ErrorMessage = "Vui lòng nhập tên ngày nghỉ lễ")]
+        [MaxLength(200, ErrorMessage = "Tên ngày nghỉ không được vượt quá 200 ký tự")]
         public string TenNgayNghi { get; set; } = string.Empty;
 
-        [Required]
+        [Required(ErrorMessage = "Vui lòng chọn ngày bắt đầu")]
         [Column(TypeName = "date")]
         public DateTime NgayBatDau { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Vui lòng chọn ngày kết thúc")]
         [Column(TypeName = "date")]
         public DateTime NgayKetThuc { get; set; }
 
-        [Required]
-        [MaxLength(50)]
+        [Required(ErrorMessage = "Vui lòng chọn loại ngày nghỉ")]
+        [MaxLength(50, ErrorMessage = "Loại ngày nghỉ không được vượt quá 50 ký tự")]
         public string LoaiNgayNghi { get; set; } = string.Empty;
 
         public string? GhiChu { get; set; }

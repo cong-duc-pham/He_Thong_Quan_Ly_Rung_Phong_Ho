@@ -1,0 +1,301 @@
+@{
+    ViewBag.Title = "Quản lý chấm công";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid p-3">
+    <div class="row mb-3">
+        <div class="col">
+            <h3 class="text-success fw-bold">
+                <i class="bi bi-clipboard-data"></i> Quản lý chấm công
+            </h3>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="@Url.Action("Index", "ChamCong")">Chấm công</a></li>
+                    <li class="breadcrumb-item active">Quản lý</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Bộ lọc -->
+    <div class="card shadow-sm mb-3">
+        <div class="card-body">
+            <form id="filterForm" class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label">Từ ngày</label>
+                    <input type="date" class="form-control" id="fromDate" value="">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Đến ngày</label>
+                    <input type="date" class="form-control" id="toDate" value="">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Nhân viên</label>
+                    <select class="form-select" id="maNV">
+                        <option value="">-- Tất cả --</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Trạng thái</label>
+                    <select class="form-select" id="trangThai">
+                        <option value="">-- Tất cả --</option>
+                        <option value="HoanThanh">Hoàn thành</option>
+                        <option value="DangLam">Đang làm</option>
+                        <option value="ChuaCham">Chưa chấm</option>
+                    </select>
+                </div>
+                <div class="col-md-1 d-flex align-items-end">
+                    <button type="button" class="btn btn-success w-100" onclick="loadData()">
+                        <i class="bi bi-search"></i> Lọc
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Thống kê -->
+    <div class="row mb-3">
+        <div class="col-md-3">
+            <div class="card text-white bg-success">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title mb-1">Hoàn thành</h6>
+                            <h3 class="mb-0" id="countHoanThanh">0</h3>
+                        </div>
+                        <i class="bi bi-check-circle" style="font-size: 2.5rem; opacity: 0.5;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-warning">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title mb-1">Đang làm</h6>
+                            <h3 class="mb-0" id="countDangLam">0</h3>
+                        </div>
+                        <i class="bi bi-hourglass-split" style="font-size: 2.5rem; opacity: 0.5;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-secondary">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title mb-1">Chưa chấm</h6>
+                            <h3 class="mb-0" id="countChuaCham">0</h3>
+                        </div>
+                        <i class="bi bi-dash-circle" style="font-size: 2.5rem; opacity: 0.5;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-info">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title mb-1">Tổng số</h6>
+                            <h3 class="mb-0" id="countTotal">0</h3>
+                        </div>
+                        <i class="bi bi-list-ul" style="font-size: 2.5rem; opacity: 0.5;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bảng dữ liệu -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="bi bi-table"></i> Chi tiết chấm công</h5>
+            <button class="btn btn-sm btn-light" onclick="exportToExcel()">
+                <i class="bi bi-file-earmark-excel"></i> Xuất Excel
+            </button>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover table-striped mb-0" id="dataTable">
+                    <thead class="table-success">
+                        <tr>
+                            <th>STT</th>
+                            <th>Nhân viên</th>
+                            <th>Ngày</th>
+                            <th>Ca làm việc</th>
+                            <th>Lô rừng</th>
+                            <th>Giờ vào</th>
+                            <th>Giờ ra</th>
+                            <th>Số giờ</th>
+                            <th>Trạng thái</th>
+                            <th>Ghi chú</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dataTableBody">
+                        <tr>
+                            <td colspan="10" class="text-center py-4">
+                                <div class="spinner-border text-success" role="status">
+                                    <span class="visually-hidden">Đang tải...</span>
+                                </div>
+                                <p class="text-muted mt-2">Đang tải dữ liệu...</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let allData = [];
+
+        // Khởi tạo
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set ngày mặc định (7 ngày gần nhất)
+            const today = new Date();
+            const sevenDaysAgo = new Date(today);
+            sevenDaysAgo.setDate(today.getDate() - 7);
+            
+            document.getElementById('fromDate').valueAsDate = sevenDaysAgo;
+            document.getElementById('toDate').valueAsDate = today;
+
+            loadNhanVienList();
+            loadData();
+        });
+
+        // Load danh sách nhân viên
+        function loadNhanVienList() {
+            fetch('@Url.Action("GetNhanVienList", "ChamCong")')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const select = document.getElementById('maNV');
+                        data.data.forEach(nv => {
+                            const option = document.createElement('option');
+                            option.value = nv.MaNV;
+                            option.textContent = `${nv.HoTen} - ${nv.ChucVu || ''}`;
+                            select.appendChild(option);
+                        });
+                    }
+                })
+                .catch(error => console.error('Error loading nhan vien:', error));
+        }
+
+        // Load dữ liệu chấm công
+        function loadData() {
+            const fromDate = document.getElementById('fromDate').value;
+            const toDate = document.getElementById('toDate').value;
+            const maNV = document.getElementById('maNV').value;
+            const trangThai = document.getElementById('trangThai').value;
+
+            const params = new URLSearchParams();
+            if (fromDate) params.append('fromDate', fromDate);
+            if (toDate) params.append('toDate', toDate);
+            if (maNV) params.append('maNV', maNV);
+            if (trangThai) params.append('trangThai', trangThai);
+
+            fetch('@Url.Action("GetAllAttendance", "ChamCong")?' + params.toString())
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        allData = data.data;
+                        renderTable(data.data);
+                        updateStatistics(data.data);
+                    } else {
+                        document.getElementById('dataTableBody').innerHTML = 
+                            `<tr><td colspan="10" class="text-center text-danger py-3">${data.message}</td></tr>`;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('dataTableBody').innerHTML = 
+                        `<tr><td colspan="10" class="text-center text-danger py-3">Lỗi: ${error.message}</td></tr>`;
+                });
+        }
+
+        // Hiển thị bảng
+        function renderTable(data) {
+            const tbody = document.getElementById('dataTableBody');
+            
+            if (data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="10" class="text-center text-muted py-3">Không có dữ liệu</td></tr>';
+                return;
+            }
+
+            let html = '';
+            data.forEach((item, index) => {
+                let statusBadge = '';
+                let statusClass = '';
+                
+                if (item.TrangThai === 'Hoàn thành') {
+                    statusBadge = '<span class="badge bg-success">Hoàn thành</span>';
+                    statusClass = 'table-success';
+                } else if (item.TrangThai === 'Đang làm') {
+                    statusBadge = '<span class="badge bg-warning text-dark">Đang làm</span>';
+                    statusClass = 'table-warning';
+                } else {
+                    statusBadge = '<span class="badge bg-secondary">Chưa chấm</span>';
+                }
+
+                html += `
+                    <tr class="${statusClass}">
+                        <td>${index + 1}</td>
+                        <td>${item.TenNV}</td>
+                        <td>${item.NgayLamViec}</td>
+                        <td>${item.TenCa}<br><small class="text-muted">${item.GioBatDau} - ${item.GioKetThuc}</small></td>
+                        <td>${item.TenLo}</td>
+                        <td>${item.GioVao || '<span class="text-muted">---</span>'}</td>
+                        <td>${item.GioRa || '<span class="text-muted">---</span>'}</td>
+                        <td>${item.SoGioLam ? item.SoGioLam.toFixed(1) + 'h' : '<span class="text-muted">---</span>'}</td>
+                        <td>${statusBadge}</td>
+                        <td>${item.GhiChu || '<span class="text-muted">---</span>'}</td>
+                    </tr>
+                `;
+            });
+
+            tbody.innerHTML = html;
+        }
+
+        // Cập nhật thống kê
+        function updateStatistics(data) {
+            const hoanThanh = data.filter(d => d.TrangThai === 'Hoàn thành').length;
+            const dangLam = data.filter(d => d.TrangThai === 'Đang làm').length;
+            const chuaCham = data.filter(d => d.TrangThai === 'Chưa chấm công').length;
+
+            document.getElementById('countHoanThanh').textContent = hoanThanh;
+            document.getElementById('countDangLam').textContent = dangLam;
+            document.getElementById('countChuaCham').textContent = chuaCham;
+            document.getElementById('countTotal').textContent = data.length;
+        }
+
+        // Xuất Excel (tạm thời xuất CSV)
+        function exportToExcel() {
+            if (allData.length === 0) {
+                alert('Không có dữ liệu để xuất!');
+                return;
+            }
+
+            let csv = 'STT,Nhân viên,Ngày,Ca làm việc,Lô rừng,Giờ vào,Giờ ra,Số giờ,Trạng thái,Ghi chú\n';
+            
+            allData.forEach((item, index) => {
+                csv += `${index + 1},"${item.TenNV}",${item.NgayLamViec},"${item.TenCa}","${item.TenLo}",${item.GioVao || ''},${item.GioRa || ''},${item.SoGioLam || ''},"${item.TrangThai}","${item.GhiChu || '"}"\n`;
+            });
+
+            const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', `ChamCong_${new Date().toISOString().slice(0,10)}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
+}

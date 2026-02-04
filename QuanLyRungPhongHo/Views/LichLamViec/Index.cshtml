@@ -204,14 +204,24 @@
 @section Scripts {
     <script src="~/js/lichlamviec.js" asp-append-version="true"></script>
     <script>
-        // Init sau khi trang load xong
-        console.log('🔥 View loaded, calling init in 100ms...');
-        setTimeout(function() {
-            if (typeof window.init === 'function') {
-                window.init();
-            } else {
-                console.error('window.init not found!');
-            }
-        }, 100);
+        // Cách khắc phục: Dùng setInterval để kiểm tra định kỳ cho đến khi script tải xong
+        document.addEventListener("DOMContentLoaded", function() {
+            var attempts = 0;
+            var maxAttempts = 50; // Thử tối đa 5 giây (50 * 100ms)
+
+            var initInterval = setInterval(function() {
+                if (typeof window.initLichLamViec === 'function') {
+                    // Script đã tải xong -> Chạy ngay và hủy interval
+                    clearInterval(initInterval);
+                    window.initLichLamViec();
+                } else {
+                    attempts++;
+                    if (attempts >= maxAttempts) {
+                        clearInterval(initInterval);
+                        console.error("❌ Quá thời gian chờ tải lichlamviec.js");
+                    }
+                }
+            }, 100); // Kiểm tra mỗi 100ms
+        });
     </script>
 }

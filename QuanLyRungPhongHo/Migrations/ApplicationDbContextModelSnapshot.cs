@@ -42,7 +42,7 @@ namespace QuanLyRungPhongHo.Migrations
 
                     b.HasIndex("MaXa");
 
-                    b.ToTable("DanhMucThons");
+                    b.ToTable("DanhMucThons", (string)null);
                 });
 
             modelBuilder.Entity("QuanLyRungPhongHo.Models.DanhMucXa", b =>
@@ -58,7 +58,7 @@ namespace QuanLyRungPhongHo.Migrations
 
                     b.HasKey("MaXa");
 
-                    b.ToTable("DanhMucXas");
+                    b.ToTable("DanhMucXas", (string)null);
                 });
 
             modelBuilder.Entity("QuanLyRungPhongHo.Models.LoRung", b =>
@@ -97,7 +97,7 @@ namespace QuanLyRungPhongHo.Migrations
 
                     b.HasIndex("MaThon");
 
-                    b.ToTable("LoRungs");
+                    b.ToTable("LoRungs", (string)null);
                 });
 
             modelBuilder.Entity("QuanLyRungPhongHo.Models.NhanSu", b =>
@@ -125,7 +125,7 @@ namespace QuanLyRungPhongHo.Migrations
 
                     b.HasIndex("MaXa");
 
-                    b.ToTable("NhanSus");
+                    b.ToTable("NhanSus", (string)null);
                 });
 
             modelBuilder.Entity("QuanLyRungPhongHo.Models.NhatKyBaoVe", b =>
@@ -160,7 +160,7 @@ namespace QuanLyRungPhongHo.Migrations
 
                     b.HasIndex("MaNV_GhiNhan");
 
-                    b.ToTable("NhatKyBaoVes");
+                    b.ToTable("NhatKyBaoVes", (string)null);
                 });
 
             modelBuilder.Entity("QuanLyRungPhongHo.Models.Permission", b =>
@@ -193,7 +193,7 @@ namespace QuanLyRungPhongHo.Migrations
 
                     b.HasKey("PermissionId");
 
-                    b.ToTable("Permissions");
+                    b.ToTable("Permissions", (string)null);
                 });
 
             modelBuilder.Entity("QuanLyRungPhongHo.Models.RolePermission", b =>
@@ -228,7 +228,7 @@ namespace QuanLyRungPhongHo.Migrations
                     b.HasIndex("RoleName", "PermissionId")
                         .IsUnique();
 
-                    b.ToTable("RolePermissions");
+                    b.ToTable("RolePermissions", (string)null);
                 });
 
             modelBuilder.Entity("QuanLyRungPhongHo.Models.SinhVat", b =>
@@ -259,7 +259,7 @@ namespace QuanLyRungPhongHo.Migrations
 
                     b.HasIndex("LoRungMaLo");
 
-                    b.ToTable("SinhVats");
+                    b.ToTable("SinhVats", (string)null);
                 });
 
             modelBuilder.Entity("QuanLyRungPhongHo.Models.TaiKhoan", b =>
@@ -291,7 +291,7 @@ namespace QuanLyRungPhongHo.Migrations
                         .IsUnique()
                         .HasFilter("[MaNV] IS NOT NULL");
 
-                    b.ToTable("TaiKhoans");
+                    b.ToTable("TaiKhoans", (string)null);
                 });
 
             modelBuilder.Entity("QuanLyRungPhongHo.Models.DanhMucThon", b =>

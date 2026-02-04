@@ -73,6 +73,7 @@
                 <tr>
                     <th>Họ tên</th>
                     <th>Chức vụ</th>
+                    <th>Liên hệ</th>
                     <th>Địa bàn</th>
                     <th>Tài khoản (Quyền)</th>
                     <th class="text-center">Tác vụ</th>
@@ -86,9 +87,15 @@
                         <tr>
                             <td>
                                 <div class="fw-bold">@item.HoTen</div>
-                                <small class="text-muted">@item.SDT</small>
                             </td>
                             <td><span class="badge bg-primary">@item.ChucVu</span></td>
+                            <td>
+                                <div><small class="text-muted"><i class="bi bi-telephone"></i> @item.SDT</small></div>
+                                @if (!string.IsNullOrEmpty(item.Email))
+                                {
+                                    <div><small class="text-muted"><i class="bi bi-envelope"></i> @item.Email</small></div>
+                                }
+                            </td>
                             <td>@item.TenXa</td>
                             <td>
                                 @if (!string.IsNullOrEmpty(item.TenDangNhap))
@@ -114,7 +121,7 @@
                 }
                 else
                 {
-                    <tr><td colspan="5" class="text-center text-muted py-3">Không có dữ liệu</td></tr>
+                    <tr><td colspan="6" class="text-center text-muted py-3">Không có dữ liệu</td></tr>
                 }
             </tbody>
         </table>
@@ -132,6 +139,10 @@
                     </div>
                     <p class="mb-1 small"><i class="bi bi-geo-alt"></i> @item.TenXa</p>
                     <p class="mb-1 small"><i class="bi bi-telephone"></i> @item.SDT</p>
+                    @if (!string.IsNullOrEmpty(item.Email))
+                    {
+                        <p class="mb-1 small"><i class="bi bi-envelope"></i> @item.Email</p>
+                    }
                     <p class="mb-2 small"><i class="bi bi-person"></i> TK: @item.TenDangNhap</p>
                     <div class="d-flex gap-2">
                         <button class="btn btn-outline-primary btn-sm flex-fill" onclick="editData(@item.MaNV, event)">Sửa</button>
@@ -177,6 +188,13 @@
                                    pattern="^(03|05|07|08|09|01[2|6|8|9])+([0-9]{8})$" required>
                             <div class="invalid-feedback">SĐT không hợp lệ (VD: 0912345678)</div>
                         </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" name="Email" id="Email" 
+                               placeholder="email@example.com">
+                        <div class="invalid-feedback">Email không hợp lệ</div>
+                        <small class="text-muted">Email dùng để khôi phục mật khẩu</small>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Địa bàn quản lý <span class="text-danger">*</span></label>

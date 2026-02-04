@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using QuanLyRungPhongHo.Data;
 using Microsoft.AspNetCore.Localization;
 using System.Globalization;
+using QuanLyRungPhongHo.Services; // Add this line
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -50,6 +51,10 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     });
 
 builder.Services.AddAuthorization();
+
+// Add OTP and Email services
+builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IOtpService, OtpService>();
 
 // ===================== BUILD APP =====================
 

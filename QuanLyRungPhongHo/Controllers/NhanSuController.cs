@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using QuanLyRungPhongHo.Data;
 using QuanLyRungPhongHo.Models;
+using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
 using System.Security.Cryptography;
 using System.Text;
@@ -36,6 +37,7 @@ namespace QuanLyRungPhongHo.Controllers
                                 HoTen = ns.HoTen,
                                 ChucVu = ns.ChucVu ?? "",
                                 SDT = ns.SDT ?? "",
+                                Email = ns.Email ?? "",
                                 MaXa = ns.MaXa,
                                 TenXa = x != null ? x.TenXa : "Chưa phân công",
                                 TenDangNhap = t != null ? t.TenDangNhap : "",
@@ -45,7 +47,8 @@ namespace QuanLyRungPhongHo.Controllers
                 if (!string.IsNullOrEmpty(searchString))
                 {
                     query = query.Where(x => x.HoTen.Contains(searchString) || 
-                                             (x.SDT != null && x.SDT.Contains(searchString)));
+                                             (x.SDT != null && x.SDT.Contains(searchString)) ||
+                                             (x.Email != null && x.Email.Contains(searchString)));
                 }
                 if (!string.IsNullOrEmpty(roleFilter))
                 {
@@ -92,6 +95,7 @@ namespace QuanLyRungPhongHo.Controllers
                     HoTen = ns.HoTen,
                     ChucVu = ns.ChucVu,
                     SDT = ns.SDT,
+                    Email = ns.Email,
                     MaXa = ns.MaXa,
                     TenDangNhap = tk?.TenDangNhap ?? "",
                     Quyen = tk?.Quyen ?? "NhanVien_Thon"
@@ -130,6 +134,16 @@ namespace QuanLyRungPhongHo.Controllers
                 if (!Regex.IsMatch(model.SDT, @"^(03|05|07|08|09|01[2|6|8|9])+([0-9]{8})$"))
                 {
                     return Json(new { success = false, message = "Số điện thoại không đúng định dạng VN!" });
+                }
+
+                // Validate Email nếu có nhập
+                if (!string.IsNullOrWhiteSpace(model.Email))
+                {
+                    var emailAttribute = new EmailAddressAttribute();
+                    if (!emailAttribute.IsValid(model.Email))
+                    {
+                        return Json(new { success = false, message = "Email không đúng định dạng!" });
+                    }
                 }
                 
                 if (string.IsNullOrWhiteSpace(model.MaXa))
@@ -173,6 +187,19 @@ namespace QuanLyRungPhongHo.Controllers
                             return Json(new { success = false, message = "Tên đăng nhập đã tồn tại!" });
                         }
 
+                        // Kiểm tra trùng email
+                        if (!string.IsNullOrWhiteSpace(model.Email))
+                        {
+                            var existingEmail = await _context.NhanSus
+                                .Where(x => x.Email == model.Email && x.MaNV != model.MaNV)
+                                .FirstOrDefaultAsync();
+                                
+                            if (existingEmail != null)
+                            {
+                                return Json(new { success = false, message = "Email đã được sử dụng!" });
+                            }
+                        }
+
                         if (model.MaNV == 0) // THÊM MỚI
                         {
                             var ns = new NhanSu
@@ -180,6 +207,7 @@ namespace QuanLyRungPhongHo.Controllers
                                 HoTen = model.HoTen.Trim(),
                                 ChucVu = model.ChucVu,
                                 SDT = model.SDT.Trim(),
+                                Email = !string.IsNullOrWhiteSpace(model.Email) ? model.Email.Trim() : null,
                                 MaXa = model.MaXa
                             };
                             _context.NhanSus.Add(ns);
@@ -212,6 +240,7 @@ namespace QuanLyRungPhongHo.Controllers
                             ns.HoTen = model.HoTen.Trim();
                             ns.ChucVu = model.ChucVu;
                             ns.SDT = model.SDT.Trim();
+                            ns.Email = !string.IsNullOrWhiteSpace(model.Email) ? model.Email.Trim() : null;
                             ns.MaXa = model.MaXa;
                             
                             _context.NhanSus.Update(ns);
@@ -333,6 +362,7 @@ namespace QuanLyRungPhongHo.Controllers
                                 HoTen = ns.HoTen,
                                 ChucVu = ns.ChucVu ?? "",
                                 SDT = ns.SDT ?? "",
+                                Email = ns.Email ?? "",
                                 MaXa = ns.MaXa,
                                 TenXa = x != null ? x.TenXa : "Chưa phân công",
                                 TenDangNhap = t != null ? t.TenDangNhap : "",
@@ -342,7 +372,8 @@ namespace QuanLyRungPhongHo.Controllers
                 if (!string.IsNullOrEmpty(searchString))
                 {
                     query = query.Where(x => x.HoTen.Contains(searchString) || 
-                                             (x.SDT != null && x.SDT.Contains(searchString)));
+                                             (x.SDT != null && x.SDT.Contains(searchString)) ||
+                                             (x.Email != null && x.Email.Contains(searchString)));
                 }
                 if (!string.IsNullOrEmpty(roleFilter))
                 {

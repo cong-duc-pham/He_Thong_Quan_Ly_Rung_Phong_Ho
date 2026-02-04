@@ -21,6 +21,10 @@ namespace QuanLyRungPhongHo.Models
         [RegularExpression(@"^(03|05|07|08|09|01[2|6|8|9])+([0-9]{8})$", ErrorMessage = "Số điện thoại không đúng định dạng VN")]
         public string? SDT { get; set; }
 
+        [Display(Name = "Email")]
+        [EmailAddress(ErrorMessage = "Email không đúng định dạng")]
+        public string? Email { get; set; }
+
         [Display(Name = "Địa bàn (Xã)")]
         [Required(ErrorMessage = "Vui lòng chọn xã")]
         public string? MaXa { get; set; }

@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="PageTitle" xml:space="preserve">
+    <value>Xóa Lô Rừng</value>
+  </data>
+  <data name="PageHeader" xml:space="preserve">
+    <value>Xác Nhận Xóa Lô Rừng</value>
+  </data>
+  <data name="WarningTitle" xml:space="preserve">
+    <value>Cảnh báo:</value>
+  </data>
+  <data name="WarningMessage" xml:space="preserve">
+    <value>Bạn có chắc chắn muốn xóa lô rừng này không? Hành động này</value>
+  </data>
+  <data name="CannotUndo" xml:space="preserve">
+    <value>không thể hoàn tác!</value>
+  </data>
+  <data name="SubCompartment" xml:space="preserve">
+    <value>Tiểu Khu:</value>
+  </data>
+  <data name="Compartment" xml:space="preserve">
+    <value>Khoảnh:</value>
+  </data>
+  <data name="Lot" xml:space="preserve">
+    <value>Lô:</value>
+  </data>
+  <data name="Village" xml:space="preserve">
+    <value>Thôn/Bản:</value>
+  </data>
+  <data name="Commune" xml:space="preserve">
+    <value>Xã:</value>
+  </data>
+  <data name="Area" xml:space="preserve">
+    <value>Diện Tích:</value>
+  </data>
+  <data name="ForestType" xml:space="preserve">
+    <value>Loại Rừng:</value>
+  </data>
+  <data name="Status" xml:space="preserve">
+    <value>Trạng Thái:</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Hủy</value>
+  </data>
+  <data name="ConfirmDelete" xml:space="preserve">
+    <value>Xác Nhận Xóa</value>
+  </data>
+  <data name="BackToList" xml:space="preserve">
+    <value>Quay lại danh sách</value>
+  </data>
+  <data name="TechnicalInfo" xml:space="preserve">
+    <value>Thông Tin Kỹ Thuật</value>
+  </data>
+  <data name="GeographicalLocation" xml:space="preserve">
+    <value>Vị Trí Địa Lý</value>
+  </data>
+  <data name="ForestInfo" xml:space="preserve">
+    <value>Thông Tin Rừng</value>
+  </data>
+  <data name="LotCode" xml:space="preserve">
+    <value>Mã Lô:</value>
+  </data>
+</root>

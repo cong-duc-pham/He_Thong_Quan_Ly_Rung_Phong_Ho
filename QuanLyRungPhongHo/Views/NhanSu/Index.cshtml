@@ -1,13 +1,14 @@
 ﻿@using QuanLyRungPhongHo.Models
 @model IEnumerable<NhanSuViewModel>
+@inject Microsoft.AspNetCore.Mvc.Localization.IViewLocalizer Localizer
 
 @{
-    ViewBag.Title = "Quản lý Nhân sự";
+    ViewBag.Title = Localizer["PageTitle"];
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <div class="container-fluid p-3">
-    <h3 class="text-success fw-bold mb-4"><i class="bi bi-people-fill"></i> Quản lý Nhân sự</h3>
+    <h3 class="text-success fw-bold mb-4"><i class="bi bi-people-fill"></i> @Localizer["PageHeader"]</h3>
 
     @if (TempData["SuccessMessage"] != null)
     {
@@ -30,11 +31,11 @@
             <div id="nhansuSearchForm" class="row g-3 align-items-center">
                 <div class="col-md-4">
                     <input type="text" id="nhansuSearchInput" name="searchString" class="form-control" 
-                           placeholder="Tìm theo tên hoặc SĐT..." value="">
+                           placeholder="@Localizer["SearchPlaceholder"]" value="">
                 </div>
                 <div class="col-md-3">
                     <select id="nhansuXaFilter" name="maXaFilter" class="form-select">
-                        <option value="">--- Tất cả địa bàn ---</option>
+                        <option value="">@Localizer["AllArea"]</option>
                         @foreach (var xa in (SelectList)ViewBag.DsXa)
                         {
                             <option value="@xa.Value">@xa.Text</option>
@@ -43,15 +44,15 @@
                 </div>
                 <div class="col-md-3">
                     <select id="nhansuRoleFilter" name="roleFilter" class="form-select">
-                        <option value="">-- Tất cả chức vụ --</option>
-                        <option value="Trạm trưởng">Trạm trưởng</option>
-                        <option value="Kiểm lâm viên">Kiểm lâm viên</option>
-                        <option value="Bảo vệ rừng">Bảo vệ rừng</option>
+                        <option value="">@Localizer["AllPositions"]</option>
+                        <option value="Trạm trưởng">@Localizer["PositionStationChief"]</option>
+                        <option value="Kiểm lâm viên">@Localizer["PositionForester"]</option>
+                        <option value="Bảo vệ rừng">@Localizer["PositionForestGuard"]</option>
                     </select>
                 </div>
                 <div class="col-md-2">
                     <button type="button" class="btn btn-success w-100" onclick="openModal()" style="height: 38px;">
-                        Thêm mới
+                        @Localizer["AddNew"]
                     </button>
                 </div>
             </div>
@@ -61,7 +62,7 @@
     <!-- Thống kê kết quả tìm kiếm -->
     <div class="mb-3">
         <span class="badge bg-info text-dark" id="nhansuTotal">
-            Tổng số: @Model.Count() nhân sự
+            @Localizer["TotalCount"]: @Model.Count() @Localizer["StaffUnit"]
         </span>
         <span class="badge bg-primary" id="nhansuSearchStatus" style="display: none;"></span>
     </div>
@@ -71,12 +72,12 @@
         <table class="table table-hover align-middle mb-0" id="nhansuTable">
             <thead class="bg-success text-white">
                 <tr>
-                    <th>Họ tên</th>
-                    <th>Chức vụ</th>
-                    <th>Liên hệ</th>
-                    <th>Địa bàn</th>
-                    <th>Tài khoản (Quyền)</th>
-                    <th class="text-center">Tác vụ</th>
+                    <th>@Localizer["FullName"]</th>
+                    <th>@Localizer["Position"]</th>
+                    <th>@Localizer["Contact"]</th>
+                    <th>@Localizer["Area"]</th>
+                    <th>@Localizer["Account"]</th>
+                    <th class="text-center">@Localizer["Actions"]</th>
                 </tr>
             </thead>
             <tbody id="nhansuTableBody">
@@ -105,7 +106,7 @@
                                 }
                                 else
                                 {
-                                    <span class="text-danger"><i class="bi bi-exclamation-circle"></i> Chưa có TK</span>
+                                    <span class="text-danger"><i class="bi bi-exclamation-circle"></i> @Localizer["NoAccount"]</span>
                                 }
                             </td>
                             <td class="text-center">
@@ -121,7 +122,7 @@
                 }
                 else
                 {
-                    <tr><td colspan="6" class="text-center text-muted py-3">Không có dữ liệu</td></tr>
+                    <tr><td colspan="6" class="text-center text-muted py-3">@Localizer["NoData"]</td></tr>
                 }
             </tbody>
         </table>
@@ -145,8 +146,8 @@
                     }
                     <p class="mb-2 small"><i class="bi bi-person"></i> TK: @item.TenDangNhap</p>
                     <div class="d-flex gap-2">
-                        <button class="btn btn-outline-primary btn-sm flex-fill" onclick="editData(@item.MaNV, event)">Sửa</button>
-                        <button class="btn btn-outline-danger btn-sm flex-fill" onclick="deleteData(@item.MaNV)">Xóa</button>
+                        <button class="btn btn-outline-primary btn-sm flex-fill" onclick="editData(@item.MaNV, event)">@Localizer["Edit"]</button>
+                        <button class="btn btn-outline-danger btn-sm flex-fill" onclick="deleteData(@item.MaNV)">@Localizer["Delete"]</button>
                     </div>
                 </div>
             </div>
@@ -158,7 +159,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header bg-success text-white">
-                <h5 class="modal-title" id="modalTitle">Thêm Nhân sự</h5>
+                <h5 class="modal-title" id="modalTitle">@Localizer["ModalTitleAdd"]</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
@@ -167,73 +168,73 @@
                     <input type="hidden" id="MaNV" name="MaNV" value="0">
                     
                     <div class="mb-3">
-                        <label class="form-label">Họ tên <span class="text-danger">*</span></label>
+                        <label class="form-label">@Localizer["NameLabel"] <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" name="HoTen" id="HoTen" required>
-                        <div class="invalid-feedback">Vui lòng nhập họ tên</div>
+                        <div class="invalid-feedback">@Localizer["NameRequired"]</div>
                     </div>
                     <div class="row">
                         <div class="col-6 mb-3">
-                            <label class="form-label">Chức vụ <span class="text-danger">*</span></label>
+                            <label class="form-label">@Localizer["PositionLabel"] <span class="text-danger">*</span></label>
                             <select class="form-select" name="ChucVu" id="ChucVu" required>
-                                <option value="">-- Chọn --</option>
-                                <option value="Kiểm lâm viên">Kiểm lâm viên</option>
-                                <option value="Trạm trưởng">Trạm trưởng</option>
-                                <option value="Bảo vệ rừng">Bảo vệ rừng</option>
+                                <option value="">@Localizer["ChoosePosition"]</option>
+                                <option value="Kiểm lâm viên">@Localizer["PositionForester"]</option>
+                                <option value="Trạm trưởng">@Localizer["PositionStationChief"]</option>
+                                <option value="Bảo vệ rừng">@Localizer["PositionForestGuard"]</option>
                             </select>
-                            <div class="invalid-feedback">Vui lòng chọn chức vụ</div>
+                            <div class="invalid-feedback">@Localizer["PositionRequired"]</div>
                         </div>
                         <div class="col-6 mb-3">
-                            <label class="form-label">SĐT <span class="text-danger">*</span></label>
+                            <label class="form-label">@Localizer["PhoneLabel"] <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" name="SDT" id="SDT" 
                                    pattern="^(03|05|07|08|09|01[2|6|8|9])+([0-9]{8})$" required>
-                            <div class="invalid-feedback">SĐT không hợp lệ (VD: 0912345678)</div>
+                            <div class="invalid-feedback">@Localizer["PhoneInvalid"]</div>
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Email</label>
+                        <label class="form-label">@Localizer["EmailLabel"]</label>
                         <input type="email" class="form-control" name="Email" id="Email" 
                                placeholder="email@example.com">
-                        <div class="invalid-feedback">Email không hợp lệ</div>
-                        <small class="text-muted">Email dùng để khôi phục mật khẩu</small>
+                        <div class="invalid-feedback">@Localizer["EmailInvalid"]</div>
+                        <small class="text-muted">@Localizer["EmailNote"]</small>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Địa bàn quản lý <span class="text-danger">*</span></label>
-                        @Html.DropDownList("MaXa", (SelectList)ViewBag.DsXa, "-- Chọn địa bàn --", 
+                        <label class="form-label">@Localizer["AreaLabel"] <span class="text-danger">*</span></label>
+                        @Html.DropDownList("MaXa", (SelectList)ViewBag.DsXa, Localizer["ChooseArea"].Value, 
                             new { @class = "form-select", @id = "MaXa", required = "required" })
-                        <div class="invalid-feedback">Vui lòng chọn địa bàn</div>
+                        <div class="invalid-feedback">@Localizer["AreaRequired"]</div>
                     </div>
                     
                     <hr>
-                    <h6 class="text-muted">Thông tin tài khoản</h6>
+                    <h6 class="text-muted">@Localizer["AccountInfo"]</h6>
                     <div class="mb-3">
-                        <label class="form-label">Tên đăng nhập <span class="text-danger">*</span></label>
+                        <label class="form-label">@Localizer["UsernameLabel"] <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" name="TenDangNhap" id="TenDangNhap" 
                                pattern="^[a-zA-Z0-9_]{5,50}$" required>
-                        <div class="invalid-feedback">5-50 ký tự, chỉ chữ, số và gạch dưới</div>
+                        <div class="invalid-feedback">@Localizer["UsernameInvalid"]</div>
                     </div>
                     <div class="row">
                          <div class="col-6 mb-3">
-                            <label class="form-label">Mật khẩu <span class="text-danger" id="passRequired">*</span></label>
+                            <label class="form-label">@Localizer["PasswordLabel"] <span class="text-danger" id="passRequired">*</span></label>
                             <input type="password" class="form-control" name="MatKhau" id="MatKhau" 
-                                   minlength="6" placeholder="Tối thiểu 6 ký tự">
-                            <div class="invalid-feedback">Mật khẩu tối thiểu 6 ký tự</div>
-                            <small class="text-muted" id="passNote" style="display:none;">Để trống nếu không đổi</small>
+                                   minlength="6" placeholder="@Localizer["PasswordPlaceholder"]">
+                            <div class="invalid-feedback">@Localizer["PasswordInvalid"]</div>
+                            <small class="text-muted" id="passNote" style="display:none;">@Localizer["PasswordNote"]</small>
                         </div>
                         <div class="col-6 mb-3">
-                            <label class="form-label">Quyền <span class="text-danger">*</span></label>
+                            <label class="form-label">@Localizer["RoleLabel"] <span class="text-danger">*</span></label>
                              <select class="form-select" name="Quyen" id="Quyen" required>
-                                <option value="NhanVien_Thon">Nhân viên</option>
-                                <option value="QuanLy_Xa">Quản lý</option>
-                                <option value="Admin_Tinh">Admin</option>
+                                <option value="NhanVien_Thon">@Localizer["RoleStaff"]</option>
+                                <option value="QuanLy_Xa">@Localizer["RoleManager"]</option>
+                                <option value="Admin_Tinh">@Localizer["RoleAdmin"]</option>
                             </select>
                         </div>
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@Localizer["Close"]</button>
                 <button type="button" class="btn btn-success" onclick="saveData()" id="btnSave">
-                    <i class="bi bi-save"></i> Lưu dữ liệu
+                    <i class="bi bi-save"></i> @Localizer["Save"]
                 </button>
             </div>
         </div>

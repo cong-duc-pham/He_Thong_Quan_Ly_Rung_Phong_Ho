@@ -1,7 +1,8 @@
 @model QuanLyRungPhongHo.Models.DanhMucXa
+@inject Microsoft.AspNetCore.Mvc.Localization.IViewLocalizer Localizer
 
 @{
-    ViewData["Title"] = "Sửa Xã";
+    ViewData["Title"] = Localizer["PageTitle"];
 }
 
 @section Styles {
@@ -14,7 +15,7 @@
         <div class="digioi-card">
             <div class="digioi-header warning">
                 <h4>
-                    <i class="bi bi-pencil-square"></i> Sửa Thông Tin Xã
+                    <i class="bi bi-pencil-square"></i> @Localizer["PageHeader"]
                 </h4>
             </div>
 
@@ -25,23 +26,23 @@
                     <!-- Mã xã -->
                     <div class="mb-3">
                         <label asp-for="MaXa" class="form-label">
-                            <i class="bi bi-tag"></i> Mã Xã
+                            <i class="bi bi-tag"></i> @Localizer["MaXa"]
                         </label>
                         <input asp-for="MaXa"
                                class="form-control"
                                readonly />
-                        <div class="form-text">Mã xã không thể thay đổi.</div>
+                        <div class="form-text">@Localizer["MaXaReadOnly"]</div>
                     </div>
 
                     <!-- Tên xã -->
                     <div class="mb-4">
                         <label asp-for="TenXa" class="form-label">
-                            <i class="bi bi-building"></i> Tên Xã
-                            <span class="text-danger">*</span>
+                            <i class="bi bi-building"></i> @Localizer["TenXa"]
+                            <span class="text-danger">@Localizer["Required"]</span>
                         </label>
                         <input asp-for="TenXa"
                                class="form-control"
-                               placeholder="Nhập tên xã"
+                               placeholder="@Localizer["TenXaPlaceholder"]"
                                maxlength="100" />
                         <span asp-validation-for="TenXa" class="text-danger"></span>
                     </div>
@@ -49,10 +50,10 @@
                     <!-- Nút -->
                     <div class="form-actions">
                         <a asp-action="Index" class="btn btn-cancel">
-                            <i class="bi bi-x-circle"></i> Hủy
+                            <i class="bi bi-x-circle"></i> @Localizer["Cancel"]
                         </a>
                         <button type="submit" class="btn btn-warning">
-                            <i class="bi bi-check-circle"></i> Cập nhật
+                            <i class="bi bi-check-circle"></i> @Localizer["Update"]
                         </button>
                     </div>
                 </form>
@@ -61,7 +62,7 @@
 
         <div class="back-link">
             <a asp-action="Index">
-                <i class="bi bi-arrow-left"></i> Quay lại danh sách
+                <i class="bi bi-arrow-left"></i> @Localizer["BackToList"]
             </a>
         </div>
 

@@ -8,19 +8,32 @@ namespace QuanLyRungPhongHo.Controllers
         [HttpGet] 
         public IActionResult SetLanguage(string culture, string returnUrl)
         {
+            if (string.IsNullOrEmpty(culture))
+            {
+                culture = "vi";
+            }
+
+            // Set cookie với culture đã chọn
             Response.Cookies.Append(
                 CookieRequestCultureProvider.DefaultCookieName,
-                CookieRequestCultureProvider.MakeCookieValue(
-                    new RequestCulture(culture)
-                ),
+                CookieRequestCultureProvider.MakeCookieValue(new RequestCulture(culture)),
                 new CookieOptions
                 {
-                    Expires = DateTimeOffset.UtcNow.AddYears(1)
+                    Expires = DateTimeOffset.UtcNow.AddYears(1),
+                    Path = "/",
+                    HttpOnly = false,
+                    IsEssential = true,
+                    SameSite = SameSiteMode.Lax
                 }
             );
 
-            return LocalRedirect(returnUrl ?? "/");
+            // Validate và redirect
+            if (string.IsNullOrEmpty(returnUrl) || !Url.IsLocalUrl(returnUrl))
+            {
+                returnUrl = "/";
+            }
+
+            return LocalRedirect(returnUrl);
         }
     }
-
 }

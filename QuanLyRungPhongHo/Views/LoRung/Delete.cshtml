@@ -1,7 +1,8 @@
+@inject Microsoft.AspNetCore.Mvc.Localization.IViewLocalizer Localizer
 @model QuanLyRungPhongHo.Models.LoRung
 
 @{
-    ViewData["Title"] = "Xóa Lô Rừng";
+    ViewData["Title"] = Localizer["PageTitle"];
 }
 
 @section Styles {
@@ -12,40 +13,40 @@
     <div class="digioi-card">
         <div class="digioi-card-header">
             <h4>
-                <i class="bi bi-exclamation-triangle"></i> Xác Nhận Xóa Lô Rừng
+                <i class="bi bi-exclamation-triangle"></i> @Localizer["PageHeader"]
             </h4>
         </div>
 
         <div class="digioi-card-body">
             <div class="digioi-alert digioi-alert-warning">
                 <i class="bi bi-info-circle"></i>
-                <strong>Cảnh báo:</strong> Bạn có chắc chắn muốn xóa lô rừng này không?  
-                Hành động này không thể hoàn tác!
+                <strong>@Localizer["WarningTitle"]</strong> @Localizer["WarningMessage"] 
+                @Localizer["CannotUndo"]
             </div>
 
             <div class="digioi-info-grid">
                 <!-- Thông tin kỹ thuật -->
                 <div class="digioi-info-card">
                     <div class="digioi-info-card-header">
-                        <i class="bi bi-info-circle"></i> Thông Tin Kỹ Thuật
+                        <i class="bi bi-info-circle"></i> @Localizer["TechnicalInfo"]
                     </div>
                     <div class="digioi-info-card-body">
                         <div class="digioi-info-row">
-                            <div class="digioi-info-label">Mã Lô:</div>
+                            <div class="digioi-info-label">@Localizer["LotCode"]</div>
                             <div class="digioi-info-value">
                                 <span class="digioi-badge digioi-badge-secondary">@Model.MaLo</span>
                             </div>
                         </div>
                         <div class="digioi-info-row">
-                            <div class="digioi-info-label">Tiểu Khu:</div>
+                            <div class="digioi-info-label">@Localizer["SubCompartment"]</div>
                             <div class="digioi-info-value">@Model.SoTieuKhu</div>
                         </div>
                         <div class="digioi-info-row">
-                            <div class="digioi-info-label">Khoảnh:</div>
+                            <div class="digioi-info-label">@Localizer["Compartment"]</div>
                             <div class="digioi-info-value">@Model.SoKhoanh</div>
                         </div>
                         <div class="digioi-info-row">
-                            <div class="digioi-info-label">Lô:</div>
+                            <div class="digioi-info-label">@Localizer["Lot"]</div>
                             <div class="digioi-info-value">@Model.SoLo</div>
                         </div>
                     </div>
@@ -54,17 +55,17 @@
                 <!-- Vị trí địa lý -->
                 <div class="digioi-info-card">
                     <div class="digioi-info-card-header">
-                        <i class="bi bi-geo-alt"></i> Vị Trí Địa Lý
+                        <i class="bi bi-geo-alt"></i> @Localizer["GeographicalLocation"]
                     </div>
                     <div class="digioi-info-card-body">
                         <div class="digioi-info-row">
-                            <div class="digioi-info-label">Thôn/Bản:</div>
+                            <div class="digioi-info-label">@Localizer["Village"]</div>
                             <div class="digioi-info-value">
                                 <strong>@Model.DanhMucThon?.TenThon</strong>
                             </div>
                         </div>
                         <div class="digioi-info-row">
-                            <div class="digioi-info-label">Xã:</div>
+                            <div class="digioi-info-label">@Localizer["Commune"]</div>
                             <div class="digioi-info-value">
                                 <span class="digioi-badge digioi-badge-success">
                                     @Model.DanhMucThon?.DanhMucXa?.TenXa
@@ -78,26 +79,26 @@
             <!-- Thông tin rừng -->
             <div class="digioi-info-card">
                 <div class="digioi-info-card-header">
-                    <i class="bi bi-tree-fill"></i> Thông Tin Rừng
+                    <i class="bi bi-tree-fill"></i> @Localizer["ForestInfo"]
                 </div>
                 <div class="digioi-info-card-body">
                     <div class="digioi-form-row">
                         <div class="digioi-form-col">
-                            <strong>Diện Tích:</strong><br />
+                            <strong>@Localizer["Area"]</strong><br />
                             <span style="font-size: 24px; color: var(--green);">
                                 @(Model.DienTich?.ToString("N2") ?? "—") ha
                             </span>
                         </div>
 
                         <div class="digioi-form-col">
-                            <strong>Loại Rừng:</strong><br />
+                            <strong>@Localizer["ForestType"]</strong><br />
                             <span class="digioi-badge digioi-badge-info">
                                 @Model.LoaiRung
                             </span>
                         </div>
 
                         <div class="digioi-form-col">
-                            <strong>Trạng Thái:</strong><br />
+                            <strong>@Localizer["Status"]</strong><br />
                             @{
                                 var badgeClass = Model.TrangThai switch
                                 {
@@ -120,10 +121,10 @@
                 <input type="hidden" asp-for="MaLo" />
                 <div class="digioi-form-actions">
                     <a asp-action="Index" class="digioi-btn digioi-btn-secondary digioi-btn-lg">
-                        <i class="bi bi-x-circle"></i> Hủy
+                        <i class="bi bi-x-circle"></i> @Localizer["Cancel"]
                     </a>
                     <button type="submit" class="digioi-btn digioi-btn-danger digioi-btn-lg">
-                        <i class="bi bi-trash"></i> Xác Nhận Xóa
+                        <i class="bi bi-trash"></i> @Localizer["ConfirmDelete"]
                     </button>
                 </div>
             </form>
@@ -132,7 +133,7 @@
 
     <div class="digioi-back-link">
         <a asp-action="Index">
-            <i class="bi bi-arrow-left"></i> Quay lại danh sách
+            <i class="bi bi-arrow-left"></i> @Localizer["BackToList"]
         </a>
     </div>
 </div>

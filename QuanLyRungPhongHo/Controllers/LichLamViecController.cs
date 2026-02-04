@@ -283,6 +283,33 @@ namespace QuanLyRungPhongHo.Controllers
             }
         }
 
+        [HttpPost]
+        public async Task<IActionResult> DeleteScheduleItem([FromBody] DeleteScheduleItemRequest request)
+        {
+            try
+            {
+                var schedule = await _context.LichLamViecs.FindAsync(request.ScheduleId);
+
+                if (schedule == null)
+                {
+                    return Json(new { success = false, message = "Không tìm thấy lịch làm việc" });
+                }
+
+                _context.LichLamViecs.Remove(schedule);
+                await _context.SaveChangesAsync();
+
+                return Json(new
+                {
+                    success = true,
+                    message = "Đã xóa nhân viên khỏi ca làm việc"
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
         // ✅ Helper: Lấy ngày Thứ Hai của tuần
         private DateTime GetMondayOfWeek(DateTime date)
         {
@@ -371,5 +398,10 @@ namespace QuanLyRungPhongHo.Controllers
     public class ClearWeekRequest
     {
         public DateTime WeekStart { get; set; }
+    }
+
+    public class DeleteScheduleItemRequest
+    {
+        public int ScheduleId { get; set; }
     }
 }

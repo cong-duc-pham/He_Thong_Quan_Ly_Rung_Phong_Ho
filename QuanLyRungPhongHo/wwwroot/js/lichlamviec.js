@@ -1,5 +1,5 @@
 ﻿// ========================================
-// LICH LAM VIEC - FIXED VERSION
+// LICH LAM VIEC - AUTO INIT VERSION
 // ========================================
 
 console.log('📦 [lichlamviec.js] Loading...');
@@ -13,231 +13,206 @@ let dragSource = null;
 let draggedElement = null;
 let dropSuccessful = false;
 
-// Use global flag instead of local
-window.isLichLamViecInitialized = window.isLichLamViecInitialized || false;
+// Cấu hình ràng buộc
+const MAX_EMPLOYEES_PER_SHIFT = 3; // Tối đa 3 nhân viên/ca
+let emergencyMode = false; // Chế độ khẩn cấp để bỏ qua giới hạn
 
 // ========================================
-// MAIN INITIALIZATION
+// TỰ ĐỘNG KHỞI TẠO KHI DOM READY
 // ========================================
 
-async function initLichLamViec() {
-    console.log('🔵 [INIT] initLichLamViec() called!');
-
-    // Check if already initialized
-    if (window.isLichLamViecInitialized) {
-        console.log('⚠️ [INIT] Already initialized, skipping...');
-        return;
-    }
-
-    // Wait for DOM to be ready if not already
+(function () {
     if (document.readyState === 'loading') {
-        console.log('⏳ [INIT] DOM still loading, waiting...');
-        await new Promise(resolve => {
-            document.addEventListener('DOMContentLoaded', resolve, { once: true });
-        });
+        document.addEventListener('DOMContentLoaded', initializeApp);
+    } else {
+        // DOM đã sẵn sàng, chạy ngay
+        initializeApp();
     }
+})();
 
-    // Check if required elements exist
+function initializeApp() {
+    console.log('🚀 [INIT] Starting app initialization...');
+
+    // Kiểm tra DOM
     const employeesList = document.getElementById('employeesList');
     const scheduleTable = document.querySelector('.schedule-table');
 
-    console.log('🔍 [INIT] DOM check:', {
-        employeesList: !!employeesList,
-        scheduleTable: !!scheduleTable
-    });
-
     if (!employeesList || !scheduleTable) {
-        console.error('❌ [INIT] Required DOM elements not found!', {
-            employeesList: employeesList,
-            scheduleTable: scheduleTable
-        });
-        // Don't mark as initialized so it can be retried
+        console.error('❌ [INIT] Required DOM elements not found!');
         return;
     }
 
-    console.log('🚀 [INIT] Starting initialization...');
-    window.isLichLamViecInitialized = true;
+    console.log('✅ [INIT] DOM elements found');
+
+    // 1. Khởi tạo UI cơ bản NGAY LẬP TỨC
+    updateWeekInfo();
+    updateDayHeaders();
+    setupSearchFilter();
+    updateStats();
+
+    // 2. Khởi tạo DRAG & DROP NGAY (không đợi API)
+    initDragAndDrop();
+    console.log('✅ [INIT] Drag & Drop activated!');
+
+    // 3. Load dữ liệu từ server (chạy sau, không block UI)
+    loadDataFromServer();
+}
+
+// ========================================
+// LOAD DATA (Không block UI)
+// ========================================
+
+async function loadDataFromServer() {
+    console.log('📡 [DATA] Loading data from server...');
 
     try {
-        // Load employees from API
-        // 1. Setup UI & Kéo thả NGAY LẬP TỨC (Không chờ API)
-        console.log('🎨 Setting up UI & DragDrop immediately...');
-        updateWeekInfo();
-        updateDayHeaders();
-        setupSearchFilter();
+        // Load song song
+        await Promise.all([
+            loadEmployees(),
+            loadShifts(),
+            loadScheduleFromServer()
+        ]);
 
-        // Kích hoạt kéo thả ngay vì DOM nhân viên đã có từ Server (ViewBag)
-        initDragAndDrop();
-
-        // 2. Sau đó mới tải dữ liệu ngầm (Background)
-        console.log('📡 Loading data in background...');
-
-        // Chạy song song các API để tiết kiệm thời gian
-        const loadEmpPromise = loadEmployees();
-        const loadShiftPromise = loadShifts();
-        const loadSchedulePromise = loadScheduleFromServer();
-
-        await Promise.all([loadEmpPromise, loadShiftPromise, loadSchedulePromise]);
-
-        console.log('✅ [INIT] Complete! Data synced.');
+        console.log('✅ [DATA] All data loaded successfully');
     } catch (error) {
-        console.error('❌ Init error:', error);
-        window.isLichLamViecInitialized = false;
+        console.error('❌ [DATA] Error loading data:', error);
+        showNotification('Không thể tải dữ liệu từ server', 'warning');
     }
 }
 
 // ========================================
-// DRAG AND DROP - IMPROVED
+// DRAG AND DROP - SIMPLIFIED
 // ========================================
 
 function initDragAndDrop() {
     console.log('🎯 [DRAG] Initializing drag and drop...');
 
-    // Setup listeners
     setupEmployeeCardsDrag();
     setupScheduleCellsDrop();
-    setupAssignedEmployeesDrag();
 
     console.log('✅ [DRAG] Drag and drop ready!');
 }
 
 function setupEmployeeCardsDrag() {
     const employeeCards = document.querySelectorAll('.employee-card');
-    console.log(`📋 [DRAG] Setting up drag for ${employeeCards.length} employee cards`);
+    console.log(`📋 [DRAG] Setting up ${employeeCards.length} employee cards`);
 
     employeeCards.forEach(card => {
-        // Skip if already initialized
-        if (card.dataset.dragInitialized === 'true') return;
-        card.dataset.dragInitialized = 'true';
-        card.draggable = true;
-
-        card.addEventListener('dragstart', function (e) {
-            console.log('🖱️ [DRAG] Started dragging employee:', this.dataset.name);
-
-            draggedEmployee = {
-                id: parseInt(this.dataset.id),
-                name: this.dataset.name,
-                role: this.dataset.role || ''
-            };
-            dragSource = 'sidebar';
-            draggedElement = null;
-            dropSuccessful = false;
-
-            this.classList.add('dragging');
-            e.dataTransfer.effectAllowed = 'copy';
-            e.dataTransfer.setData('text/plain', this.dataset.id);
-        });
-
-        card.addEventListener('dragend', function (e) {
-            console.log('🖱️ [DRAG] Ended dragging employee');
-            this.classList.remove('dragging');
-        });
+        card.addEventListener('dragstart', handleEmployeeDragStart);
+        card.addEventListener('dragend', handleEmployeeDragEnd);
     });
+}
 
-    console.log(`✅ [DRAG] Employee cards setup complete`);
+function handleEmployeeDragStart(e) {
+    const card = e.currentTarget;
+    console.log('🖱️ [DRAG] Dragging employee:', card.dataset.name);
+
+    draggedEmployee = {
+        id: parseInt(card.dataset.id),
+        name: card.dataset.name,
+        role: card.dataset.role || ''
+    };
+    dragSource = 'sidebar';
+    draggedElement = null;
+    dropSuccessful = false;
+
+    card.classList.add('dragging');
+    e.dataTransfer.effectAllowed = 'copy';
+    e.dataTransfer.setData('text/plain', card.dataset.id);
+}
+
+function handleEmployeeDragEnd(e) {
+    e.currentTarget.classList.remove('dragging');
 }
 
 function setupScheduleCellsDrop() {
     const cells = document.querySelectorAll('.schedule-cell');
-    console.log(`📅 [DRAG] Setting up drop zones for ${cells.length} cells`);
+    console.log(`📅 [DRAG] Setting up ${cells.length} drop zones`);
 
     cells.forEach(cell => {
-        // Skip if already initialized
-        if (cell.dataset.dropInitialized === 'true') return;
-        cell.dataset.dropInitialized = 'true';
-
-        cell.addEventListener('dragover', function (e) {
-            e.preventDefault();
-            e.dataTransfer.dropEffect = dragSource === 'sidebar' ? 'copy' : 'move';
-            this.classList.add('drag-over');
-        });
-
-        cell.addEventListener('dragleave', function (e) {
-            // Only remove if leaving the cell itself, not child elements
-            if (e.target === this) {
-                this.classList.remove('drag-over');
-            }
-        });
-
-        cell.addEventListener('drop', function (e) {
-            e.preventDefault();
-            this.classList.remove('drag-over');
-
-            if (!draggedEmployee) {
-                console.warn('⚠️ [DRAG] No employee being dragged');
-                return;
-            }
-
-            const day = this.dataset.day;
-            const shift = this.dataset.shift;
-            console.log(`📍 [DRAG] Dropped employee ${draggedEmployee.name} to ${day} shift ${shift}`);
-
-            // Check if already exists
-            const existing = this.querySelector(`[data-id="${draggedEmployee.id}"]`);
-            if (existing) {
-                console.log('⚠️ [DRAG] Employee already in this cell');
-                showNotification('Nhân viên đã có trong ca này!', 'warning');
-                dropSuccessful = false;
-                return;
-            }
-
-            // Mark drop as successful if moving from another cell
-            if (dragSource === 'cell') {
-                dropSuccessful = true;
-            }
-
-            // Add employee to cell
-            addEmployeeToCell(this, draggedEmployee);
-            updateStats();
-            console.log('✅ [DRAG] Employee added to cell successfully');
-        });
+        cell.addEventListener('dragover', handleCellDragOver);
+        cell.addEventListener('dragleave', handleCellDragLeave);
+        cell.addEventListener('drop', handleCellDrop);
     });
-
-    console.log(`✅ [DRAG] Schedule cells setup complete`);
 }
 
-function setupAssignedEmployeesDrag() {
-    const assignedEmployees = document.querySelectorAll('.assigned-employee');
-    console.log(`👥 [DRAG] Setting up drag for ${assignedEmployees.length} assigned employees`);
+function handleCellDragOver(e) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = dragSource === 'sidebar' ? 'copy' : 'move';
+    e.currentTarget.classList.add('drag-over');
+}
 
-    assignedEmployees.forEach(empEl => {
-        empEl.draggable = true;
+function handleCellDragLeave(e) {
+    if (e.target === e.currentTarget) {
+        e.currentTarget.classList.remove('drag-over');
+    }
+}
 
-        empEl.addEventListener('dragstart', function (e) {
-            console.log('🖱️ [DRAG] Started dragging assigned employee');
+function handleCellDrop(e) {
+    e.preventDefault();
+    const cell = e.currentTarget;
+    cell.classList.remove('drag-over');
 
-            draggedEmployee = {
-                id: parseInt(this.dataset.id),
-                name: this.querySelector('.assigned-employee-name').textContent,
-                scheduleId: this.dataset.scheduleId
-            };
-            dragSource = 'cell';
-            draggedElement = this;
-            dropSuccessful = false;
+    if (!draggedEmployee) {
+        console.warn('⚠️ [DRAG] No employee being dragged');
+        return;
+    }
 
-            this.classList.add('dragging');
-            e.dataTransfer.effectAllowed = 'move';
-            e.dataTransfer.setData('text/plain', this.dataset.id);
-        });
+    const day = cell.dataset.day;
+    const shift = cell.dataset.shift;
+    console.log(`📍 [DRAG] Dropped ${draggedEmployee.name} to ${day} shift ${shift}`);
 
-        empEl.addEventListener('dragend', function (e) {
-            console.log('🖱️ [DRAG] Ended dragging assigned employee');
-            this.classList.remove('dragging');
+    // ✅ RÀNG BUỘC 1: Kiểm tra ngày đã qua
+    const cellDate = getCellDate(day);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    if (cellDate < today) {
+        showNotification('❌ Không thể phân công vào ngày đã qua!', 'error');
+        return;
+    }
 
-            // Only remove if drop was successful
-            if (dropSuccessful && draggedElement) {
-                console.log('🗑️ [DRAG] Removing old element after successful move');
-                draggedElement.remove();
-                updateStats();
-            }
+    // ✅ RÀNG BUỘC 2: Kiểm tra trùng lặp trong ca
+    const existing = cell.querySelector(`[data-id="${draggedEmployee.id}"]`);
+    if (existing) {
+        showNotification('Nhân viên đã có trong ca này!', 'warning');
+        return;
+    }
 
-            // Reset state
-            draggedElement = null;
-            dropSuccessful = false;
-        });
-    });
+    // ✅ RÀNG BUỘC 3: Kiểm tra nhân viên đã làm ca khác trong cùng ngày chưa
+    const hasOtherShift = checkEmployeeOnSameDay(draggedEmployee.id, day, shift);
+    if (hasOtherShift) {
+        if (!confirm(`⚠️ ${draggedEmployee.name} đã được phân công ca khác trong ngày này!\n\nBạn có chắc muốn tiếp tục?`)) {
+            return;
+        }
+    }
 
-    console.log(`✅ [DRAG] Assigned employees setup complete`);
+    // ✅ RÀNG BUỘC 4: Giới hạn số lượng nhân viên trong ca
+    const currentCount = cell.querySelectorAll('.assigned-employee').length;
+    if (currentCount >= MAX_EMPLOYEES_PER_SHIFT && !emergencyMode) {
+        const msg = `⚠️ Ca này đã đủ ${MAX_EMPLOYEES_PER_SHIFT} nhân viên!\n\nBật chế độ khẩn cấp (nút ở góc trên) để vượt giới hạn.`;
+        showNotification(msg, 'warning');
+        // Highlight nút khẩn cấp
+        highlightEmergencyButton();
+        return;
+    }
+
+    // Thêm nhân viên vào cell
+    addEmployeeToCell(cell, draggedEmployee);
+
+    // Nếu di chuyển từ cell khác, xóa khỏi cell cũ
+    if (dragSource === 'cell' && draggedElement) {
+        draggedElement.remove();
+    }
+
+    // Cảnh báo nếu vượt giới hạn (chế độ khẩn cấp)
+    if (currentCount + 1 > MAX_EMPLOYEES_PER_SHIFT && emergencyMode) {
+        showNotification(`⚠️ Chế độ khẩn cấp: Ca này có ${currentCount + 1}/${MAX_EMPLOYEES_PER_SHIFT} nhân viên`, 'warning');
+    }
+
+    updateStats();
+    updateCellWarnings();
+    console.log('✅ [DRAG] Employee added successfully');
 }
 
 function addEmployeeToCell(cell, employee) {
@@ -249,45 +224,37 @@ function addEmployeeToCell(cell, employee) {
 
     employeeEl.innerHTML = `
         <span class="assigned-employee-name">${employee.name}</span>
-        <button onclick="removeEmployee(this)" class="remove-btn">
+        <button onclick="removeEmployee(this)" class="remove-btn" type="button">
             <i class="fas fa-times"></i>
         </button>
     `;
 
     cell.appendChild(employeeEl);
 
-    // Setup drag for this new element
-    setupDragForSingleElement(employeeEl);
+    // Setup drag cho nhân viên đã phân công
+    employeeEl.addEventListener('dragstart', handleAssignedDragStart);
+    employeeEl.addEventListener('dragend', handleAssignedDragEnd);
 }
 
-function setupDragForSingleElement(empEl) {
-    empEl.draggable = true;
+function handleAssignedDragStart(e) {
+    const empEl = e.currentTarget;
 
-    empEl.addEventListener('dragstart', function (e) {
-        draggedEmployee = {
-            id: parseInt(this.dataset.id),
-            name: this.querySelector('.assigned-employee-name').textContent,
-            scheduleId: this.dataset.scheduleId
-        };
-        dragSource = 'cell';
-        draggedElement = this;
-        dropSuccessful = false;
+    draggedEmployee = {
+        id: parseInt(empEl.dataset.id),
+        name: empEl.querySelector('.assigned-employee-name').textContent,
+        scheduleId: empEl.dataset.scheduleId
+    };
+    dragSource = 'cell';
+    draggedElement = empEl;
+    dropSuccessful = false;
 
-        this.classList.add('dragging');
-        e.dataTransfer.effectAllowed = 'move';
-    });
+    empEl.classList.add('dragging');
+    e.dataTransfer.effectAllowed = 'move';
+}
 
-    empEl.addEventListener('dragend', function (e) {
-        this.classList.remove('dragging');
-
-        if (dropSuccessful && draggedElement) {
-            draggedElement.remove();
-            updateStats();
-        }
-
-        draggedElement = null;
-        dropSuccessful = false;
-    });
+function handleAssignedDragEnd(e) {
+    e.currentTarget.classList.remove('dragging');
+    draggedElement = null;
 }
 
 // ========================================
@@ -301,14 +268,11 @@ async function loadEmployees() {
 
         if (data.success) {
             employees = data.data;
-            console.log(`✅ Loaded ${employees.length} employees from API`);
+            console.log(`✅ Loaded ${employees.length} employees`);
             updateStats();
-        } else {
-            console.error('Failed to load employees:', data);
         }
     } catch (error) {
-        console.error('Error loading employees:', error);
-        throw error;
+        console.error('❌ Error loading employees:', error);
     }
 }
 
@@ -320,12 +284,9 @@ async function loadShifts() {
         if (data.success) {
             shifts = data.data;
             console.log(`✅ Loaded ${shifts.length} shifts`);
-        } else {
-            console.error('Failed to load shifts:', data);
         }
     } catch (error) {
-        console.error('Error loading shifts:', error);
-        throw error;
+        console.error('❌ Error loading shifts:', error);
     }
 }
 
@@ -337,15 +298,18 @@ async function loadScheduleFromServer() {
         const response = await fetch(`/LichLamViec/GetSchedule?weekStart=${startDate}`);
         const data = await response.json();
 
-        // Clear old assignments
+        // Xóa lịch cũ
         document.querySelectorAll('.schedule-cell').forEach(cell => {
             cell.innerHTML = '';
         });
 
         if (data.success && data.schedule && data.schedule.length > 0) {
-            data.schedule.forEach((item) => {
-                const cell = document.querySelector(`.schedule-cell[data-day="${item.day}"][data-shift="${item.shiftId}"]`);
-                if (cell) {
+            data.schedule.forEach(item => {
+                const cell = document.querySelector(
+                    `.schedule-cell[data-day="${item.day}"][data-shift="${item.shiftId}"]`
+                );
+
+                if (cell && item.employees) {
                     item.employees.forEach(emp => {
                         addEmployeeToCell(cell, {
                             id: emp.id,
@@ -355,15 +319,14 @@ async function loadScheduleFromServer() {
                     });
                 }
             });
+
+            console.log('✅ Schedule loaded from server');
         }
 
-        // Setup drag for newly added assigned employees
-        console.log('🔄 [DRAG] Re-initializing drag for assigned employees after load');
-        setupAssignedEmployeesDrag();
-
         updateStats();
+        updateCellWarnings(); // Cập nhật cảnh báo sau khi load
     } catch (error) {
-        console.error('Error loading schedule:', error);
+        console.error('❌ Error loading schedule:', error);
     }
 }
 
@@ -424,7 +387,7 @@ function updateDayHeaders() {
 }
 
 // ========================================
-// SAVE SCHEDULE
+// SAVE & CLEAR SCHEDULE
 // ========================================
 
 async function saveSchedule() {
@@ -458,9 +421,7 @@ async function saveSchedule() {
     try {
         const response = await fetch('/LichLamViec/SaveSchedule', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 WeekStart: weekStart.toISOString(),
                 Schedule: schedule
@@ -487,21 +448,34 @@ async function saveSchedule() {
 async function clearSchedule() {
     if (!confirm('Xác nhận xóa toàn bộ lịch tuần này?')) return;
 
-    const cells = document.querySelectorAll('.schedule-cell');
-    let count = 0;
+    const weekStart = getWeekStart(currentWeek);
 
-    cells.forEach(cell => {
-        const assigned = cell.querySelectorAll('.assigned-employee');
-        count += assigned.length;
-        cell.innerHTML = '';
-    });
+    try {
+        const response = await fetch('/LichLamViec/ClearWeekSchedule', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                WeekStart: weekStart.toISOString()
+            })
+        });
 
-    updateStats();
+        const data = await response.json();
 
-    if (count > 0) {
-        showNotification(`Đã xóa ${count} ca làm việc!`, 'success');
-    } else {
-        showNotification('Lịch đã trống!', 'info');
+        if (data.success) {
+            // Xóa giao diện
+            const cells = document.querySelectorAll('.schedule-cell');
+            cells.forEach(cell => {
+                cell.innerHTML = '';
+            });
+
+            updateStats();
+            showNotification(data.message || 'Đã xóa lịch tuần thành công!', 'success');
+        } else {
+            showNotification('Lỗi: ' + data.message, 'error');
+        }
+    } catch (error) {
+        console.error('❌ Error clearing schedule:', error);
+        showNotification('Không thể xóa lịch!', 'error');
     }
 }
 
@@ -525,18 +499,16 @@ function updateStats() {
         totalEl.textContent = cards.length;
     }
 
-    if (assignedEl) assignedEl.textContent = assignedIds.size;
+    if (assignedEl) {
+        assignedEl.textContent = assignedIds.size;
+    }
 }
 
 function setupSearchFilter() {
     const searchInput = document.getElementById('searchEmployee');
     if (!searchInput) return;
 
-    // Remove old listener
-    const newSearch = searchInput.cloneNode(true);
-    searchInput.parentNode.replaceChild(newSearch, searchInput);
-
-    newSearch.addEventListener('input', function (e) {
+    searchInput.addEventListener('input', function (e) {
         const searchTerm = e.target.value.toLowerCase();
         const cards = document.querySelectorAll('.employee-card');
 
@@ -556,16 +528,46 @@ function setupSearchFilter() {
 function removeEmployee(btn) {
     const empEl = btn.closest('.assigned-employee');
     const empName = empEl.querySelector('.assigned-employee-name').textContent;
+    const scheduleId = empEl.dataset.scheduleId;
 
-    if (confirm(`Xác nhận xóa "${empName}" khỏi ca làm việc?`)) {
+    if (!confirm(`Xác nhận xóa "${empName}" khỏi ca làm việc?`)) {
+        return;
+    }
+
+    // Nếu chưa lưu vào DB (scheduleId rỗng), chỉ xóa giao diện
+    if (!scheduleId || scheduleId === '0' || scheduleId === '') {
         empEl.remove();
         updateStats();
         showNotification(`Đã xóa ${empName} khỏi ca`, 'info');
+        return;
     }
+
+    // Nếu đã có trong DB, gọi API xóa
+    fetch('/LichLamViec/DeleteScheduleItem', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            ScheduleId: parseInt(scheduleId)
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            empEl.remove();
+            updateStats();
+            showNotification(`Đã xóa ${empName} khỏi ca`, 'success');
+        } else {
+            showNotification('Lỗi: ' + data.message, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('❌ Error removing employee:', error);
+        showNotification('Không thể xóa nhân viên!', 'error');
+    });
 }
 
 // ========================================
-// HELPER FUNCTIONS
+// UTILITY FUNCTIONS
 // ========================================
 
 function getWeekStart(date) {
@@ -573,6 +575,87 @@ function getWeekStart(date) {
     const day = d.getDay();
     const diff = d.getDate() - day + (day === 0 ? -6 : 1);
     return new Date(d.setDate(diff));
+}
+
+function getCellDate(dayString) {
+    const weekStart = getWeekStart(currentWeek);
+    const dayOffset = {
+        'mon': 0, 'tue': 1, 'wed': 2, 'thu': 3,
+        'fri': 4, 'sat': 5, 'sun': 6
+    }[dayString.toLowerCase()] || 0;
+    
+    const date = new Date(weekStart);
+    date.setDate(date.getDate() + dayOffset);
+    date.setHours(0, 0, 0, 0);
+    return date;
+}
+
+function checkEmployeeOnSameDay(employeeId, targetDay, targetShift) {
+    // Lấy tất cả các cell trong cùng ngày
+    const sameDayCells = document.querySelectorAll(`.schedule-cell[data-day="${targetDay}"]`);
+    
+    for (const cell of sameDayCells) {
+        // Bỏ qua cell đích
+        if (cell.dataset.shift === targetShift) continue;
+        
+        // Kiểm tra xem nhân viên có trong cell này không
+        const empInCell = cell.querySelector(`[data-id="${employeeId}"]`);
+        if (empInCell) {
+            return true;
+        }
+    }
+    return false;
+}
+
+function updateCellWarnings() {
+    const cells = document.querySelectorAll('.schedule-cell');
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    cells.forEach(cell => {
+        const day = cell.dataset.day;
+        const cellDate = getCellDate(day);
+        const count = cell.querySelectorAll('.assigned-employee').length;
+        
+        // Xóa các class cảnh báo cũ
+        cell.classList.remove('cell-past', 'cell-full', 'cell-overfull');
+        
+        // Ngày đã qua
+        if (cellDate < today) {
+            cell.classList.add('cell-past');
+        }
+        // Đã đầy
+        else if (count >= MAX_EMPLOYEES_PER_SHIFT && count < MAX_EMPLOYEES_PER_SHIFT + 2) {
+            cell.classList.add('cell-full');
+        }
+        // Quá tải
+        else if (count >= MAX_EMPLOYEES_PER_SHIFT + 2) {
+            cell.classList.add('cell-overfull');
+        }
+    });
+}
+
+function toggleEmergencyMode() {
+    emergencyMode = !emergencyMode;
+    const btn = document.getElementById('emergencyBtn');
+    
+    if (emergencyMode) {
+        btn.classList.add('active');
+        btn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Khẩn cấp: BẬT';
+        showNotification('🚨 Đã bật chế độ khẩn cấp - Có thể vượt giới hạn nhân viên', 'warning');
+    } else {
+        btn.classList.remove('active');
+        btn.innerHTML = '<i class="fas fa-shield-alt"></i> Khẩn cấp: TẮT';
+        showNotification('Đã tắt chế độ khẩn cấp', 'info');
+    }
+}
+
+function highlightEmergencyButton() {
+    const btn = document.getElementById('emergencyBtn');
+    if (btn && !emergencyMode) {
+        btn.classList.add('highlight-pulse');
+        setTimeout(() => btn.classList.remove('highlight-pulse'), 2000);
+    }
 }
 
 function getWeekNumber(date) {
@@ -617,11 +700,17 @@ function showNotification(message, type = 'info') {
 // EXPORT TO WINDOW
 // ========================================
 
-window.initLichLamViec = initLichLamViec;
 window.previousWeek = previousWeek;
 window.nextWeek = nextWeek;
 window.clearSchedule = clearSchedule;
 window.saveSchedule = saveSchedule;
 window.removeEmployee = removeEmployee;
+window.toggleEmergencyMode = toggleEmergencyMode;
 
-console.log('✅ [lichlamviec.js] Loaded. window.initLichLamViec is ready.');
+console.log('✅ [lichlamviec.js] Loaded & Auto-initialized');
+console.log(`⚙️ Ràng buộc: Tối đa ${MAX_EMPLOYEES_PER_SHIFT} nhân viên/ca`);
+
+// Cập nhật cảnh báo mỗi khi có thay đổi
+setInterval(() => {
+    updateCellWarnings();
+}, 5000); // Kiểm tra mỗi 5 giây

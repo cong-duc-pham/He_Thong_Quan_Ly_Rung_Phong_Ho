@@ -9,8 +9,6 @@ namespace QuanLyRungPhongHo.Models
         public string? ChucVu { get; set; }
         public string? SDT { get; set; }
 
-        public string? Email { get; set; }
-
         public string? Email { get; set; } // Thêm trường Email
         public string? GhiChuNoiBo { get; set; } // Thêm trường Ghi chú nội bộ
 

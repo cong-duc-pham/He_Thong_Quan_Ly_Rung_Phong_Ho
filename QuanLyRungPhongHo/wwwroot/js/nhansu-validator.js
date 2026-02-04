@@ -320,61 +320,46 @@ const NhanSuValidatorClient = {
 
     //Khởi tạo validation realtime cho form
     init() {
-        console.log('🔧 Đang khởi tạo validation realtime...');
+        console.log('🔧 NhanSuValidatorClient: Đang khởi tạo validation realtime...');
         this.bindEvents();
-        console.log('✅ Validation realtime đã được khởi tạo!');
+        console.log('✅ NhanSuValidatorClient: Validation realtime đã được khởi tạo!');
     },
 
     //Bind events vào form fields
     bindEvents() {
-        console.log('📋 Binding events vào form fields...');
+        console.log('📋 NhanSuValidatorClient: Binding events vào form fields...');
 
         // Họ Tên
         const hoTenField = document.getElementById('HoTen');
-        console.log('🔍 HoTen field:', hoTenField);
         if (hoTenField) {
-            console.log('✅ Binding events to HoTen');
             hoTenField.addEventListener('input', () => {
-                console.log('🎯 HoTen input event fired!');
                 this.validateHoTen(hoTenField.value, hoTenField);
             });
             hoTenField.addEventListener('blur', () => {
                 this.validateHoTen(hoTenField.value, hoTenField);
             });
-        } else {
-            console.error('❌ HoTen field NOT FOUND!');
         }
 
         // SĐT
         const sdtField = document.getElementById('SDT');
-        console.log('🔍 SDT field:', sdtField);
         if (sdtField) {
-            console.log('✅ Binding events to SDT');
             sdtField.addEventListener('input', () => {
-                console.log('🎯 SDT input event fired!');
                 this.validateSDT(sdtField.value, sdtField);
             });
             sdtField.addEventListener('blur', () => {
                 this.validateSDT(sdtField.value, sdtField);
             });
-        } else {
-            console.error('❌ SDT field NOT FOUND!');
         }
 
         // Email
         const emailField = document.getElementById('Email');
-        console.log('🔍 Email field:', emailField);
         if (emailField) {
-            console.log('✅ Binding events to Email');
             emailField.addEventListener('input', () => {
-                console.log('🎯 Email input event fired!');
                 this.validateEmail(emailField.value, emailField);
             });
             emailField.addEventListener('blur', () => {
                 this.validateEmail(emailField.value, emailField);
             });
-        } else {
-            console.error('❌ Email field NOT FOUND!');
         }
 
         // Tên Đăng Nhập
@@ -421,7 +406,7 @@ const NhanSuValidatorClient = {
             });
         }
 
-        console.log('✅ Events đã được bind!');
+        console.log('✅ NhanSuValidatorClient: Events đã được bind!');
     },
 
     //Validate toàn bộ form trước khi submit
@@ -455,10 +440,17 @@ const NhanSuValidatorClient = {
     }
 };
 
-// Khởi tạo khi document ready
-document.addEventListener('DOMContentLoaded', function () {
-    NhanSuValidatorClient.init();
-});
-
-// Export để có thể gọi từ nhansu.js
+// Export vào cả window và đảm bảo nó tồn tại
 window.NhanSuValidatorClient = NhanSuValidatorClient;
+
+// Khởi tạo an toàn
+const initAll = () => {
+    console.log('📄 Khởi tạo NhanSuValidatorClient...');
+    window.NhanSuValidatorClient.init();
+};
+
+if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    initAll();
+} else {
+    document.addEventListener('DOMContentLoaded', initAll);
+}   

@@ -124,10 +124,10 @@
                     <thead class="table-success">
                         <tr>
                             <th>STT</th>
+                            <th>Mã NV</th>
                             <th>Nhân viên</th>
                             <th>Ngày</th>
                             <th>Ca làm việc</th>
-                            <th>Lô rừng</th>
                             <th>Giờ vào</th>
                             <th>Giờ ra</th>
                             <th>Số giờ</th>
@@ -137,7 +137,7 @@
                     </thead>
                     <tbody id="dataTableBody">
                         <tr>
-                            <td colspan="10" class="text-center py-4">
+                            <td colspan="11" class="text-center py-4">
                                 <div class="spinner-border text-success" role="status">
                                     <span class="visually-hidden">Đang tải...</span>
                                 </div>
@@ -209,13 +209,13 @@
                         updateStatistics(data.data);
                     } else {
                         document.getElementById('dataTableBody').innerHTML = 
-                            `<tr><td colspan="10" class="text-center text-danger py-3">${data.message}</td></tr>`;
+                            `<tr><td colspan="11" class="text-center text-danger py-3">${data.message}</td></tr>`;
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
                     document.getElementById('dataTableBody').innerHTML = 
-                        `<tr><td colspan="10" class="text-center text-danger py-3">Lỗi: ${error.message}</td></tr>`;
+                        `<tr><td colspan="11" class="text-center text-danger py-3">Lỗi: ${error.message}</td></tr>`;
                 });
         }
 
@@ -224,7 +224,7 @@
             const tbody = document.getElementById('dataTableBody');
             
             if (data.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="10" class="text-center text-muted py-3">Không có dữ liệu</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="11" class="text-center text-muted py-3">Không có dữ liệu</td></tr>';
                 return;
             }
 
@@ -246,10 +246,10 @@
                 html += `
                     <tr class="${statusClass}">
                         <td>${index + 1}</td>
+                        <td><strong>${item.MaNV}</strong></td>
                         <td>${item.TenNV}</td>
                         <td>${item.NgayLamViec}</td>
                         <td>${item.TenCa}<br><small class="text-muted">${item.GioBatDau} - ${item.GioKetThuc}</small></td>
-                        <td>${item.TenLo}</td>
                         <td>${item.GioVao || '<span class="text-muted">---</span>'}</td>
                         <td>${item.GioRa || '<span class="text-muted">---</span>'}</td>
                         <td>${item.SoGioLam ? item.SoGioLam.toFixed(1) + 'h' : '<span class="text-muted">---</span>'}</td>

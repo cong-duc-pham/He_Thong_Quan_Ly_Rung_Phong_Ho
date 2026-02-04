@@ -85,6 +85,7 @@ namespace QuanLyRungPhongHo.Controllers
                     .ThenBy(l => l.CaLamViec!.GioBatDau)
                     .Select(l => new
                     {
+                        MaNV = l.MaNV,
                         NgayLamViec = l.NgayLamViec.ToString("dd/MM/yyyy"),
                         TenCa = l.CaLamViec!.TenCa,
                         TenLo = l.LoRung != null 

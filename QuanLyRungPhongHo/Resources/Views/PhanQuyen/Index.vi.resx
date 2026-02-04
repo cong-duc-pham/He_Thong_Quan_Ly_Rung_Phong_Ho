@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="PageTitle">
+    <value>Quản lý Phân quyền Hệ thống</value>
+  </data>
+  <data name="ProvinceAdmin">
+    <value>Admin tỉnh</value>
+  </data>
+  <data name="GuideTitle">
+    <value>Hướng dẫn</value>
+  </data>
+  <data name="GuideText">
+    <value>Bật/tắt checkbox để cấp hoặc thu hồi quyền cho từng vai trò. Thay đổi sẽ được lưu tự động.</value>
+  </data>
+  <data name="Module">
+    <value>Module</value>
+  </data>
+  <data name="Permission">
+    <value>Quyền</value>
+  </data>
+  <data name="Status">
+    <value>Trạng thái</value>
+  </data>
+  <data name="FullAccess">
+    <value>Luôn có full quyền - Không thể thay đổi</value>
+  </data>
+  <data name="UpdateSuccess">
+    <value>Cập nhật quyền thành công</value>
+  </data>
+  <data name="UpdateError">
+    <value>Có lỗi xảy ra khi cập nhật quyền</value>
+  </data>
+  <data name="Role">
+    <value>Vai trò</value>
+  </data>
+  <data name="Admin">
+    <value>Quản trị viên</value>
+  </data>
+  <data name="Manager">
+    <value>Quản lý</value>
+  </data>
+  <data name="Staff">
+    <value>Nhân viên</value>
+  </data>
+  <data name="Viewer">
+    <value>Người xem</value>
+  </data>
+  <data name="Loading">
+    <value>Đang tải...</value>
+  </data>
+  <data name="Error">
+    <value>Lỗi</value>
+  </data>
+  <data name="Success">
+    <value>Thành công</value>
+  </data>
+  <data name="Confirm">
+    <value>Xác nhận</value>
+  </data>
+  <data name="Cancel">
+    <value>Hủy</value>
+  </data>
+  <data name="Save">
+    <value>Lưu</value>
+  </data>
+  <data name="ConfirmChange">
+    <value>Bạn có chắc chắn muốn thay đổi quyền này?</value>
+  </data>
+  <data name="NoPermissions">
+    <value>Không có quyền nào được tìm thấy</value>
+  </data>
+  <data name="SearchPlaceholder">
+    <value>Tìm kiếm quyền...</value>
+  </data>
+  <data name="FilterByModule">
+    <value>Lọc theo Module</value>
+  </data>
+  <data name="AllModules">
+    <value>Tất cả Module</value>
+  </data>
+  <data name="Refresh">
+    <value>Làm mới</value>
+  </data>
+  <data name="ExportToExcel">
+    <value>Xuất Excel</value>
+  </data>
+  <data name="PermissionDescription">
+    <value>Mô tả quyền</value>
+  </data>
+  <data name="LastUpdated">
+    <value>Cập nhật lần cuối</value>
+  </data>
+  <data name="UpdatedBy">
+    <value>Người cập nhật</value>
+  </data>
+</root>

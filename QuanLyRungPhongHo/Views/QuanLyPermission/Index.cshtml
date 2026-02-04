@@ -1,3 +1,4 @@
+@inject IViewLocalizer Localizer
 @model IEnumerable<QuanLyRungPhongHo.Models.Permission>
 @{
     ViewData["Title"] = "Quản lý Chức năng (Permissions)";
@@ -8,10 +9,10 @@
         <div class="card-header bg-success text-white">
             <div class="d-flex justify-content-between align-items-center">
                 <h4 class="mb-0">
-                    <i class="fas fa-key me-2"></i>Quản lý Chức năng & Quyền
+                    <i class="fas fa-key me-2"></i>@Localizer["PageTitle"]
                 </h4>
                 <a asp-action="Create" class="btn btn-light btn-sm">
-                    <i class="fas fa-plus me-1"></i>Thêm chức năng mới
+                    <i class="fas fa-plus me-1"></i>@Localizer["AddNew"]
                 </a>
             </div>
         </div>
@@ -29,11 +30,11 @@
                 <table class="table table-hover table-bordered">
                     <thead class="table-light">
                         <tr>
-                            <th width="20%">Chức năng</th>
-                            <th width="40%">Tên quyền</th>
-                            <th width="25%">Mã quyền</th>
-                            <th width="5%" class="text-center">Trạng thái</th>
-                            <th width="10%" class="text-center">Thao tác</th>
+                            <th width="20%">@Localizer["Function"]</th>
+                            <th width="40%">@Localizer["PermissionName"]</th>
+                            <th width="25%">@Localizer["PermissionCode"]</th>
+                            <th width="5%" class="text-center">@Localizer["Status"]</th>
+                            <th width="10%" class="text-center">@Localizer["Actions"]</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -55,23 +56,23 @@
                                     <td class="text-center">
                                         @if (permission.IsActive)
                                         {
-                                            <span class="badge bg-success">Đang dùng</span>
+                                            <span class="badge bg-success">@Localizer["Active"]</span>
                                         }
                                         else
                                         {
-                                            <span class="badge bg-secondary">Tắt</span>
+                                            <span class="badge bg-secondary">@Localizer["Inactive"]</span>
                                         }
                                     </td>
                                     <td class="text-center">
                                         <a asp-action="Edit" asp-route-id="@permission.PermissionId" 
-                                           class="btn btn-sm btn-warning" title="Sửa">
+                                           class="btn btn-sm btn-warning" title="@Localizer["Edit"]">
                                             <i class="fas fa-edit"></i>
                                         </a>
                                         <form asp-action="Delete" asp-route-id="@permission.PermissionId" 
                                               method="post" style="display:inline;" 
-                                              onsubmit="return confirm('Bạn có chắc muốn xóa quyền này?');">
+                                              onsubmit="return confirm('@Localizer["DeleteConfirm"]');">
                                             @Html.AntiForgeryToken()
-                                            <button type="submit" class="btn btn-sm btn-danger" title="Xóa">
+                                            <button type="submit" class="btn btn-sm btn-danger" title="@Localizer["Delete"]">
                                                 <i class="fas fa-trash"></i>
                                             </button>
                                         </form>

@@ -60,7 +60,7 @@
             <div class="stats-bar">
                 <div class="stat-card">
                     <div class="stat-label">Tổng NV</div>
-                    <div class="stat-value" id="totalEmployees">0</div>
+                    <div class="stat-value" id="totalEmployees">@((ViewBag.Employees as IEnumerable<dynamic>)?.Count() ?? 0)</div>
                 </div>
                 <div class="stat-card stat-card-assigned">
                     <div class="stat-label">Đã phân</div>
@@ -69,7 +69,24 @@
             </div>
 
             <div class="employees-list" id="employeesList">
-                <!-- Employees will be loaded here by JavaScript -->
+                @if (ViewBag.Employees != null)
+                {
+                    foreach (var emp in ViewBag.Employees)
+                    {
+                        <div class="employee-card" draggable="true" data-id="@emp.id" data-name="@emp.name" data-role="@(emp.role ?? "")">
+                            <div class="employee-avatar">@emp.name.ToString().Substring(0, 1)</div>
+                            <div class="employee-info">
+                                <div class="employee-name">@emp.name</div>
+                                <div class="employee-role">@(emp.role ?? "Nhân viên")</div>
+                            </div>
+                            <i class="fas fa-grip-vertical employee-drag-icon"></i>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div style="padding: 20px; text-align: center; color: #9ca3af;">Không có nhân viên</div>
+                }
             </div>
         </div>
 
@@ -184,53 +201,17 @@
         </div>
     </div>
 </div>
-
 @section Scripts {
-    <!-- ✅ XÓA script cũ trong _Layout, chỉ load 1 lần ở đây -->
-    @* <script src="~/js/lichlamviec.js" asp-append-version="true"></script> *@
-
+    <script src="~/js/lichlamviec.js" asp-append-version="true"></script>
     <script>
-        // ✅ FIX: Đảm bảo init chỉ chạy 1 lần và đúng thời điểm
-        (function() {
-            let initialized = false;
-
-            function tryInit() {
-                // Kiểm tra xem đã khởi tạo chưa
-                if (initialized) {
-                    console.log('⚠️ Already initialized, skipping...');
-                    return;
-                }
-
-                // Kiểm tra các element cần thiết đã tồn tại chưa
-                const employeesList = document.getElementById('employeesList');
-                const searchEmployee = document.getElementById('searchEmployee');
-                const scheduleCells = document.querySelectorAll('.schedule-cell');
-
-                if (!employeesList || !searchEmployee || scheduleCells.length === 0) {
-                    console.log('⏳ Waiting for DOM elements...');
-                    setTimeout(tryInit, 100);
-                    return;
-                }
-
-                // Kiểm tra hàm init có tồn tại không
-                if (typeof window.init !== 'function') {
-                    console.error('❌ Function init() not found! Check lichlamviec.js');
-                    return;
-                }
-
-                console.log('🚀 All elements ready, initializing...');
-                initialized = true;
-
-                // Gọi hàm init
+        // Init sau khi trang load xong
+        console.log('🔥 View loaded, calling init in 100ms...');
+        setTimeout(function() {
+            if (typeof window.init === 'function') {
                 window.init();
-            }
-
-            // Bắt đầu thử khởi tạo
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', tryInit);
             } else {
-                setTimeout(tryInit, 50);
+                console.error('window.init not found!');
             }
-        })();
+        }, 100);
     </script>
 }

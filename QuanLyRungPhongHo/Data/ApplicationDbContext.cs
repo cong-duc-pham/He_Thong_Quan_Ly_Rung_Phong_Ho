@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using QLRungPhongHo.Models;
 using QuanLyRungPhongHo.Models;
 
 namespace QuanLyRungPhongHo.Data

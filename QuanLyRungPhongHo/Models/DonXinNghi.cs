@@ -1,10 +1,9 @@
 ﻿// Models/DonXinNghi.cs
-using QuanLyRungPhongHo.Models;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace QLRungPhongHo.Models
+namespace QuanLyRungPhongHo.Models
 {
     [Table("DonXinNghis")]
     public class DonXinNghi

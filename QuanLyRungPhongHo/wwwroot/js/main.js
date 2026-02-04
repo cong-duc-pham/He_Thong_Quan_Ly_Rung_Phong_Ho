@@ -300,13 +300,15 @@
             [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]')).map(el => new bootstrap.Popover(el));
         }
 
-        $('.btn-delete, .delete-button').off('click').on('click', function (e) {
-            if (!confirm('Bạn có chắc chắn muốn xóa không?')) {
-                e.preventDefault();
-                e.stopPropagation();
-                return false;
-            }
-        });
+        if (typeof $ !== 'undefined') {
+            $('.btn-delete, .delete-button').off('click').on('click', function (e) {
+                if (!confirm('Bạn có chắc chắn muốn xóa không?')) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
+                }
+            });
+        }
     }
 
     // Xử lý back/forward button

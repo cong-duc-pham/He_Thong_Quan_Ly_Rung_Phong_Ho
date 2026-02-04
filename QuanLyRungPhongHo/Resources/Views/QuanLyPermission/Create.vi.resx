@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="PageTitle">
+    <value>Thêm chức năng mới</value>
+  </data>
+  <data name="ModuleName">
+    <value>Tên Module</value>
+  </data>
+  <data name="ModuleNamePlaceholder">
+    <value>VD: Quản Lý Thiết Bị</value>
+  </data>
+  <data name="ModuleNameHelp">
+    <value>Module nhóm các quyền liên quan (VD: Lô Rừng, Nhân Sự...)</value>
+  </data>
+  <data name="PermissionCode">
+    <value>Mã quyền</value>
+  </data>
+  <data name="PermissionCodePlaceholder">
+    <value>VD: ThietBi.Create</value>
+  </data>
+  <data name="PermissionCodeHelp">
+    <value>Định dạng: Module.Action (VD: LoRung.Create)</value>
+  </data>
+  <data name="PermissionName">
+    <value>Tên quyền</value>
+  </data>
+  <data name="PermissionNamePlaceholder">
+    <value>VD: Tạo mới Thiết bị</value>
+  </data>
+  <data name="Description">
+    <value>Mô tả (tùy chọn)</value>
+  </data>
+  <data name="IsActive">
+    <value>Kích hoạt ngay</value>
+  </data>
+  <data name="Back">
+    <value>Quay lại</value>
+  </data>
+  <data name="Save">
+    <value>Lưu lại</value>
+  </data>
+  <data name="Required">
+    <value>Trường này là bắt buộc</value>
+  </data>
+  <data name="Cancel">
+    <value>Hủy</value>
+  </data>
+  <data name="Success">
+    <value>Thành công</value>
+  </data>
+  <data name="Error">
+    <value>Lỗi</value>
+  </data>
+  <data name="CreateSuccess">
+    <value>Tạo quyền mới thành công</value>
+  </data>
+  <data name="CreateError">
+    <value>Có lỗi xảy ra khi tạo quyền mới</value>
+  </data>
+  <data name="DuplicateCode">
+    <value>Mã quyền đã tồn tại trong hệ thống</value>
+  </data>
+  <data name="InvalidFormat">
+    <value>Định dạng không hợp lệ</value>
+  </data>
+</root>

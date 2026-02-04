@@ -1,13 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using QLRungPhongHo.Models;
 using QuanLyRungPhongHo.Data;
+using QuanLyRungPhongHo.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace QLRungPhongHo.Controllers
+namespace QuanLyRungPhongHo.Controllers
 {
     public class LichLamViecController : Controller
     {
@@ -18,8 +18,19 @@ namespace QLRungPhongHo.Controllers
             _context = context;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
+            // Load danh sách nhân viên sẵn vào View
+            var employees = await _context.NhanSus
+                .Select(n => new
+                {
+                    id = n.MaNV,
+                    name = n.HoTen,
+                    role = n.ChucVu
+                })
+                .ToListAsync();
+            
+            ViewBag.Employees = employees;
             return View();
         }
 
@@ -198,8 +209,10 @@ namespace QLRungPhongHo.Controllers
                                 MaCa = item.ShiftId,
                                 NgayLamViec = date,
                                 TrangThai = "Đã phân công",
+                                GhiChu = "",
                                 NgayTao = DateTime.Now,
-                                NguoiTao = currentUserId
+                                NguoiTao = currentUserId,
+                                MaLo = null
                             };
 
                             _context.LichLamViecs.Add(newSchedule);
@@ -225,6 +238,17 @@ namespace QLRungPhongHo.Controllers
             {
                 Console.WriteLine($"❌ ERROR: {ex.Message}");
                 Console.WriteLine($"Stack: {ex.StackTrace}");
+                
+                // Log inner exception if exists
+                if (ex.InnerException != null)
+                {
+                    Console.WriteLine($"❌ INNER ERROR: {ex.InnerException.Message}");
+                    if (ex.InnerException.InnerException != null)
+                    {
+                        Console.WriteLine($"❌ INNER INNER ERROR: {ex.InnerException.InnerException.Message}");
+                    }
+                }
+                
                 return Json(new { success = false, message = "Lỗi: " + ex.Message });
             }
         }

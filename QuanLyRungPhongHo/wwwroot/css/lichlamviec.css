@@ -1,0 +1,806 @@
+﻿/* ========================================
+   RESET & BASE STYLES
+   ======================================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f5f7fa;
+}
+
+/* Override container styles from layout */
+.container,
+.container-fluid {
+    max-width: 100% !important;
+}
+
+#main-content {
+    padding: 0 !important;
+}
+
+    #main-content .container-fluid {
+        padding: 1.5rem !important;
+    }
+
+/* ========================================
+   PAGE HEADER
+   ======================================== */
+.page-header {
+    background: white;
+    padding: 24px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    margin-bottom: 24px;
+}
+
+    .page-header h1 {
+        font-size: 28px;
+        color: #1a1a1a;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 8px;
+    }
+
+        .page-header h1 i {
+            color: #16a34a;
+        }
+
+    .page-header p {
+        color: #6b7280;
+        font-size: 14px;
+        margin: 0;
+    }
+
+/* ========================================
+   CONTROLS BAR
+   ======================================== */
+.controls {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    margin-bottom: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.week-selector {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.week-nav-btn {
+    width: 36px;
+    height: 36px;
+    border: 1px solid #e5e7eb;
+    background: white;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+    .week-nav-btn:hover {
+        background: #f0fdf4;
+        border-color: #16a34a;
+        color: #16a34a;
+        transform: scale(1.05);
+    }
+
+    .week-nav-btn:active {
+        transform: scale(0.95);
+    }
+
+.week-info {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1a1a1a;
+    padding: 0 16px;
+    min-width: 260px;
+    text-align: center;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+/* ========================================
+   BUTTONS
+   ======================================== */
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+    .btn:active {
+        transform: scale(0.98);
+    }
+
+.btn-primary {
+    background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+    color: white;
+}
+
+    .btn-primary:hover {
+        background: linear-gradient(135deg, #15803d 0%, #166534 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(22, 163, 74, 0.4);
+    }
+
+.btn-secondary {
+    background: white;
+    color: #374151;
+    border: 1px solid #e5e7eb;
+}
+
+    .btn-secondary:hover {
+        background: #f0fdf4;
+        border-color: #16a34a;
+        color: #16a34a;
+    }
+
+/* ========================================
+   MAIN LAYOUT - ✅ FIX
+   ======================================== */
+.main-layout {
+    display: flex;
+    gap: 20px;
+    align-items: start;
+    overflow-x: hidden;
+}
+
+/* ========================================
+   EMPLOYEES PANEL (SIDEBAR) - ✅ FIX
+   ======================================== */
+.employees-panel {
+    width: 320px;
+    min-width: 320px;
+    max-width: 320px;
+    flex-shrink: 0;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    height: fit-content;
+    position: sticky;
+    top: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.panel-header {
+    padding: 20px;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+    .panel-header h3 {
+        font-size: 16px;
+        color: #1a1a1a;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+.search-box {
+    position: relative;
+}
+
+    .search-box input {
+        width: 100%;
+        padding: 10px 12px 10px 36px;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        font-size: 14px;
+        transition: all 0.2s;
+    }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #16a34a;
+            box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
+        }
+
+    .search-box i {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #9ca3af;
+        font-size: 14px;
+    }
+
+/* ========================================
+   STATISTICS BAR
+   ======================================== */
+.stats-bar {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+    padding: 0 16px;
+}
+
+.stat-card {
+    flex: 1;
+    background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+    color: white;
+    padding: 14px;
+    border-radius: 8px;
+    text-align: center;
+    transition: transform 0.2s;
+}
+
+    .stat-card:hover {
+        transform: translateY(-2px);
+    }
+
+.stat-card-assigned {
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+}
+
+.stat-label {
+    font-size: 11px;
+    opacity: 0.9;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.stat-value {
+    font-size: 24px;
+    font-weight: 700;
+}
+
+/* ========================================
+   EMPLOYEES LIST - ✅ FIX
+   ======================================== */
+.employees-list {
+    padding: 16px;
+    max-height: calc(100vh - 450px);
+    min-height: 200px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.employee-card {
+    background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+    color: white;
+    padding: 12px;
+    border-radius: 8px;
+    cursor: move;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    user-select: none;
+    flex-shrink: 0;
+}
+
+    .employee-card:hover {
+        transform: translateX(4px);
+        box-shadow: 0 4px 12px rgba(22, 163, 74, 0.4);
+    }
+
+    .employee-card.dragging {
+        opacity: 0.4;
+        transform: rotate(2deg) scale(0.95);
+    }
+
+.employee-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    flex-shrink: 0;
+    font-size: 14px;
+}
+
+.employee-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.employee-name {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.employee-role {
+    font-size: 12px;
+    opacity: 0.9;
+}
+
+.employee-drag-icon {
+    opacity: 0.6;
+    font-size: 14px;
+}
+
+/* ========================================
+   SCHEDULE PANEL - ✅ FIX
+   ======================================== */
+.schedule-panel {
+    flex: 1;
+    min-width: 0;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    overflow: hidden;
+}
+
+.schedule-header {
+    padding: 20px;
+    border-bottom: 2px solid #f3f4f6;
+}
+
+    .schedule-header h3 {
+        font-size: 18px;
+        color: #1a1a1a;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin: 0;
+    }
+
+.schedule-grid {
+    padding: 20px;
+    overflow-x: auto;
+}
+
+/* ========================================
+   SCHEDULE TABLE
+   ======================================== */
+.schedule-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    min-width: 900px;
+}
+
+    .schedule-table th {
+        background: #f9fafb;
+        padding: 16px 12px;
+        text-align: center;
+        font-weight: 600;
+        font-size: 14px;
+        color: #374151;
+        border-bottom: 2px solid #e5e7eb;
+    }
+
+        .schedule-table th:first-child {
+            text-align: left;
+            padding-left: 20px;
+        }
+
+/* ========================================
+   SHIFT LABELS
+   ======================================== */
+.shift-label {
+    padding: 16px 20px;
+    font-weight: 600;
+    font-size: 14px;
+    color: #374151;
+    background: #f9fafb;
+    border-right: 2px solid #e5e7eb;
+    white-space: nowrap;
+}
+
+    .shift-label i {
+        margin-right: 8px;
+    }
+
+    .shift-label.morning {
+        color: #ea580c;
+    }
+
+    .shift-label.afternoon {
+        color: #16a34a;
+    }
+
+    .shift-label.evening {
+        color: #2563eb;
+    }
+
+/* ========================================
+   DAY HEADERS
+   ======================================== */
+.day-header {
+    text-align: center;
+    transition: background-color 0.2s;
+}
+
+.day-name {
+    font-size: 13px;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.day-date {
+    font-size: 18px;
+    color: #1a1a1a;
+    margin-top: 4px;
+    font-weight: 600;
+}
+
+.day-header.weekend {
+    background: #fef3c7;
+}
+
+.day-header.today {
+    background: #dcfce7;
+}
+
+    .day-header.today .day-date {
+        color: #16a34a;
+    }
+
+/* ========================================
+   SCHEDULE CELLS
+   ======================================== */
+.schedule-cell {
+    padding: 8px;
+    min-height: 120px;
+    border: 1px solid #e5e7eb;
+    background: white;
+    position: relative;
+    vertical-align: top;
+    transition: all 0.2s;
+}
+
+    .schedule-cell.weekend {
+        background: #fffbeb;
+    }
+
+    .schedule-cell.drag-over {
+        background: #f0fdf4;
+        border: 2px dashed #16a34a;
+        box-shadow: inset 0 0 0 2px rgba(22, 163, 74, 0.1);
+    }
+
+/* ========================================
+   ASSIGNED EMPLOYEES
+   ======================================== */
+.assigned-employee {
+    background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+    color: white;
+    padding: 8px 10px;
+    border-radius: 6px;
+    margin-bottom: 6px;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: move;
+    transition: all 0.2s;
+    opacity: 0;
+    transform: translateY(10px);
+    user-select: none;
+}
+
+    .assigned-employee:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(22, 163, 74, 0.3);
+    }
+
+    .assigned-employee.dragging {
+        opacity: 0.4;
+        transform: rotate(2deg) scale(0.95);
+    }
+
+.assigned-employee-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    min-width: 0;
+}
+
+    .assigned-employee-info span {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+.assigned-avatar {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+.remove-btn {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    border: none;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+
+    .remove-btn i {
+        font-size: 10px;
+    }
+
+.assigned-employee:hover .remove-btn {
+    opacity: 1;
+}
+
+.remove-btn:hover {
+    background: rgba(239, 68, 68, 0.9);
+    transform: scale(1.15);
+}
+
+/* ========================================
+   CELL COUNT BADGE
+   ======================================== */
+.cell-count {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    background: #16a34a;
+    color: white;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* ========================================
+   LEGEND
+   ======================================== */
+.legend {
+    display: flex;
+    gap: 20px;
+    padding: 16px 20px;
+    background: #f9fafb;
+    border-top: 1px solid #e5e7eb;
+    flex-wrap: wrap;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #6b7280;
+}
+
+.legend-color {
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+}
+
+/* ========================================
+   TOAST NOTIFICATIONS
+   ======================================== */
+.toast-notification {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    background: white;
+    padding: 16px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    z-index: 9999;
+    opacity: 0;
+    transform: translateX(400px);
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    max-width: 400px;
+}
+
+    .toast-notification.show {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    .toast-notification i {
+        font-size: 20px;
+        flex-shrink: 0;
+    }
+
+    .toast-notification span {
+        flex: 1;
+        font-size: 14px;
+        color: #1a1a1a;
+    }
+
+.toast-success {
+    border-left: 4px solid #16a34a;
+}
+
+    .toast-success i {
+        color: #16a34a;
+    }
+
+.toast-error {
+    border-left: 4px solid #ef4444;
+}
+
+    .toast-error i {
+        color: #ef4444;
+    }
+
+.toast-warning {
+    border-left: 4px solid #f59e0b;
+}
+
+    .toast-warning i {
+        color: #f59e0b;
+    }
+
+.toast-info {
+    border-left: 4px solid #3b82f6;
+}
+
+    .toast-info i {
+        color: #3b82f6;
+    }
+
+/* ========================================
+   SCROLLBAR
+   ======================================== */
+.employees-list::-webkit-scrollbar,
+.schedule-grid::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+.employees-list::-webkit-scrollbar-track,
+.schedule-grid::-webkit-scrollbar-track {
+    background: #f3f4f6;
+}
+
+.employees-list::-webkit-scrollbar-thumb,
+.schedule-grid::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 3px;
+}
+
+    .employees-list::-webkit-scrollbar-thumb:hover,
+    .schedule-grid::-webkit-scrollbar-thumb:hover {
+        background: #9ca3af;
+    }
+
+/* ========================================
+   RESPONSIVE DESIGN
+   ======================================== */
+@media (max-width: 1200px) {
+    .main-layout {
+        flex-direction: column;
+    }
+
+    .employees-panel {
+        position: relative;
+        top: 0;
+        width: 100%;
+        max-width: 100%;
+        min-width: 100%;
+        max-height: 400px;
+    }
+
+    .employees-list {
+        max-height: 280px;
+    }
+
+    .controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .week-selector {
+        justify-content: center;
+    }
+
+    .action-buttons {
+        justify-content: center;
+    }
+
+    .week-info {
+        min-width: auto;
+    }
+}
+
+@media (max-width: 768px) {
+    #main-content .container-fluid {
+        padding: 0.75rem !important;
+    }
+
+    .page-header h1 {
+        font-size: 22px;
+    }
+
+    .btn {
+        font-size: 13px;
+        padding: 8px 16px;
+    }
+
+    .stats-bar {
+        flex-direction: column;
+    }
+
+    .schedule-grid {
+        padding: 12px;
+    }
+
+    .toast-notification {
+        right: 10px;
+        left: 10px;
+        max-width: none;
+    }
+}
+
+/* ========================================
+   PRINT STYLES
+   ======================================== */
+@media print {
+    .employees-panel,
+    .controls,
+    .remove-btn {
+        display: none !important;
+    }
+
+    .main-layout {
+        flex-direction: column;
+    }
+
+    .schedule-panel {
+        box-shadow: none;
+    }
+
+    .assigned-employee {
+        break-inside: avoid;
+    }
+}

@@ -29,8 +29,8 @@
             <!-- Form không submit, chỉ nhập dữ liệu -->
             <div id="nhansuSearchForm" class="row g-3 align-items-center">
                 <div class="col-md-4">
-                    <input type="text" id="nhansuSearchInput" name="searchString" class="form-control" 
-                           placeholder="Tìm theo tên hoặc SĐT..." value="">
+                    <input type="text" id="nhansuSearchInput" name="searchString" class="form-control"
+                        placeholder="Tìm theo tên hoặc SĐT..." value="">
                 </div>
                 <div class="col-md-3">
                     <select id="nhansuXaFilter" name="maXaFilter" class="form-select">
@@ -81,7 +81,7 @@
             </thead>
             <tbody id="nhansuTableBody">
                 @if (Model.Any())
-                {   
+                {
                     foreach (var item in Model)
                     {
                         <tr>
@@ -121,7 +121,9 @@
                 }
                 else
                 {
-                    <tr><td colspan="6" class="text-center text-muted py-3">Không có dữ liệu</td></tr>
+                    <tr>
+                        <td colspan="6" class="text-center text-muted py-3">Không có dữ liệu</td>
+                    </tr>
                 }
             </tbody>
         </table>
@@ -145,8 +147,10 @@
                     }
                     <p class="mb-2 small"><i class="bi bi-person"></i> TK: @item.TenDangNhap</p>
                     <div class="d-flex gap-2">
-                        <button class="btn btn-outline-primary btn-sm flex-fill" onclick="editData(@item.MaNV, event)">Sửa</button>
-                        <button class="btn btn-outline-danger btn-sm flex-fill" onclick="deleteData(@item.MaNV)">Xóa</button>
+                        <button class="btn btn-outline-primary btn-sm flex-fill"
+                            onclick="editData(@item.MaNV, event)">Sửa</button>
+                        <button class="btn btn-outline-danger btn-sm flex-fill"
+                            onclick="deleteData(@item.MaNV)">Xóa</button>
                     </div>
                 </div>
             </div>
@@ -155,85 +159,127 @@
 </div>
 
 <div class="modal fade" id="nhanSuModal" tabindex="-1" data-bs-backdrop="static">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header bg-success text-white">
-                <h5 class="modal-title" id="modalTitle">Thêm Nhân sự</h5>
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-gradient"
+                style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%);">
+                <h5 class="modal-title text-white fw-bold" id="modalTitle">
+                    <i class="bi bi-person-plus-fill me-2"></i>Thêm Nhân sự
+                </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body p-4" style="max-height: 70vh; overflow-y: auto;">
                 <form id="frmNhanSu" novalidate>
                     @Html.AntiForgeryToken()
                     <input type="hidden" id="MaNV" name="MaNV" value="0">
-                    
-                    <div class="mb-3">
-                        <label class="form-label">Họ tên <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" name="HoTen" id="HoTen" required>
-                        <div class="invalid-feedback">Vui lòng nhập họ tên</div>
-                    </div>
-                    <div class="row">
-                        <div class="col-6 mb-3">
-                            <label class="form-label">Chức vụ <span class="text-danger">*</span></label>
-                            <select class="form-select" name="ChucVu" id="ChucVu" required>
-                                <option value="">-- Chọn --</option>
-                                <option value="Kiểm lâm viên">Kiểm lâm viên</option>
-                                <option value="Trạm trưởng">Trạm trưởng</option>
-                                <option value="Bảo vệ rừng">Bảo vệ rừng</option>
-                            </select>
-                            <div class="invalid-feedback">Vui lòng chọn chức vụ</div>
+
+                    <!-- Thông tin cá nhân -->
+                    <div class="mb-4">
+                        <h6 class="text-success fw-bold mb-3 pb-2 border-bottom border-success">
+                            <i class="bi bi-person-circle me-2"></i>Thông tin cá nhân
+                        </h6>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Họ tên <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control form-control-sm" name="HoTen" id="HoTen"
+                                    required>
+                                <div class="invalid-feedback"></div>
+                                <div class="valid-feedback"></div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Chức vụ <span class="text-danger">*</span></label>
+                                <select class="form-select form-select-sm" name="ChucVu" id="ChucVu" required>
+                                    <option value="">-- Chọn --</option>
+                                    <option value="Kiểm lâm">Kiểm lâm</option>
+                                    <option value="Phó Kiểm lâm">Phó Kiểm lâm</option>
+                                    <option value="Trưởng trạm">Trưởng trạm</option>
+                                    <option value="Phó trạm">Phó trạm</option>
+                                    <option value="Nhân viên bảo vệ rừng">Nhân viên bảo vệ rừng</option>
+                                    <option value="Cán bộ kỹ thuật">Cán bộ kỹ thuật</option>
+                                    <option value="Hướng dẫn viên">Hướng dẫn viên</option>
+                                </select>
+                                <div class="invalid-feedback"></div>
+                                <div class="valid-feedback"></div>
+                            </div>
                         </div>
-                        <div class="col-6 mb-3">
-                            <label class="form-label">SĐT <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" name="SDT" id="SDT"
-                                   pattern="^(03|05|07|08|09|01[2689])[0-9]{8}$" required>
-                            <div class="invalid-feedback">SĐT không hợp lệ (VD: 0912345678)</div>
+
+                        <div class="row g-3 mt-1">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Số điện thoại <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" class="form-control form-control-sm" name="SDT" id="SDT"
+                                    pattern="^(03|05|07|08|09|01[2|6|8|9])+([0-9]{8})$" required>
+                                <div class="invalid-feedback"></div>
+                                <div class="valid-feedback"></div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Email <span class="text-danger">*</span></label>
+                                <input type="email" class="form-control form-control-sm" name="Email" id="Email"
+                                    placeholder="email@example.com" required>
+                                <div class="invalid-feedback"></div>
+                                <div class="valid-feedback"></div>
+                            </div>
+                        </div>
+                        <div class="row g-3 mt-1">
+                            <div class="col-md-12">
+                                <label class="form-label fw-semibold">Địa bàn quản lý <span
+                                        class="text-danger">*</span></label>
+                                @Html.DropDownList("MaXa", (SelectList)ViewBag.DsXa, "-- Chọn địa bàn --",
+                                new { @class = "form-select form-select-sm", @id = "MaXa", required = "required" })
+                                <div class="invalid-feedback"></div>
+                                <div class="valid-feedback"></div>
+                            </div>
                         </div>
                     </div>
+
+                    <!-- Thông tin tài khoản -->
                     <div class="mb-3">
-                        <label class="form-label">Email</label>
-                        <input type="email" class="form-control" name="Email" id="Email" 
-                               placeholder="email@example.com">
-                        <div class="invalid-feedback">Email không hợp lệ</div>
-                        <small class="text-muted">Email dùng để khôi phục mật khẩu</small>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Địa bàn quản lý <span class="text-danger">*</span></label>
-                        @Html.DropDownList("MaXa", (SelectList)ViewBag.DsXa, "-- Chọn địa bàn --", 
-                            new { @class = "form-select", @id = "MaXa", required = "required" })
-                        <div class="invalid-feedback">Vui lòng chọn địa bàn</div>
-                    </div>
-                    
-                    <hr>
-                    <h6 class="text-muted">Thông tin tài khoản</h6>
-                    <div class="mb-3">
-                        <label class="form-label">Tên đăng nhập <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" name="TenDangNhap" id="TenDangNhap" 
-                               pattern="^[a-zA-Z0-9_]{5,50}$" required>
-                        <div class="invalid-feedback">5-50 ký tự, chỉ chữ, số và gạch dưới</div>
-                    </div>
-                    <div class="row">
-                         <div class="col-6 mb-3">
-                            <label class="form-label">Mật khẩu <span class="text-danger" id="passRequired">*</span></label>
-                            <input type="password" class="form-control" name="MatKhau" id="MatKhau" 
-                                   minlength="6" placeholder="Tối thiểu 6 ký tự">
-                            <div class="invalid-feedback">Mật khẩu tối thiểu 6 ký tự</div>
-                            <small class="text-muted" id="passNote" style="display:none;">Để trống nếu không đổi</small>
+                        <h6 class="text-success fw-bold mb-3 pb-2 border-bottom border-success">
+                            <i class="bi bi-shield-lock-fill me-2"></i>Thông tin tài khoản
+                        </h6>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Tên đăng nhập <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" class="form-control form-control-sm" name="TenDangNhap"
+                                    id="TenDangNhap" pattern="^[a-zA-Z0-9_]{5,50}$" required>
+                                <div class="invalid-feedback"></div>
+                                <div class="valid-feedback"></div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Quyền <span class="text-danger">*</span></label>
+                                <select class="form-select form-select-sm" name="Quyen" id="Quyen" required>
+                                    <option value="Kiem_Lam">Kiểm lâm</option>
+                                    <option value="QuanLy_Xa">Quản lý Xã</option>
+                                    <option value="Admin_Tinh">Admin Tỉnh</option>
+                                </select>
+                                <div class="invalid-feedback"></div>
+                                <div class="valid-feedback"></div>
+                            </div>
                         </div>
-                        <div class="col-6 mb-3">
-                            <label class="form-label">Quyền <span class="text-danger">*</span></label>
-                             <select class="form-select" name="Quyen" id="Quyen" required>
-                                <option value="NhanVien_Thon">Nhân viên</option>
-                                <option value="QuanLy_Xa">Quản lý</option>
-                                <option value="Admin_Tinh">Admin</option>
-                            </select>
+                        <div class="row g-3 mt-1">
+                            <div class="col-md-12">
+                                <label class="form-label fw-semibold">
+                                    Mật khẩu <span class="text-danger" id="passRequired">*</span>
+                                </label>
+                                <input type="password" class="form-control form-control-sm" name="MatKhau" id="MatKhau"
+                                    minlength="6" placeholder="Tối thiểu 6 ký tự">
+                                <div class="invalid-feedback"></div>
+                                <div class="valid-feedback"></div>
+                                <small class="text-muted" id="passNote" style="display:none;">
+                                    <i class="bi bi-info-circle"></i> Để trống nếu không đổi
+                                </small>
+                            </div>
                         </div>
                     </div>
                 </form>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                <button type="button" class="btn btn-success" onclick="saveData()" id="btnSave">
-                    <i class="bi bi-save"></i> Lưu dữ liệu
+            <div class="modal-footer bg-light">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle me-1"></i>Đóng
+                </button>
+                <button type="button" class="btn btn-success shadow-sm" onclick="saveData()" id="btnSave">
+                    <i class="bi bi-check-circle me-1"></i>Lưu dữ liệu
                 </button>
             </div>
         </div>
@@ -241,5 +287,6 @@
 </div>
 
 @section Scripts {
+    <script src="~/js/nhansu-validator.js" asp-append-version="true"></script>
     <script src="~/js/nhansu.js" asp-append-version="true"></script>
 }

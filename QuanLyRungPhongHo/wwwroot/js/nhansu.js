@@ -147,6 +147,17 @@
                 } catch(e) {}
             }, 5000);
         });
+
+        // Khởi tạo tooltips
+        initTooltips();
+    }
+
+    // Khởi tạo Bootstrap tooltips
+    function initTooltips() {
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
     }
 
     if (document.readyState === 'loading') {
@@ -157,6 +168,24 @@
 
     window.NhanSuSearchInit = init;
 })();
+
+// Toggle hiển thị mật khẩu
+function togglePassword(fieldId) {
+    const field = document.getElementById(fieldId);
+    const icon = document.getElementById(fieldId + '-icon');
+    
+    if (!field || !icon) return;
+    
+    if (field.type === 'password') {
+        field.type = 'text';
+        icon.classList.remove('bi-eye');
+        icon.classList.add('bi-eye-slash');
+    } else {
+        field.type = 'password';
+        icon.classList.remove('bi-eye-slash');
+        icon.classList.add('bi-eye');
+    }
+}
 
 // Mở modal thêm nhân sự mới
 function openModal() {
@@ -179,6 +208,26 @@ function openModal() {
     const passNote = document.getElementById('passNote');
     if (passRequired) passRequired.style.display = 'inline';
     if (passNote) passNote.style.display = 'none';
+    
+    // Clear validation states
+    const fields = ['HoTen', 'SDT', 'Email', 'TenDangNhap', 'MatKhau', 'ChucVu', 'MaXa', 'Quyen'];
+    fields.forEach(fieldId => {
+        const field = document.getElementById(fieldId);
+        if (field && window.NhanSuValidatorClient) {
+            window.NhanSuValidatorClient.clearValidation(field);
+        }
+    });
+    
+    // ⚠️ QUAN TRỌNG: Bind events SAU KHI modal đã show
+    modalElement.addEventListener('shown.bs.modal', function bindEventsAfterShow() {
+        console.log('🔄 Modal đã show - Re-initializing validator...');
+        if (window.NhanSuValidatorClient) {
+            window.NhanSuValidatorClient.bindEvents();
+        }
+        console.log('✅ Validation realtime đã sẵn sàng!');
+        // Remove listener sau khi đã bind (chỉ bind 1 lần)
+        modalElement.removeEventListener('shown.bs.modal', bindEventsAfterShow);
+    }, { once: true });
     
     modal.show();
 }
@@ -217,7 +266,7 @@ function editData(id, event) {
             document.getElementById('Email').value = res.email || '';
             document.getElementById('MaXa').value = res.maXa || '';
             document.getElementById('TenDangNhap').value = res.tenDangNhap || '';
-            document.getElementById('Quyen').value = res.quyen || 'NhanVien_Thon';
+            document.getElementById('Quyen').value = res.quyen || 'Kiem_Lam';
             
             // Mật khẩu không bắt buộc khi sửa
             const matKhauField = document.getElementById('MatKhau');
@@ -231,6 +280,26 @@ function editData(id, event) {
             if (passNote) passNote.style.display = 'block';
 
             document.getElementById('modalTitle').textContent = 'Cập nhật Nhân sự';
+
+            // Clear validation states trước
+            const fields = ['HoTen', 'SDT', 'Email', 'TenDangNhap', 'MatKhau', 'ChucVu', 'MaXa', 'Quyen'];
+            fields.forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                if (field && window.NhanSuValidatorClient) {
+                    window.NhanSuValidatorClient.clearValidation(field);
+                }
+            });
+            
+            // ⚠️ QUAN TRỌNG: Bind events SAU KHI modal đã show
+            modalElement.addEventListener('shown.bs.modal', function bindEventsAfterShow() {
+                console.log('🔄 Modal đã show - Re-initializing validator...');
+                if (window.NhanSuValidatorClient) {
+                    window.NhanSuValidatorClient.bindEvents();
+                }
+                console.log('✅ Validation realtime đã sẵn sàng!');
+                // Remove listener sau khi đã bind (chỉ bind 1 lần)
+                modalElement.removeEventListener('shown.bs.modal', bindEventsAfterShow);
+            }, { once: true });
 
             const modal = bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement, { backdrop: 'static', keyboard: false });
             modal.show();
@@ -247,6 +316,35 @@ function editData(id, event) {
 // Lưu nhân sự
 function saveData() {
     const form = document.getElementById('frmNhanSu');
+    
+    // === VALIDATE VỚI REALTIME VALIDATION ===
+    if (window.NhanSuValidatorClient && !window.NhanSuValidatorClient.validateForm()) {
+        // Hiển thị thông báo
+        const alertDiv = document.createElement('div');
+        alertDiv.className = 'alert alert-danger alert-dismissible fade show mt-3';
+        alertDiv.innerHTML = `
+            <i class="bi bi-exclamation-triangle"></i> 
+            Vui lòng kiểm tra lại các trường đánh dấu đỏ!
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        
+        const modalBody = form.parentElement;
+        const existingAlert = modalBody.querySelector('.alert-danger');
+        if (existingAlert) existingAlert.remove();
+        
+        modalBody.insertBefore(alertDiv, form);
+        
+        // Auto close sau 5s
+        setTimeout(() => {
+            try {
+                new bootstrap.Alert(alertDiv).close();
+            } catch(e) {}
+        }, 5000);
+        
+        return;
+    }
+    
+    // Fallback: Nếu không có NhanSuValidatorClient, dùng native HTML5 validation
     if (!form.checkValidity()) {
         form.classList.add('was-validated');
         return;
@@ -254,7 +352,7 @@ function saveData() {
 
     const btnSave = document.getElementById('btnSave');
     btnSave.disabled = true;
-    btnSave.innerHTML = 'Đang lưu...';
+    btnSave.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Đang lưu...';
 
     const formData = new FormData(form);
     const maNV = parseInt(formData.get('MaNV')) || 0;
@@ -266,7 +364,7 @@ function saveData() {
     const tokenInput = form.querySelector('input[name="__RequestVerificationToken"]');
     if (!tokenInput) {
         btnSave.disabled = false;
-        btnSave.innerHTML = 'Lưu dữ liệu';
+        btnSave.innerHTML = '<i class="bi bi-save"></i> Lưu dữ liệu';
         return;
     }
 
@@ -281,16 +379,93 @@ function saveData() {
     .then(r => r.json())
     .then(res => {
         btnSave.disabled = false;
-        btnSave.innerHTML = 'Lưu dữ liệu';
+        btnSave.innerHTML = '<i class="bi bi-save"></i> Lưu dữ liệu';
         
         if (res.success) {
-            bootstrap.Modal.getInstance(document.getElementById('nhanSuModal'))?.hide();
-            setTimeout(() => location.reload(), 500);
+            // Hiển thị thông báo thành công
+            const successAlert = document.createElement('div');
+            successAlert.className = 'alert alert-success alert-dismissible fade show mt-3';
+            successAlert.innerHTML = `
+                <i class="bi bi-check-circle"></i> ${res.message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            
+            const modalBody = form.parentElement;
+            const existingAlert = modalBody.querySelector('.alert');
+            if (existingAlert) existingAlert.remove();
+            
+            modalBody.insertBefore(successAlert, form);
+            
+            // Đóng modal và reload sau 1s
+            setTimeout(() => {
+                bootstrap.Modal.getInstance(document.getElementById('nhanSuModal'))?.hide();
+                location.reload();
+            }, 1000);
+        } else {
+            // Xóa bất kỳ alert nào đang hiển thị ở trên
+            const modalBody = form.parentElement;
+            const existingAlert = modalBody.querySelector('.alert');
+            if (existingAlert) existingAlert.remove();
+            
+            console.log('🔍 Response lỗi:', res);
+            console.log('🔍 errorField:', res.errorField);
+            console.log('🔍 NhanSuValidatorClient exists:', !!window.NhanSuValidatorClient);
+            
+            // Hiển thị lỗi INLINE dưới input nếu có errorField
+            if (res.errorField) {
+                const field = document.getElementById(res.errorField);
+                console.log('🔍 Field element:', field);
+                
+                if (field && window.NhanSuValidatorClient) {
+                    // Hiển thị lỗi ngay dưới input
+                    console.log('✅ Hiển thị lỗi inline cho field:', res.errorField);
+                    window.NhanSuValidatorClient.showError(field, res.message);
+                    // Focus vào field bị lỗi
+                    field.focus();
+                    field.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                } else if (field) {
+                    // Fallback: Không có validator, tự tạo error message
+                    console.log('⚠️ Không có validator, tự tạo error inline');
+                    field.classList.add('is-invalid');
+                    const feedback = field.parentElement.querySelector('.invalid-feedback');
+                    if (feedback) {
+                        feedback.textContent = res.message;
+                        feedback.style.display = 'block';
+                    } else {
+                        // Tạo mới invalid-feedback
+                        const newFeedback = document.createElement('div');
+                        newFeedback.className = 'invalid-feedback d-block';
+                        newFeedback.textContent = res.message;
+                        field.parentElement.appendChild(newFeedback);
+                    }
+                    field.focus();
+                } else {
+                    console.error('❌ Không tìm thấy field:', res.errorField);
+                }
+            } else {
+                // Không có errorField - hiển thị message chung
+                console.error('⚠️ Lỗi không có errorField:', res.message);
+            }
         }
     })
-    .catch(() => {
+    .catch(err => {
         btnSave.disabled = false;
-        btnSave.innerHTML = 'Lưu dữ liệu';
+        btnSave.innerHTML = '<i class="bi bi-save"></i> Lưu dữ liệu';
+        
+        console.error('Lỗi:', err);
+        
+        const errorAlert = document.createElement('div');
+        errorAlert.className = 'alert alert-danger alert-dismissible fade show mt-3';
+        errorAlert.innerHTML = `
+            <i class="bi bi-x-circle"></i> Lỗi kết nối server!
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        
+        const modalBody = form.parentElement;
+        const existingAlert = modalBody.querySelector('.alert');
+        if (existingAlert) existingAlert.remove();
+        
+        modalBody.insertBefore(errorAlert, form);
     });
 }
 

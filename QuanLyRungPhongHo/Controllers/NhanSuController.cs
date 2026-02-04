@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using QuanLyRungPhongHo.Data;
 using QuanLyRungPhongHo.Models;
+using QuanLyRungPhongHo.Validators;
 using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
 using System.Security.Cryptography;
@@ -46,7 +47,7 @@ namespace QuanLyRungPhongHo.Controllers
 
                 if (!string.IsNullOrEmpty(searchString))
                 {
-                    query = query.Where(x => x.HoTen.Contains(searchString) || 
+                    query = query.Where(x => x.HoTen.Contains(searchString) ||
                                              (x.SDT != null && x.SDT.Contains(searchString)) ||
                                              (x.Email != null && x.Email.Contains(searchString)));
                 }
@@ -107,107 +108,117 @@ namespace QuanLyRungPhongHo.Controllers
             }
         }
 
-        // Lưu (Thêm hoặc Sửa) với validation chi tiết
+        // Lưu (Thêm hoặc Sửa) với validation chi tiết chuyên nghiệp
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<JsonResult> Save(NhanSuViewModel model)
         {
             try
             {
-                // Validation chi tiết
-                if (string.IsNullOrWhiteSpace(model.HoTen))
-                {
-                    return Json(new { success = false, message = "Họ tên không được để trống!" });
-                }
-                
-                if (string.IsNullOrWhiteSpace(model.ChucVu))
-                {
-                    return Json(new { success = false, message = "Vui lòng chọn chức vụ!" });
-                }
-                
-                if (string.IsNullOrWhiteSpace(model.SDT))
-                {
-                    return Json(new { success = false, message = "SĐT không được để trống!" });
-                }
-                
-                // Validate SĐT Việt Nam
-                if (!Regex.IsMatch(model.SDT, @"^(03|05|07|08|09|01[2|6|8|9])+([0-9]{8})$"))
-                {
-                    return Json(new { success = false, message = "Số điện thoại không đúng định dạng VN!" });
-                }
+                // 1. VALIDATION HỌ TÊN
+                var hoTenValidation = NhanSuValidator.ValidateHoTen(model.HoTen);
+                if (!hoTenValidation.IsValid)
+                    return Json(new { success = false, message = hoTenValidation.ErrorMessage, errorField = "HoTen" });
 
-                // Validate Email nếu có nhập
-                if (!string.IsNullOrWhiteSpace(model.Email))
-                {
-                    var emailAttribute = new EmailAddressAttribute();
-                    if (!emailAttribute.IsValid(model.Email))
-                    {
-                        return Json(new { success = false, message = "Email không đúng định dạng!" });
-                    }
-                }
-                
-                if (string.IsNullOrWhiteSpace(model.MaXa))
-                {
-                    return Json(new { success = false, message = "Vui lòng chọn địa bàn!" });
-                }
-                
-                if (string.IsNullOrWhiteSpace(model.TenDangNhap))
-                {
-                    return Json(new { success = false, message = "Tên đăng nhập không được để trống!" });
-                }
-                
-                // Validate username
-                if (!Regex.IsMatch(model.TenDangNhap, @"^[a-zA-Z0-9_]{5,50}$"))
-                {
-                    return Json(new { success = false, message = "Tên đăng nhập từ 5-50 ký tự, chỉ chữ, số và gạch dưới!" });
-                }
-                
-                // Kiểm tra mật khẩu khi thêm mới
-                if (model.MaNV == 0 && string.IsNullOrWhiteSpace(model.MatKhau))
-                {
-                    return Json(new { success = false, message = "Mật khẩu không được để trống khi thêm mới!" });
-                }
-                
-                if (!string.IsNullOrWhiteSpace(model.MatKhau) && model.MatKhau.Length < 6)
-                {
-                    return Json(new { success = false, message = "Mật khẩu phải có ít nhất 6 ký tự!" });
-                }
+                // 2. VALIDATION CHỨC VỤ
+                var chucVuValidation = NhanSuValidator.ValidateChucVu(model.ChucVu);
+                if (!chucVuValidation.IsValid)
+                    return Json(new { success = false, message = chucVuValidation.ErrorMessage, errorField = "ChucVu" });
+
+                // 3. VALIDATION SỐ ĐIỆN THOẠI
+                var sdtValidation = NhanSuValidator.ValidateSDT(model.SDT);
+                if (!sdtValidation.IsValid)
+                    return Json(new { success = false, message = sdtValidation.ErrorMessage, errorField = "SDT" });
+
+                // 4. VALIDATION EMAIL
+                var emailValidation = NhanSuValidator.ValidateEmail(model.Email);
+                if (!emailValidation.IsValid)
+                    return Json(new { success = false, message = emailValidation.ErrorMessage, errorField = "Email" });
+
+                // 5. VALIDATION MÃ XÃ
+                var maXaValidation = NhanSuValidator.ValidateMaXa(model.MaXa);
+                if (!maXaValidation.IsValid)
+                    return Json(new { success = false, message = maXaValidation.ErrorMessage, errorField = "MaXa" });
+
+                // 6. VALIDATION TÊN ĐĂNG NHẬP
+                var tenDangNhapValidation = NhanSuValidator.ValidateTenDangNhap(model.TenDangNhap);
+                if (!tenDangNhapValidation.IsValid)
+                    return Json(new { success = false, message = tenDangNhapValidation.ErrorMessage, errorField = "TenDangNhap" });
+
+                // 7. VALIDATION MẬT KHẨU
+                bool isPasswordRequired = (model.MaNV == 0); // Bắt buộc khi thêm mới
+                var matKhauValidation = NhanSuValidator.ValidateMatKhau(model.MatKhau, isPasswordRequired);
+                if (!matKhauValidation.IsValid)
+                    return Json(new { success = false, message = matKhauValidation.ErrorMessage, errorField = "MatKhau" });
+
+                // 8. VALIDATION QUYỀN
+                var quyenValidation = NhanSuValidator.ValidateQuyen(model.Quyen);
+                if (!quyenValidation.IsValid)
+                    return Json(new { success = false, message = quyenValidation.ErrorMessage, errorField = "Quyen" });
+
+                // 9. VALIDATION NGHIỆP VỤ: Quyền phù hợp với chức vụ
+                var quyenChucVuValidation = NhanSuValidator.ValidateQuyenVsChucVu(model.Quyen, model.ChucVu);
+                if (!quyenChucVuValidation.IsValid)
+                    return Json(new { success = false, message = quyenChucVuValidation.ErrorMessage });
+
+                // 10. CHUẨN HÓA DỮ LIỆU
+                model.HoTen = NhanSuValidator.NormalizeHoTen(model.HoTen);
+                model.SDT = NhanSuValidator.NormalizeSDT(model.SDT!);
+                model.Email = NhanSuValidator.NormalizeEmail(model.Email);
+                model.TenDangNhap = model.TenDangNhap?.Trim();
 
                 using (var transaction = await _context.Database.BeginTransactionAsync())
                 {
                     try
                     {
-                        // Kiểm tra trùng tên đăng nhập
+                        // 11. KIỂM TRA TRÙNG TÊN ĐĂNG NHẬP
                         var existingUsername = await _context.TaiKhoans
                             .Where(x => x.TenDangNhap == model.TenDangNhap && x.MaNV != model.MaNV)
                             .FirstOrDefaultAsync();
-                            
+
                         if (existingUsername != null)
                         {
-                            return Json(new { success = false, message = "Tên đăng nhập đã tồn tại!" });
+                            return Json(new { success = false, message = "Tên đăng nhập đã tồn tại! Vui lòng chọn tên khác.", errorField = "TenDangNhap" });
                         }
 
-                        // Kiểm tra trùng email
+                        // 12. KIỂM TRA TRÙNG SỐ ĐIỆN THOẠI
+                        var existingSDT = await _context.NhanSus
+                            .Where(x => x.SDT == model.SDT && x.MaNV != model.MaNV)
+                            .FirstOrDefaultAsync();
+
+                        if (existingSDT != null)
+                        {
+                            return Json(new { success = false, message = "Số điện thoại đã được sử dụng bởi nhân sự khác!", errorField = "SDT" });
+                        }
+
+                        // 13. KIỂM TRA TRÙNG EMAIL (nếu có)
                         if (!string.IsNullOrWhiteSpace(model.Email))
                         {
                             var existingEmail = await _context.NhanSus
                                 .Where(x => x.Email == model.Email && x.MaNV != model.MaNV)
                                 .FirstOrDefaultAsync();
-                                
+
                             if (existingEmail != null)
                             {
-                                return Json(new { success = false, message = "Email đã được sử dụng!" });
+                                return Json(new { success = false, message = "Email đã được sử dụng bởi nhân sự khác!", errorField = "Email" });
                             }
+                        }
+
+                        // 14. KIỂM TRA MÃ XÃ TỒN TẠI
+                        var xaExists = await _context.DanhMucXas.AnyAsync(x => x.MaXa == model.MaXa);
+                        if (!xaExists)
+                        {
+                            return Json(new { success = false, message = "Mã xã không tồn tại trong hệ thống!" });
                         }
 
                         if (model.MaNV == 0) // THÊM MỚI
                         {
                             var ns = new NhanSu
                             {
-                                HoTen = model.HoTen.Trim(),
+                                HoTen = model.HoTen,
                                 ChucVu = model.ChucVu,
-                                SDT = model.SDT.Trim(),
-                                Email = !string.IsNullOrWhiteSpace(model.Email) ? model.Email.Trim() : null,
+                                SDT = model.SDT,
+                                Email = !string.IsNullOrWhiteSpace(model.Email) ? model.Email : null,
                                 MaXa = model.MaXa
                             };
                             _context.NhanSus.Add(ns);
@@ -215,17 +226,18 @@ namespace QuanLyRungPhongHo.Controllers
 
                             // HASH mật khẩu trước khi lưu
                             string hashedPassword = HashPassword(model.MatKhau ?? "123456");
-                            
+
                             var tk = new TaiKhoan
                             {
                                 MaNV = ns.MaNV,
-                                TenDangNhap = model.TenDangNhap.Trim(),
-                                MatKhau = hashedPassword, // Lưu mật khẩu đã hash
-                                Quyen = model.Quyen ?? "NhanVien_Thon"
+                                TenDangNhap = model.TenDangNhap,
+                                MatKhau = hashedPassword,
+                                Quyen = model.Quyen ?? "Kiem_Lam",
+                                TrangThai = true
                             };
                             _context.TaiKhoans.Add(tk);
                             await _context.SaveChangesAsync();
-                            
+
                             await transaction.CommitAsync();
                             return Json(new { success = true, message = "Thêm nhân sự thành công!" });
                         }
@@ -237,39 +249,40 @@ namespace QuanLyRungPhongHo.Controllers
                                 return Json(new { success = false, message = "Không tìm thấy nhân sự!" });
                             }
 
-                            ns.HoTen = model.HoTen.Trim();
+                            ns.HoTen = model.HoTen;
                             ns.ChucVu = model.ChucVu;
-                            ns.SDT = model.SDT.Trim();
-                            ns.Email = !string.IsNullOrWhiteSpace(model.Email) ? model.Email.Trim() : null;
+                            ns.SDT = model.SDT;
+                            ns.Email = !string.IsNullOrWhiteSpace(model.Email) ? model.Email : null;
                             ns.MaXa = model.MaXa;
-                            
+
                             _context.NhanSus.Update(ns);
 
                             var tk = await _context.TaiKhoans.FirstOrDefaultAsync(t => t.MaNV == model.MaNV);
                             if (tk != null)
                             {
-                                tk.TenDangNhap = model.TenDangNhap.Trim();
+                                tk.TenDangNhap = model.TenDangNhap;
                                 tk.Quyen = model.Quyen ?? tk.Quyen;
-                                
+
                                 // HASH mật khẩu nếu người dùng nhập mật khẩu mới
                                 if (!string.IsNullOrWhiteSpace(model.MatKhau))
                                 {
                                     tk.MatKhau = HashPassword(model.MatKhau);
                                 }
-                                
+
                                 _context.TaiKhoans.Update(tk);
                             }
                             else
                             {
                                 // Tạo tài khoản mới nếu chưa có
                                 string hashedPassword = HashPassword(model.MatKhau ?? "123456");
-                                
+
                                 var newTk = new TaiKhoan
                                 {
                                     MaNV = model.MaNV,
-                                    TenDangNhap = model.TenDangNhap.Trim(),
+                                    TenDangNhap = model.TenDangNhap,
                                     MatKhau = hashedPassword,
-                                    Quyen = model.Quyen ?? "NhanVien_Thon"
+                                    Quyen = model.Quyen ?? "Kiem_Lam",
+                                    TrangThai = true
                                 };
                                 _context.TaiKhoans.Add(newTk);
                             }
@@ -292,7 +305,7 @@ namespace QuanLyRungPhongHo.Controllers
             }
         }
 
-        // Xóa với transaction
+        // Khóa/Mở khóa tài khoản (thay vì xóa để tránh ảnh hưởng dữ liệu liên quan)
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<JsonResult> Delete(int id)
@@ -307,31 +320,83 @@ namespace QuanLyRungPhongHo.Controllers
                         return Json(new { success = false, message = "Không tìm thấy nhân sự!" });
                     }
 
-                    // Xóa tài khoản trước
+                    // Tìm tài khoản của nhân sự
                     var tk = await _context.TaiKhoans.FirstOrDefaultAsync(t => t.MaNV == id);
-                    if (tk != null)
+                    if (tk == null)
                     {
-                        _context.TaiKhoans.Remove(tk);
+                        return Json(new { success = false, message = "Không tìm thấy tài khoản của nhân sự này!" });
                     }
 
-                    // Sau đó xóa nhân sự
-                    _context.NhanSus.Remove(ns);
-                    
-                    await _context.SaveChangesAsync();
-                    await transaction.CommitAsync();
-                    
-                    return Json(new { success = true, message = "Xóa thành công!" });
-                }
-                catch (DbUpdateException)
-                {
-                    await transaction.RollbackAsync();
-                    return Json(new { success = false, message = "Không thể xóa! Nhân sự này đã có dữ liệu liên quan." });
+                    // Kiểm tra xem tài khoản có dữ liệu liên quan không
+                    var hasRelatedData = await _context.NhatKyBaoVes.AnyAsync(nk => nk.MaNV_GhiNhan == id) ||
+                                        await _context.LichLamViecs.AnyAsync(ll => ll.MaNV == id);
+
+                    if (hasRelatedData)
+                    {
+                        // Nếu có dữ liệu liên quan, chỉ khóa tài khoản
+                        tk.TrangThai = false; // Khóa tài khoản
+                        _context.TaiKhoans.Update(tk);
+                        await _context.SaveChangesAsync();
+                        await transaction.CommitAsync();
+
+                        return Json(new
+                        {
+                            success = true,
+                            message = "Đã khóa tài khoản nhân sự thành công! (Không xóa do có dữ liệu liên quan)",
+                            isLocked = true
+                        });
+                    }
+                    else
+                    {
+                        // Nếu không có dữ liệu liên quan, vẫn khóa thay vì xóa (an toàn hơn)
+                        tk.TrangThai = false;
+                        _context.TaiKhoans.Update(tk);
+                        await _context.SaveChangesAsync();
+                        await transaction.CommitAsync();
+
+                        return Json(new
+                        {
+                            success = true,
+                            message = "Đã khóa tài khoản nhân sự thành công!",
+                            isLocked = true
+                        });
+                    }
                 }
                 catch (Exception ex)
                 {
                     await transaction.RollbackAsync();
                     return Json(new { success = false, message = "Lỗi: " + ex.Message });
                 }
+            }
+        }
+
+        // Mở khóa tài khoản
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<JsonResult> UnlockAccount(int id)
+        {
+            try
+            {
+                var tk = await _context.TaiKhoans.FirstOrDefaultAsync(t => t.MaNV == id);
+                if (tk == null)
+                {
+                    return Json(new { success = false, message = "Không tìm thấy tài khoản!" });
+                }
+
+                if (tk.TrangThai)
+                {
+                    return Json(new { success = false, message = "Tài khoản đang ở trạng thái hoạt động!" });
+                }
+
+                tk.TrangThai = true;
+                _context.TaiKhoans.Update(tk);
+                await _context.SaveChangesAsync();
+
+                return Json(new { success = true, message = "Mở khóa tài khoản thành công!" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Lỗi: " + ex.Message });
             }
         }
 
@@ -371,7 +436,7 @@ namespace QuanLyRungPhongHo.Controllers
 
                 if (!string.IsNullOrEmpty(searchString))
                 {
-                    query = query.Where(x => x.HoTen.Contains(searchString) || 
+                    query = query.Where(x => x.HoTen.Contains(searchString) ||
                                              (x.SDT != null && x.SDT.Contains(searchString)) ||
                                              (x.Email != null && x.Email.Contains(searchString)));
                 }
@@ -385,14 +450,14 @@ namespace QuanLyRungPhongHo.Controllers
                 }
 
                 var result = await query.OrderByDescending(x => x.MaNV).ToListAsync();
-                
+
                 return Json(new
                 {
                     success = true,
                     items = result,
                     totalRecords = result.Count,
-                    message = result.Count == 0 ? "Không tìm thấy dữ liệu" : 
-                              result.Count == 1 ? "Tìm thấy 1 bản ghi" : 
+                    message = result.Count == 0 ? "Không tìm thấy dữ liệu" :
+                              result.Count == 1 ? "Tìm thấy 1 bản ghi" :
                               $"Tìm thấy {result.Count} bản ghi"
                 });
             }

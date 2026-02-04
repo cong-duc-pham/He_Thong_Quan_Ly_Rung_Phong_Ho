@@ -31,7 +31,7 @@
             <div id="nhansuSearchForm" class="row g-3 align-items-center">
                 <div class="col-md-4">
 
-                    <input type="text" id="nhansuSearchInput" name="searchString" class="form-control" 
+                    <input type="text" id="nhansuSearchInput" name="searchString" class="form-control"
                            placeholder="@Localizer["SearchPlaceholder"]" value="">
 
                 </div>
@@ -87,9 +87,17 @@
                 {
                     foreach (var item in Model)
                     {
-                        <tr>
+                        <tr class="@(!item.TrangThai ? "table-secondary" : "")">
                             <td>
                                 <div class="fw-bold">@item.HoTen</div>
+                                @if (item.TrangThai)
+                                {
+                                    <span class="badge bg-success">Hoạt động</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger">Bị khóa</span>
+                                }
                             </td>
                             <td><span class="badge bg-primary">@item.ChucVu</span></td>
                             <td>
@@ -112,12 +120,21 @@
                                 }
                             </td>
                             <td class="text-center">
-                                <button class="btn btn-sm btn-outline-primary" onclick="editData(@item.MaNV, event)">
+                                <button class="btn btn-sm btn-outline-primary" onclick="editData(@item.MaNV, event)" title="Sửa thông tin">
                                     <i class="bi bi-pencil"></i>
                                 </button>
-                                <button class="btn btn-sm btn-outline-danger" onclick="deleteData(@item.MaNV)">
-                                    <i class="bi bi-trash"></i>
-                                </button>
+                                @if (item.TrangThai)
+                                {
+                                    <button class="btn btn-sm btn-outline-warning" onclick="toggleLock(@item.MaNV, @item.TrangThai.ToString().ToLower())" title="Khóa tài khoản">
+                                        <i class="bi bi-lock"></i>
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button class="btn btn-sm btn-outline-success" onclick="toggleLock(@item.MaNV, @item.TrangThai.ToString().ToLower())" title="Mở khóa tài khoản">
+                                        <i class="bi bi-unlock"></i>
+                                    </button>
+                                }
                             </td>
                         </tr>
                     }
@@ -136,11 +153,21 @@
     <div class="d-md-none" id="nhansuMobileView">
         @foreach (var item in Model)
         {
-            <div class="card mb-3 shadow-sm border-start border-4 border-success" data-nhansu-id="@item.MaNV">
+            <div class="card mb-3 shadow-sm border-start border-4 @(item.TrangThai ? "border-success" : "border-secondary")" data-nhansu-id="@item.MaNV">
                 <div class="card-body">
                     <div class="d-flex justify-content-between mb-2">
                         <h6 class="fw-bold text-success mb-0">@item.HoTen</h6>
-                        <span class="badge bg-primary">@item.ChucVu</span>
+                        <div>
+                            <span class="badge bg-primary">@item.ChucVu</span>
+                            @if (item.TrangThai)
+                            {
+                                <span class="badge bg-success">Hoạt động</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger">Bị khóa</span>
+                            }
+                        </div>
                     </div>
                     <p class="mb-1 small"><i class="bi bi-geo-alt"></i> @item.TenXa</p>
                     <p class="mb-1 small"><i class="bi bi-telephone"></i> @item.SDT</p>
@@ -148,12 +175,23 @@
                     {
                         <p class="mb-1 small"><i class="bi bi-envelope"></i> @item.Email</p>
                     }
-                    <p class="mb-2 small"><i class="bi bi-person"></i> TK: @item.TenDangNhap</p>
+                    <p class="mb-2 small"><i class="bi bi-person"></i> TK: @(item.TenDangNhap ?? "Chưa có")</p>
                     <div class="d-flex gap-2">
-
-                        <button class="btn btn-outline-primary btn-sm flex-fill" onclick="editData(@item.MaNV, event)">@Localizer["Edit"]</button>
-                        <button class="btn btn-outline-danger btn-sm flex-fill" onclick="deleteData(@item.MaNV)">@Localizer["Delete"]</button>
-
+                        <button class="btn btn-outline-primary btn-sm flex-fill" onclick="editData(@item.MaNV, event)">
+                            <i class="bi bi-pencil"></i> Sửa
+                        </button>
+                        @if (item.TrangThai)
+                        {
+                            <button class="btn btn-outline-warning btn-sm flex-fill" onclick="toggleLock(@item.MaNV, @item.TrangThai.ToString().ToLower())">
+                                <i class="bi bi-lock"></i> Khóa
+                            </button>
+                        }
+                        else
+                        {
+                            <button class="btn btn-outline-success btn-sm flex-fill" onclick="toggleLock(@item.MaNV, @item.TrangThai.ToString().ToLower())">
+                                <i class="bi bi-unlock"></i> Mở khóa
+                            </button>
+                        }
                     </div>
                 </div>
             </div>
@@ -163,6 +201,11 @@
 
 <div class="modal fade" id="nhanSuModal" tabindex="-1" data-bs-backdrop="static">
     <div class="modal-dialog modal-lg modal-dialog-centered">
+<
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title text-white fw-bold" id="modalTitle">
+
         <div class="modal-content border-0 shadow-lg">
             <div class="modal-header position-relative overflow-hidden" 
                  style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%) !important; 
@@ -170,6 +213,7 @@
                         border-bottom: none !important;">
                 <h5 class="modal-title text-white fw-bold position-relative" id="modalTitle" 
                     style="font-size: 1.35rem; letter-spacing: 0.3px; color: #ffffff !important;">
+
                     <i class="bi bi-person-plus-fill me-2"></i>@Localizer["ModalTitleAdd"]
                 </h5>
                 <button type="button" class="btn-close btn-close-white position-relative" data-bs-dismiss="modal"></button>
@@ -203,7 +247,7 @@
                                 <div class="invalid-feedback">@Localizer["PositionRequired"]</div>
                                 <div class="valid-feedback"></div>
                                 <small class="text-muted">
-                                    <i class="bi bi-info-circle"></i> 
+                                    <i class="bi bi-info-circle"></i>
                                     <span id="quyenHint">Quyền hệ thống sẽ được tự động gán theo chức vụ</span>
                                 </small>
                             </div>
@@ -213,14 +257,14 @@
                             <div class="col-md-6">
                                 <label class="form-label fw-semibold">@Localizer["PhoneLabel"] <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control form-control-sm" name="SDT" id="SDT"
-                                    pattern="^(03|05|07|08|09|01[2|6|8|9])+([0-9]{8})$" required>
+                                       pattern="^(03|05|07|08|09|01[2|6|8|9])+([0-9]{8})$" required>
                                 <div class="invalid-feedback">@Localizer["PhoneInvalid"]</div>
                                 <div class="valid-feedback"></div>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label fw-semibold">@Localizer["EmailLabel"] <span class="text-danger">*</span></label>
                                 <input type="email" class="form-control form-control-sm" name="Email" id="Email"
-                                    placeholder="email@example.com" required>
+                                       placeholder="email@example.com" required>
                                 <div class="invalid-feedback">@Localizer["EmailInvalid"]</div>
                                 <div class="valid-feedback"></div>
                             </div>
@@ -245,7 +289,7 @@
                             <div class="col-md-12">
                                 <label class="form-label fw-semibold">@Localizer["UsernameLabel"] <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control form-control-sm" name="TenDangNhap"
-                                    id="TenDangNhap" pattern="^[a-zA-Z0-9_]{5,50}$" required>
+                                       id="TenDangNhap" pattern="^[a-zA-Z0-9_]{5,50}$" required>
                                 <div class="invalid-feedback">@Localizer["UsernameInvalid"]</div>
                                 <div class="valid-feedback"></div>
                             </div>
@@ -256,7 +300,7 @@
                                     @Localizer["PasswordLabel"] <span class="text-danger" id="passRequired">*</span>
                                 </label>
                                 <input type="password" class="form-control form-control-sm" name="MatKhau" id="MatKhau"
-                                    minlength="6" placeholder="@Localizer["PasswordPlaceholder"]">
+                                       minlength="6" placeholder="@Localizer["PasswordPlaceholder"]">
                                 <div class="invalid-feedback">@Localizer["PasswordInvalid"]</div>
                                 <div class="valid-feedback"></div>
                                 <small class="text-muted" id="passNote" style="display:none;">
@@ -288,14 +332,14 @@
             const chucVuSelect = document.getElementById('ChucVu');
             const quyenInput = document.getElementById('Quyen');
             const quyenHint = document.getElementById('quyenHint');
-            
+
             if (chucVuSelect && quyenInput && quyenHint) {
                 chucVuSelect.addEventListener('change', function() {
                     const selectedOption = this.options[this.selectedIndex];
                     const quyen = selectedOption.getAttribute('data-quyen');
                     if (quyen) {
                         quyenInput.value = quyen;
-                        
+
                         // Hiển thị hint
                         const quyenMap = {
                             'Admin_Tinh': 'Toàn quyền quản trị hệ thống',

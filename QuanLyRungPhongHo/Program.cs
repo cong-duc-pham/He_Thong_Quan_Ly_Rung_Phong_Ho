@@ -14,7 +14,14 @@ builder.Services.AddLocalization(options => options.ResourcesPath = "Resources")
 
 builder.Services.AddControllersWithViews()
     .AddViewLocalization()
-    .AddDataAnnotationsLocalization();
+    .AddDataAnnotationsLocalization()
+    .AddJsonOptions(options =>
+    {
+        // Configure JSON serialization with UTF-8 encoding
+        options.JsonSerializerOptions.Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping;
+        options.JsonSerializerOptions.WriteIndented = true;
+        options.JsonSerializerOptions.PropertyNamingPolicy = null; // Keep original property names
+    });
 
 // DbContext
 var connectionString = builder.Configuration.GetConnectionString("QLRungPhongHoConnection");
@@ -99,6 +106,22 @@ else
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+
+// Force UTF-8 encoding for HTML responses
+app.Use(async (context, next) =>
+{
+    // Chỉ set charset cho HTML responses
+    context.Response.OnStarting(() =>
+    {
+        if (context.Response.ContentType == null || context.Response.ContentType.Contains("text/html"))
+        {
+            context.Response.ContentType = "text/html; charset=utf-8";
+        }
+        return Task.CompletedTask;
+    });
+    
+    await next();
+});
 
 app.UseRouting();
 

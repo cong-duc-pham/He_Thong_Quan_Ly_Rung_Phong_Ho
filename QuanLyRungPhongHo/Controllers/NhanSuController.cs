@@ -44,7 +44,8 @@ namespace QuanLyRungPhongHo.Controllers
                                 MaXa = ns.MaXa,
                                 TenXa = x != null ? x.TenXa : "Chưa phân công",
                                 TenDangNhap = t != null ? t.TenDangNhap : "",
-                                Quyen = t != null ? t.Quyen : ""
+                                Quyen = t != null ? t.Quyen : "",
+                                TrangThai = t != null ? t.TrangThai : true
                             };
 
                 if (!string.IsNullOrEmpty(searchString))
@@ -102,7 +103,8 @@ namespace QuanLyRungPhongHo.Controllers
                     Email = ns.Email,
                     MaXa = ns.MaXa,
                     TenDangNhap = tk?.TenDangNhap ?? "",
-                    Quyen = tk?.Quyen ?? "NhanVien_Thon"
+                    Quyen = tk?.Quyen ?? "NhanVien_Thon",
+                    TrangThai = tk?.TrangThai ?? true
                 });
             }
             catch (Exception ex)
@@ -307,9 +309,11 @@ namespace QuanLyRungPhongHo.Controllers
             }
         }
 
-        // Khóa/Mở khóa tài khoản (thay vì xóa để tránh ảnh hưởng dữ liệu liên quan)
+        // Khóa tài khoản (thay vì xóa)
         [HttpPost]
         [ValidateAntiForgeryToken]
+
+        public async Task<JsonResult> ToggleLock(int id)
         [CheckPermission("NhanSu.Delete")]
         public async Task<JsonResult> Delete(int id)
         {
@@ -378,6 +382,7 @@ namespace QuanLyRungPhongHo.Controllers
         [ValidateAntiForgeryToken]
         [CheckPermission("NhanSu.Edit")]
         public async Task<JsonResult> UnlockAccount(int id)
+
         {
             try
             {
@@ -387,16 +392,20 @@ namespace QuanLyRungPhongHo.Controllers
                     return Json(new { success = false, message = "Không tìm thấy tài khoản!" });
                 }
 
-                if (tk.TrangThai)
-                {
-                    return Json(new { success = false, message = "Tài khoản đang ở trạng thái hoạt động!" });
-                }
-
-                tk.TrangThai = true;
+                // Đổi trạng thái
+                tk.TrangThai = !tk.TrangThai;
                 _context.TaiKhoans.Update(tk);
                 await _context.SaveChangesAsync();
 
-                return Json(new { success = true, message = "Mở khóa tài khoản thành công!" });
+                string statusMessage = tk.TrangThai ? "Đã mở khóa tài khoản!" : "Đã khóa tài khoản!";
+
+                return Json(new
+                {
+                    success = true,
+                    message = statusMessage,
+                    newStatus = tk.TrangThai,
+                    isLocked = !tk.TrangThai
+                });
             }
             catch (Exception ex)
             {
@@ -436,7 +445,8 @@ namespace QuanLyRungPhongHo.Controllers
                                 MaXa = ns.MaXa,
                                 TenXa = x != null ? x.TenXa : "Chưa phân công",
                                 TenDangNhap = t != null ? t.TenDangNhap : "",
-                                Quyen = t != null ? t.Quyen : ""
+                                Quyen = t != null ? t.Quyen : "",
+                                TrangThai = t != null ? t.TrangThai : true
                             };
 
                 if (!string.IsNullOrEmpty(searchString))

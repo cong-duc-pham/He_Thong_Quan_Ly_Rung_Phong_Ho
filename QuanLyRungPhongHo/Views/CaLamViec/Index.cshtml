@@ -1,0 +1,236 @@
+﻿@{
+    ViewData["Title"] = "Quản lý Ca làm việc";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/calamviec.css" asp-append-version="true" />
+}
+
+<div class="container-fluid px-4 py-4">
+    <!-- Header -->
+    <div class="page-header">
+        <h1>
+            <i class="fas fa-clock"></i>
+            Quản Lý Ca Làm Việc
+        </h1>
+        <p>Thiết lập và quản lý các ca làm việc trong hệ thống</p>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="stat-card stat-primary">
+                <div class="stat-icon">
+                    <i class="fas fa-list"></i>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-label">Tổng số ca</div>
+                    <div class="stat-value" id="totalShifts">0</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card stat-success">
+                <div class="stat-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-label">Đang hoạt động</div>
+                    <div class="stat-value" id="activeShifts">0</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card stat-warning">
+                <div class="stat-icon">
+                    <i class="fas fa-pause-circle"></i>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-label">Đã vô hiệu hóa</div>
+                    <div class="stat-value" id="inactiveShifts">0</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card stat-info">
+                <div class="stat-icon">
+                    <i class="fas fa-hourglass-half"></i>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-label">Tổng giờ/ngày</div>
+                    <div class="stat-value" id="totalHours">0</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls-bar">
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="Tìm kiếm ca làm việc..." id="searchInput">
+        </div>
+        <div class="action-buttons">
+            <button class="btn btn-success" onclick="openAddModal()">
+                <i class="fas fa-plus"></i>
+                Thêm ca mới
+            </button>
+            <button class="btn btn-secondary" onclick="refreshData()">
+                <i class="fas fa-sync-alt"></i>
+                Làm mới
+            </button>
+        </div>
+    </div>
+
+    <!-- Shifts Table -->
+    <div class="card shadow-sm">
+        <div class="card-header">
+            <h5 class="mb-0">
+                <i class="fas fa-table"></i>
+                Danh sách ca làm việc
+            </h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0" id="shiftsTable">
+                    <thead>
+                        <tr>
+                            <th style="width: 80px;">Mã Ca</th>
+                            <th>Tên Ca</th>
+                            <th style="width: 120px;">Giờ bắt đầu</th>
+                            <th style="width: 120px;">Giờ kết thúc</th>
+                            <th style="width: 100px;">Thời lượng</th>
+                            <th>Mô tả</th>
+                            <th style="width: 120px;">Trạng thái</th>
+                            <th style="width: 200px;">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody id="shiftsTableBody">
+                        <!-- Data will be loaded dynamically -->
+                        <tr>
+                            <td colspan="8" class="text-center py-5">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <p class="mt-2 text-muted">Đang tải dữ liệu...</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Thêm/Sửa Ca -->
+<div class="modal fade" id="shiftModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitle">
+                    <i class="fas fa-plus-circle"></i>
+                    Thêm ca làm việc mới
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="shiftForm">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" id="MaCa" name="MaCa" value="0">
+
+                    <!-- Tên Ca -->
+                    <div class="mb-3">
+                        <label for="TenCa" class="form-label">
+                            Tên ca <span class="text-danger">*</span>
+                        </label>
+                        <input type="text" class="form-control" id="TenCa" name="TenCa"
+                               placeholder="VD: Ca Sáng, Ca Chiều..." maxlength="100" required>
+                        <div class="invalid-feedback"></div>
+                        <div class="valid-feedback"></div>
+                    </div>
+
+                    <!-- Giờ bắt đầu -->
+                    <div class="mb-3">
+                        <label for="GioBatDau" class="form-label">
+                            Giờ bắt đầu <span class="text-danger">*</span>
+                        </label>
+                        <input type="time" class="form-control" id="GioBatDau" name="GioBatDau" required>
+                        <div class="invalid-feedback"></div>
+                        <div class="valid-feedback"></div>
+                    </div>
+
+                    <!-- Giờ kết thúc -->
+                    <div class="mb-3">
+                        <label for="GioKetThuc" class="form-label">
+                            Giờ kết thúc <span class="text-danger">*</span>
+                        </label>
+                        <input type="time" class="form-control" id="GioKetThuc" name="GioKetThuc" required>
+                        <div class="invalid-feedback"></div>
+                        <div class="valid-feedback"></div>
+                        <small class="form-text text-muted" id="durationHint">
+                            <i class="fas fa-info-circle"></i> Thời lượng ca: --
+                        </small>
+                    </div>
+
+                    <!-- Mô tả -->
+                    <div class="mb-3">
+                        <label for="MoTa" class="form-label">Mô tả</label>
+                        <textarea class="form-control" id="MoTa" name="MoTa" rows="3"
+                                  placeholder="Mô tả chi tiết về ca làm việc..." maxlength="500"></textarea>
+                        <div class="invalid-feedback"></div>
+                        <div class="valid-feedback"></div>
+                        <small class="form-text text-muted">
+                            <span id="moTaCount">0</span>/500 ký tự
+                        </small>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i>
+                    Hủy
+                </button>
+                <button type="button" class="btn btn-primary" onclick="saveShift()">
+                    <i class="fas fa-save"></i>
+                    Lưu lại
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Xác nhận xóa -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Xác nhận xóa
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-0">Bạn có chắc chắn muốn xóa ca làm việc <strong id="deleteShiftName"></strong>?</p>
+                <p class="text-muted mt-2 mb-0">
+                    <small><i class="fas fa-info-circle"></i> Hành động này không thể hoàn tác!</small>
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i>
+                    Hủy
+                </button>
+                <button type="button" class="btn btn-danger" onclick="confirmDelete()">
+                    <i class="fas fa-trash"></i>
+                    Xóa
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/calamviec-validator.js" asp-append-version="true"></script>
+    <script src="~/js/calamviec.js" asp-append-version="true"></script>
+}

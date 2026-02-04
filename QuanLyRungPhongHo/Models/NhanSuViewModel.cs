@@ -32,7 +32,10 @@ namespace QuanLyRungPhongHo.Models
         // Trường này chỉ để hiển thị tên xã ra bảng (không cần validate)
         public string? TenXa { get; set; }
 
-        // --- VALIDATION CHO BẢNG TÀI KHOẢN (Gộp vào để xử lý 1 lần) ---
+        // Trạng thái tài khoản
+        public bool TrangThai { get; set; } = true;
+
+        // --- validate bảng tài khaonr
         [Display(Name = "Tên đăng nhập")]
         [Required(ErrorMessage = "Tên đăng nhập là bắt buộc")]
         [StringLength(50, MinimumLength = 5, ErrorMessage = "Tên đăng nhập từ 5-50 ký tự")]

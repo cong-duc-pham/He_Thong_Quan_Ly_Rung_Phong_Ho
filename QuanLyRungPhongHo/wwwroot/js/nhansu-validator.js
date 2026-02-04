@@ -1,7 +1,4 @@
-/**
- * VALIDATION REALTIME CHO QUẢN LÝ NHÂN SỰ
- * Validate ngay khi người dùng đang nhập liệu
- */
+// Validate ngay khi người dùng đang nhập liệu
 
 const NhanSuValidatorClient = {
     // Regex patterns
@@ -18,17 +15,15 @@ const NhanSuValidatorClient = {
 
     // Danh sách đầu số hợp lệ VN
     dauSoHopLe: ['032', '033', '034', '035', '036', '037', '038', '039',
-                 '056', '058', '059',
-                 '070', '076', '077', '078', '079',
-                 '081', '082', '083', '084', '085', '086', '087', '088', '089',
-                 '090', '091', '092', '093', '094', '096', '097', '098', '099'],
+        '056', '058', '059',
+        '070', '076', '077', '078', '079',
+        '081', '082', '083', '084', '085', '086', '087', '088', '089',
+        '090', '091', '092', '093', '094', '096', '097', '098', '099'],
 
-    /**
-     * Validate Họ Tên
-     */
+    //Validate Họ Tên
     validateHoTen(value, fieldElement) {
         const trimmed = value.trim();
-        
+
         if (!trimmed) {
             this.showError(fieldElement, 'Họ tên không được để trống!');
             return false;
@@ -78,9 +73,7 @@ const NhanSuValidatorClient = {
         return true;
     },
 
-    /**
-     * Validate Số Điện Thoại
-     */
+    //Validate Số Điện Thoại
     validateSDT(value, fieldElement) {
         let sdt = value.trim().replace(/[\s\-\.]/g, ''); // Xóa khoảng trắng, dấu gạch ngang, dấu chấm
 
@@ -122,18 +115,16 @@ const NhanSuValidatorClient = {
         }
 
         this.showSuccess(fieldElement, `✓ SĐT hợp lệ: ${sdt}`);
-        
+
         // Tự động chuẩn hóa giá trị trong input
         if (fieldElement.value !== sdt) {
             fieldElement.value = sdt;
         }
-        
+
         return true;
     },
 
-    /**
-     * Validate Email
-     */
+    //Validate Email
     validateEmail(value, fieldElement) {
         const trimmed = value.trim().toLowerCase();
 
@@ -141,6 +132,7 @@ const NhanSuValidatorClient = {
         if (!trimmed) {
             this.showError(fieldElement, 'Email không được để trống!');
             return false;
+        }
 
         if (!this.patterns.email.test(trimmed)) {
             this.showError(fieldElement, 'Email không đúng định dạng! (VD: example@domain.com)');
@@ -160,18 +152,16 @@ const NhanSuValidatorClient = {
         }
 
         this.showSuccess(fieldElement, '✓ Email hợp lệ');
-        
+
         // Tự động chuẩn hóa
         if (fieldElement.value !== trimmed) {
             fieldElement.value = trimmed;
         }
-        
+
         return true;
     },
 
-    /**
-     * Validate Tên Đăng Nhập
-     */
+    // Validate Tên Đăng Nhập
     validateTenDangNhap(value, fieldElement) {
         const trimmed = value.trim();
 
@@ -221,15 +211,14 @@ const NhanSuValidatorClient = {
         return true;
     },
 
-    /**
-     * Validate Mật Khẩu
-     */
+    //Validate Mật Khẩu
     validateMatKhau(value, fieldElement, isRequired) {
         if (!value) {
             if (isRequired) {
                 this.showError(fieldElement, 'Mật khẩu không được để trống!');
                 return false;
             } else {
+                // Không bắt buộc (khi sửa), bỏ qua
                 this.clearValidation(fieldElement);
                 return true;
             }
@@ -245,28 +234,20 @@ const NhanSuValidatorClient = {
             return false;
         }
 
-        // Kiểm tra độ mạnh
-        const hasUpper = /[A-Z]/.test(value);
-        const hasLower = /[a-z]/.test(value);
-        const hasDigit = /[0-9]/.test(value);
-        const hasSpecial = /[!@#$%^&*()_+=\[\]{};:'"\\|,.<>?/~`-]/.test(value);
+        // Kiểm tra mật khẩu mạnh
+        const hasUpperCase = /[A-Z]/.test(value);
+        const hasLowerCase = /[a-z]/.test(value);
+        const hasNumber = /[0-9]/.test(value);
+        const hasSpecialChar = /[!@#$%^&*()_+=\[\]{};:'",.<>?/\\|`~-]/.test(value);
 
-        const criteriaCount = (hasUpper ? 1 : 0) + (hasLower ? 1 : 0) + (hasDigit ? 1 : 0) + (hasSpecial ? 1 : 0);
+        let strength = 0;
+        if (hasUpperCase) strength++;
+        if (hasLowerCase) strength++;
+        if (hasNumber) strength++;
+        if (hasSpecialChar) strength++;
 
-        if (criteriaCount < 3) {
-            this.showError(fieldElement, 'Mật khẩu phải chứa ít nhất 3 trong 4: chữ hoa, chữ thường, số, ký tự đặc biệt!');
-            return false;
-        }
-
-        if (value.includes(' ')) {
-            this.showError(fieldElement, 'Mật khẩu không được chứa khoảng trắng!');
-            return false;
-        }
-
-        // Weak passwords
-        const weakPasswords = ['123456', 'password', '12345678', 'qwerty', 'abc123', '111111', '123123'];
-        if (weakPasswords.some(wp => value.toLowerCase().includes(wp))) {
-            this.showError(fieldElement, 'Mật khẩu quá phổ biến, vui lòng chọn mật khẩu khác!');
+        if (strength < 2) {
+            this.showError(fieldElement, 'Mật khẩu phải chứa ít nhất 2 trong số: chữ hoa, chữ thường, số, ký tự đặc biệt!');
             return false;
         }
 
@@ -274,9 +255,7 @@ const NhanSuValidatorClient = {
         return true;
     },
 
-    /**
-     * Validate Chức Vụ (theo phân quyền hệ thống)
-     */
+    //Validate Chức Vụ (theo phân quyền hệ thống)
     validateChucVu(value, fieldElement) {
         if (!value) {
             this.showError(fieldElement, 'Vui lòng chọn chức vụ!');
@@ -292,13 +271,11 @@ const NhanSuValidatorClient = {
         return true;
     },
 
-    /**
-     * Hiển thị lỗi
-     */
+    // Hiển thị lỗi
     showError(fieldElement, message) {
         fieldElement.classList.remove('is-valid');
         fieldElement.classList.add('is-invalid');
-        
+
         // Tìm hoặc tạo feedback element
         let feedback = fieldElement.nextElementSibling;
         if (!feedback || !feedback.classList.contains('invalid-feedback')) {
@@ -310,13 +287,11 @@ const NhanSuValidatorClient = {
         feedback.style.display = 'block';
     },
 
-    /**
-     * Hiển thị thành công
-     */
+    // Hiển thị thành công
     showSuccess(fieldElement, message = '') {
         fieldElement.classList.remove('is-invalid');
         fieldElement.classList.add('is-valid');
-        
+
         // Tìm hoặc tạo feedback element
         let feedback = fieldElement.parentNode.querySelector('.valid-feedback');
         if (!feedback) {
@@ -328,35 +303,29 @@ const NhanSuValidatorClient = {
         feedback.style.display = 'block';
     },
 
-    /**
-     * Xóa validation
-     */
+    //Xóa validation
     clearValidation(fieldElement) {
         fieldElement.classList.remove('is-valid', 'is-invalid');
-        
+
         const invalidFeedback = fieldElement.parentNode.querySelector('.invalid-feedback');
         if (invalidFeedback) {
             invalidFeedback.style.display = 'none';
         }
-        
+
         const validFeedback = fieldElement.parentNode.querySelector('.valid-feedback');
         if (validFeedback) {
             validFeedback.style.display = 'none';
         }
     },
 
-    /**
-     * Khởi tạo validation realtime cho form
-     */
+    //Khởi tạo validation realtime cho form
     init() {
         console.log('🔧 Đang khởi tạo validation realtime...');
         this.bindEvents();
         console.log('✅ Validation realtime đã được khởi tạo!');
     },
 
-    /**
-     * Bind events vào form fields
-     */
+    //Bind events vào form fields
     bindEvents() {
         console.log('📋 Binding events vào form fields...');
 
@@ -455,9 +424,7 @@ const NhanSuValidatorClient = {
         console.log('✅ Events đã được bind!');
     },
 
-    /**
-     * Validate toàn bộ form trước khi submit
-     */
+    //Validate toàn bộ form trước khi submit
     validateForm() {
         const hoTen = document.getElementById('HoTen');
         const sdt = document.getElementById('SDT');
@@ -478,7 +445,7 @@ const NhanSuValidatorClient = {
         if (tenDangNhap && !this.validateTenDangNhap(tenDangNhap.value, tenDangNhap)) isValid = false;
         if (matKhau && !this.validateMatKhau(matKhau.value, matKhau, isNew)) isValid = false;
         if (chucVu && !this.validateChucVu(chucVu.value, chucVu)) isValid = false;
-        
+
         if (maXa && !maXa.value) {
             this.showError(maXa, 'Vui lòng chọn địa bàn!');
             isValid = false;
@@ -489,7 +456,7 @@ const NhanSuValidatorClient = {
 };
 
 // Khởi tạo khi document ready
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     NhanSuValidatorClient.init();
 });
 

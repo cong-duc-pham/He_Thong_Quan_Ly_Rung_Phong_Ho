@@ -13,8 +13,8 @@ const NhanSuValidatorClient = {
         password: /^.{6,100}$/
     },
 
-    // Danh sách chức vụ hợp lệ
-    chucVuHopLe: ['Kiểm lâm', 'Phó Kiểm lâm', 'Trưởng trạm', 'Phó trạm', 'Nhân viên bảo vệ rừng', 'Cán bộ kỹ thuật', 'Hướng dẫn viên'],
+    // Danh sách chức vụ hợp lệ (theo phân quyền hệ thống)
+    chucVuHopLe: ['Quản trị viên Tỉnh', 'Quản lý Xã', 'Kiểm lâm viên'],
 
     // Danh sách đầu số hợp lệ VN
     dauSoHopLe: ['032', '033', '034', '035', '036', '037', '038', '039',
@@ -275,7 +275,7 @@ const NhanSuValidatorClient = {
     },
 
     /**
-     * Validate Chức Vụ
+     * Validate Chức Vụ (theo phân quyền hệ thống)
      */
     validateChucVu(value, fieldElement) {
         if (!value) {
@@ -285,26 +285,6 @@ const NhanSuValidatorClient = {
 
         if (!this.chucVuHopLe.includes(value)) {
             this.showError(fieldElement, 'Chức vụ không hợp lệ!');
-            return false;
-        }
-
-        this.showSuccess(fieldElement, '✓');
-        return true;
-    },
-
-    /**
-     * Validate Quyền
-     */
-    validateQuyen(value, fieldElement) {
-        const quyenHopLe = ['Admin_Tinh', 'QuanLy_Xa', 'Kiem_Lam', 'NhanVien_Thon'];
-        
-        if (!value) {
-            this.showError(fieldElement, 'Vui lòng chọn quyền hạn!');
-            return false;
-        }
-
-        if (!quyenHopLe.includes(value)) {
-            this.showError(fieldElement, 'Quyền không hợp lệ!');
             return false;
         }
 
@@ -460,14 +440,6 @@ const NhanSuValidatorClient = {
             });
         }
 
-        // Quyền
-        const quyenField = document.getElementById('Quyen');
-        if (quyenField) {
-            quyenField.addEventListener('change', () => {
-                this.validateQuyen(quyenField.value, quyenField);
-            });
-        }
-
         // Mã Xã
         const maXaField = document.getElementById('MaXa');
         if (maXaField) {
@@ -493,7 +465,6 @@ const NhanSuValidatorClient = {
         const tenDangNhap = document.getElementById('TenDangNhap');
         const matKhau = document.getElementById('MatKhau');
         const chucVu = document.getElementById('ChucVu');
-        const quyen = document.getElementById('Quyen');
         const maXa = document.getElementById('MaXa');
         const maNV = document.getElementById('MaNV');
 
@@ -507,7 +478,6 @@ const NhanSuValidatorClient = {
         if (tenDangNhap && !this.validateTenDangNhap(tenDangNhap.value, tenDangNhap)) isValid = false;
         if (matKhau && !this.validateMatKhau(matKhau.value, matKhau, isNew)) isValid = false;
         if (chucVu && !this.validateChucVu(chucVu.value, chucVu)) isValid = false;
-        if (quyen && !this.validateQuyen(quyen.value, quyen)) isValid = false;
         
         if (maXa && !maXa.value) {
             this.showError(maXa, 'Vui lòng chọn địa bàn!');

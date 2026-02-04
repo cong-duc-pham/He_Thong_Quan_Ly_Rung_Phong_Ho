@@ -4,6 +4,13 @@
 (function() {
     'use strict';
 
+    // Mapping chức vụ -> quyền (theo phân quyền hệ thống)
+    const CHUC_VU_QUYEN_MAP = {
+        'Quản trị viên Tỉnh': 'Admin_Tinh',
+        'Quản lý Xã': 'QuanLy_Xa',
+        'Kiểm lâm viên': 'Kiem_Lam'
+    };
+
     // Debounce search để tránh gọi API quá nhiều lần
     function debounce(func, wait) {
         let timeout;
@@ -198,6 +205,7 @@ function openModal() {
     form.reset();
     form.classList.remove('was-validated');
     document.getElementById('MaNV').value = '0';
+    document.getElementById('Quyen').value = 'Kiem_Lam'; // Default quyền
     document.getElementById('modalTitle').textContent = 'Thêm Nhân sự mới';
     
     const matKhauField = document.getElementById('MatKhau');
@@ -210,13 +218,20 @@ function openModal() {
     if (passNote) passNote.style.display = 'none';
     
     // Clear validation states
-    const fields = ['HoTen', 'SDT', 'Email', 'TenDangNhap', 'MatKhau', 'ChucVu', 'MaXa', 'Quyen'];
+    const fields = ['HoTen', 'SDT', 'Email', 'TenDangNhap', 'MatKhau', 'ChucVu', 'MaXa'];
     fields.forEach(fieldId => {
         const field = document.getElementById(fieldId);
         if (field && window.NhanSuValidatorClient) {
             window.NhanSuValidatorClient.clearValidation(field);
         }
     });
+    
+    // Reset quyền hint
+    const quyenHint = document.getElementById('quyenHint');
+    if (quyenHint) {
+        quyenHint.textContent = 'Quyền hệ thống sẽ được tự động gán theo chức vụ';
+        quyenHint.classList.remove('text-primary', 'fw-bold');
+    }
     
     // ⚠️ QUAN TRỌNG: Bind events SAU KHI modal đã show
     modalElement.addEventListener('shown.bs.modal', function bindEventsAfterShow() {
@@ -266,7 +281,22 @@ function editData(id, event) {
             document.getElementById('Email').value = res.email || '';
             document.getElementById('MaXa').value = res.maXa || '';
             document.getElementById('TenDangNhap').value = res.tenDangNhap || '';
-            document.getElementById('Quyen').value = res.quyen || 'Kiem_Lam';
+            
+            // Mapping quyền từ response hoặc từ chức vụ
+            const quyenValue = res.quyen || 'Kiem_Lam';
+            document.getElementById('Quyen').value = quyenValue;
+            
+            // Update quyền hint
+            const quyenHint = document.getElementById('quyenHint');
+            if (quyenHint) {
+                const quyenMap = {
+                    'Admin_Tinh': 'Toàn quyền quản trị hệ thống',
+                    'QuanLy_Xa': 'Quản lý dữ liệu cấp Xã',
+                    'Kiem_Lam': 'Ghi nhật ký và xem dữ liệu'
+                };
+                quyenHint.textContent = `→ Quyền: ${quyenMap[quyenValue] || quyenValue}`;
+                quyenHint.classList.add('text-primary', 'fw-bold');
+            }
             
             // Mật khẩu không bắt buộc khi sửa
             const matKhauField = document.getElementById('MatKhau');
@@ -282,7 +312,7 @@ function editData(id, event) {
             document.getElementById('modalTitle').textContent = 'Cập nhật Nhân sự';
 
             // Clear validation states trước
-            const fields = ['HoTen', 'SDT', 'Email', 'TenDangNhap', 'MatKhau', 'ChucVu', 'MaXa', 'Quyen'];
+            const fields = ['HoTen', 'SDT', 'Email', 'TenDangNhap', 'MatKhau', 'ChucVu', 'MaXa'];
             fields.forEach(fieldId => {
                 const field = document.getElementById(fieldId);
                 if (field && window.NhanSuValidatorClient) {

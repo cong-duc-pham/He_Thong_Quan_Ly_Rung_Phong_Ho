@@ -125,41 +125,39 @@ namespace QuanLyRungPhongHo.Controllers
                 if (!chucVuValidation.IsValid)
                     return Json(new { success = false, message = chucVuValidation.ErrorMessage, errorField = "ChucVu" });
 
-                // 3. VALIDATION SỐ ĐIỆN THOẠI
+                // 3. AUTO-MAPPING QUYỀN TỪ CHỨC VỤ
+                model.Quyen = NhanSuValidator.GetQuyenFromChucVu(model.ChucVu ?? "");
+
+                // 4. VALIDATION SỐ ĐIỆN THOẠI
                 var sdtValidation = NhanSuValidator.ValidateSDT(model.SDT);
                 if (!sdtValidation.IsValid)
                     return Json(new { success = false, message = sdtValidation.ErrorMessage, errorField = "SDT" });
 
-                // 4. VALIDATION EMAIL
+                // 5. VALIDATION EMAIL
                 var emailValidation = NhanSuValidator.ValidateEmail(model.Email);
                 if (!emailValidation.IsValid)
                     return Json(new { success = false, message = emailValidation.ErrorMessage, errorField = "Email" });
 
-                // 5. VALIDATION MÃ XÃ
+                // 6. VALIDATION MÃ XÃ
                 var maXaValidation = NhanSuValidator.ValidateMaXa(model.MaXa);
                 if (!maXaValidation.IsValid)
                     return Json(new { success = false, message = maXaValidation.ErrorMessage, errorField = "MaXa" });
 
-                // 6. VALIDATION TÊN ĐĂNG NHẬP
+                // 7. VALIDATION TÊN ĐĂNG NHẬP
                 var tenDangNhapValidation = NhanSuValidator.ValidateTenDangNhap(model.TenDangNhap);
                 if (!tenDangNhapValidation.IsValid)
                     return Json(new { success = false, message = tenDangNhapValidation.ErrorMessage, errorField = "TenDangNhap" });
 
-                // 7. VALIDATION MẬT KHẨU
+                // 8. VALIDATION MẬT KHẨU
                 bool isPasswordRequired = (model.MaNV == 0); // Bắt buộc khi thêm mới
                 var matKhauValidation = NhanSuValidator.ValidateMatKhau(model.MatKhau, isPasswordRequired);
                 if (!matKhauValidation.IsValid)
                     return Json(new { success = false, message = matKhauValidation.ErrorMessage, errorField = "MatKhau" });
 
-                // 8. VALIDATION QUYỀN
+                // 9. VALIDATION QUYỀN (kiểm tra cuối cùng)
                 var quyenValidation = NhanSuValidator.ValidateQuyen(model.Quyen);
                 if (!quyenValidation.IsValid)
                     return Json(new { success = false, message = quyenValidation.ErrorMessage, errorField = "Quyen" });
-
-                // 9. VALIDATION NGHIỆP VỤ: Quyền phù hợp với chức vụ
-                var quyenChucVuValidation = NhanSuValidator.ValidateQuyenVsChucVu(model.Quyen, model.ChucVu);
-                if (!quyenChucVuValidation.IsValid)
-                    return Json(new { success = false, message = quyenChucVuValidation.ErrorMessage });
 
                 // 10. CHUẨN HÓA DỮ LIỆU
                 model.HoTen = NhanSuValidator.NormalizeHoTen(model.HoTen);

@@ -44,28 +44,32 @@
 
         // Render table desktop
         if (items.length === 0) {
-            tableBody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-3">Không có dữ liệu</td></tr>';
+            tableBody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-3">Không có dữ liệu</td></tr>';
             mobileView.innerHTML = '';
         } else {
             let tableRows = '';
             items.forEach(item => {
+                const emailDisplay = item.email ? `<div><small class="text-muted"><i class="bi bi-envelope"></i> ${item.email}</small></div>` : '';
                 tableRows += `
                     <tr>
                         <td>
                             <div class="fw-bold">${item.hoTen}</div>
-                            <small class="text-muted">${item.sdt}</small>
                         </td>
                         <td><span class="badge bg-primary">${item.chucVu}</span></td>
+                        <td>
+                            <div><small class="text-muted"><i class="bi bi-telephone"></i> ${item.sdt}</small></div>
+                            ${emailDisplay}
+                        </td>
                         <td>${item.tenXa}</td>
                         <td>
                             ${item.tenDangNhap ? `<span>${item.tenDangNhap}</span> <span class="text-muted">(${item.quyen})</span>` : '<span class="text-danger">Chưa có TK</span>'}
                         </td>
                         <td class="text-center">
                             <button class="btn btn-sm btn-outline-primary" onclick="editData(${item.maNV}, event)">
-                                Sửa
+                                <i class="bi bi-pencil"></i>
                             </button>
                             <button class="btn btn-sm btn-outline-danger" onclick="deleteData(${item.maNV})">
-                                Xóa
+                                <i class="bi bi-trash"></i>
                             </button>
                         </td>
                     </tr>`;
@@ -75,6 +79,7 @@
             // Render mobile view
             let mobileCards = '';
             items.forEach(item => {
+                const emailMobileDisplay = item.email ? `<p class="mb-1 small"><i class="bi bi-envelope"></i> ${item.email}</p>` : '';
                 mobileCards += `
                     <div class="card mb-3 shadow-sm border-start border-4 border-success">
                         <div class="card-body">
@@ -82,9 +87,10 @@
                                 <h6 class="fw-bold text-success mb-0">${item.hoTen}</h6>
                                 <span class="badge bg-primary">${item.chucVu}</span>
                             </div>
-                            <p class="mb-1 small">${item.tenXa}</p>
-                            <p class="mb-1 small">${item.sdt}</p>
-                            <p class="mb-2 small">TK: ${item.tenDangNhap || 'Chưa có'}</p>
+                            <p class="mb-1 small"><i class="bi bi-geo-alt"></i> ${item.tenXa}</p>
+                            <p class="mb-1 small"><i class="bi bi-telephone"></i> ${item.sdt}</p>
+                            ${emailMobileDisplay}
+                            <p class="mb-2 small"><i class="bi bi-person"></i> TK: ${item.tenDangNhap || 'Chưa có'}</p>
                             <div class="d-flex gap-2">
                                 <button class="btn btn-outline-primary btn-sm flex-fill" onclick="editData(${item.maNV}, event)">Sửa</button>
                                 <button class="btn btn-outline-danger btn-sm flex-fill" onclick="deleteData(${item.maNV})">Xóa</button>
@@ -208,6 +214,7 @@ function editData(id, event) {
             document.getElementById('HoTen').value = res.hoTen || '';
             document.getElementById('ChucVu').value = res.chucVu || '';
             document.getElementById('SDT').value = res.sdt || '';
+            document.getElementById('Email').value = res.email || '';
             document.getElementById('MaXa').value = res.maXa || '';
             document.getElementById('TenDangNhap').value = res.tenDangNhap || '';
             document.getElementById('Quyen').value = res.quyen || 'NhanVien_Thon';

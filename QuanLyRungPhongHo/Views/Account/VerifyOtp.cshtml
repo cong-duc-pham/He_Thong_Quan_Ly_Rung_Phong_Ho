@@ -1,0 +1,337 @@
+﻿@model QuanLyRungPhongHo.Models.OtpVerificationViewModel
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xác Nhận OTP - Quản Lý Rừng Phòng Hộ</title>
+    <link rel="stylesheet" href="~/css/Login.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .otp-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 30px 0;
+        }
+
+        .otp-input {
+            width: 50px;
+            height: 50px;
+            font-size: 24px;
+            text-align: center;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .otp-input:focus {
+            border-color: #28a745;
+            outline: none;
+            box-shadow: 0 0 5px rgba(40, 167, 69, 0.3);
+        }
+
+        .otp-input.error {
+            border-color: #dc3545;
+        }
+
+        .timer {
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+            margin: 20px 0;
+        }
+
+        .timer-text {
+            font-weight: bold;
+            color: #28a745;
+        }
+
+        .timer-text.warning {
+            color: #ffc107;
+        }
+
+        .timer-text.danger {
+            color: #dc3545;
+        }
+
+        .resend-section {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .resend-btn {
+            background: none;
+            border: none;
+            color: #28a745;
+            cursor: pointer;
+            text-decoration: underline;
+            font-size: 13px;
+        }
+
+        .resend-btn:disabled {
+            color: #ccc;
+            cursor: not-allowed;
+            text-decoration: none;
+        }
+
+        .resend-btn:hover:not(:disabled) {
+            color: #218838;
+        }
+
+        .steps-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .steps-container::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #e0e0e0;
+            z-index: 0;
+        }
+
+        .step {
+            position: relative;
+            z-index: 1;
+            flex: 1;
+            text-align: center;
+        }
+
+        .step-icon {
+            width: 40px;
+            height: 40px;
+            margin: 0 auto 10px;
+            background: #f0f0f0;
+            border: 2px solid #ddd;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: #666;
+        }
+
+        .step.completed .step-icon {
+            background: #28a745;
+            border-color: #28a745;
+            color: white;
+        }
+
+        .step.active .step-icon {
+            background: #28a745;
+            border-color: #28a745;
+            color: white;
+        }
+
+        .step-label {
+            font-size: 12px;
+            color: #666;
+            margin-top: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-left">
+            <div class="logo-section">
+                <div class="tree-icon">
+                    <img class="IMG_LOGIN" src="~/images/LogoTree_XoaPhong-removebg-preview.png" alt="Logo">
+                </div>
+                <h1>Quản Lý Rừng Phòng Hộ</h1>
+                <p>Xác nhận mã OTP để tiếp tục đặt lại mật khẩu</p>
+            </div>
+        </div>
+
+        <div class="login-right">
+            <div class="login-header">
+                <h2><i class="fas fa-shield-alt"></i> Xác Nhận OTP</h2>
+                <p>Nhập mã OTP được gửi đến @Model.Email</p>
+            </div>
+
+            <!-- Progress Steps -->
+            <div class="steps-container">
+                <div class="step completed">
+                    <div class="step-icon"><i class="fas fa-check"></i></div>
+                    <div class="step-label">Xác Nhận Email</div>
+                </div>
+                <div class="step active">
+                    <div class="step-icon">2</div>
+                    <div class="step-label">Nhập OTP</div>
+                </div>
+                <div class="step">
+                    <div class="step-icon">3</div>
+                    <div class="step-label">Mật Khẩu Mới</div>
+                </div>
+            </div>
+
+            <form asp-action="VerifyOtp" asp-controller="Account" method="post" class="login-form" id="otpForm">
+                <input type="hidden" asp-for="Email" />
+
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <!-- OTP Input Fields -->
+                <label style="display: block; margin-bottom: 15px; font-weight: 500;">Mã OTP (6 chữ số)</label>
+                <div class="otp-container" id="otpContainer">
+                    <input type="text" class="otp-input" maxlength="1" data-index="0" autocomplete="off" />
+                    <input type="text" class="otp-input" maxlength="1" data-index="1" autocomplete="off" />
+                    <input type="text" class="otp-input" maxlength="1" data-index="2" autocomplete="off" />
+                    <input type="text" class="otp-input" maxlength="1" data-index="3" autocomplete="off" />
+                    <input type="text" class="otp-input" maxlength="1" data-index="4" autocomplete="off" />
+                    <input type="text" class="otp-input" maxlength="1" data-index="5" autocomplete="off" />
+                </div>
+                <input type="hidden" asp-for="OtpCode" id="otpCodeHidden" />
+
+                <!-- Timer -->
+                <div class="timer">
+                    <span>Mã OTP sẽ hết hạn sau <span class="timer-text" id="timerText">10:00</span></span>
+                </div>
+
+                <!-- Error Message -->
+                <span asp-validation-for="OtpCode" class="text-danger"></span>
+
+                @if (ViewBag.ErrorMessage != null)
+                {
+                    <div class="alert-message show error">
+                        <i class="fas fa-exclamation-circle"></i>
+                        @ViewBag.ErrorMessage
+                    </div>
+                }
+
+                <button type="submit" class="login-btn" id="submitBtn">
+                    <span>Xác Nhận OTP</span>
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+
+                <!-- Resend OTP -->
+                <div class="resend-section">
+                    <p style="font-size: 13px; color: #666;">Không nhận được mã OTP?</p>
+                    <button type="button" class="resend-btn" id="resendBtn" disabled>
+                        Gửi lại (<span id="resendTimer">30</span>s)
+                    </button>
+                </div>
+            </form>
+
+            <div class="back-link">
+                <a asp-action="ForgotPassword" asp-controller="Account">
+                    <i class="fas fa-arrow-left"></i>
+                    Thay đổi địa chỉ email
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script src="~/js/Login.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+
+    <script>
+        // OTP Input Handling
+        const otpInputs = document.querySelectorAll('.otp-input');
+        const otpCodeHidden = document.getElementById('otpCodeHidden');
+
+        otpInputs.forEach((input, index) => {
+            input.addEventListener('keyup', function (e) {
+                // Chỉ cho phép số
+                this.value = this.value.replace(/[^0-9]/g, '');
+
+                // Auto move to next input
+                if (this.value && index < otpInputs.length - 1) {
+                    otpInputs[index + 1].focus();
+                }
+
+                // Update hidden input
+                updateOtpCode();
+            });
+
+            input.addEventListener('keydown', function (e) {
+                // Backspace
+                if (e.key === 'Backspace' && !this.value && index > 0) {
+                    otpInputs[index - 1].focus();
+                }
+            });
+
+            input.addEventListener('paste', function (e) {
+                e.preventDefault();
+                const pastedData = (e.clipboardData || window.clipboardData).getData('text');
+                const pastedDigits = pastedData.replace(/[^0-9]/g, '');
+
+                pastedDigits.split('').forEach((digit, i) => {
+                    if (index + i < otpInputs.length) {
+                        otpInputs[index + i].value = digit;
+                    }
+                });
+
+                updateOtpCode();
+                otpInputs[Math.min(index + pastedDigits.length, otpInputs.length - 1)].focus();
+            });
+        });
+
+        function updateOtpCode() {
+            const otpCode = Array.from(otpInputs).map(input => input.value).join('');
+            otpCodeHidden.value = otpCode;
+        }
+
+        // Timer Countdown
+        let remainingTime = @ViewBag.RemainingTime ?? 600;
+
+        function updateTimer() {
+            const minutes = Math.floor(remainingTime / 60);
+            const seconds = remainingTime % 60;
+            const timerText = document.getElementById('timerText');
+
+            timerText.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+            if (remainingTime > 0) {
+                remainingTime--;
+                setTimeout(updateTimer, 1000);
+            } else {
+                timerText.textContent = 'Hết hạn';
+                document.getElementById('submitBtn').disabled = true;
+                otpInputs.forEach(input => input.disabled = true);
+            }
+        }
+
+        updateTimer();
+
+        // Resend OTP Timer
+        let resendTimer = 30;
+        const resendBtn = document.getElementById('resendBtn');
+
+        function updateResendTimer() {
+            if (resendTimer > 0) {
+                document.getElementById('resendTimer').textContent = resendTimer;
+                resendTimer--;
+                setTimeout(updateResendTimer, 1000);
+            } else {
+                resendBtn.disabled = false;
+            }
+        }
+
+        resendBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            // Implement resend logic
+            resendTimer = 30;
+            this.disabled = true;
+            updateResendTimer();
+        });
+
+        updateResendTimer();
+
+        // Focus first input on load
+        otpInputs[0].focus();
+    </script>
+</body>
+</html>

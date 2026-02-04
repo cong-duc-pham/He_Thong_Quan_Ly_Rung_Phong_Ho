@@ -8,6 +8,7 @@ namespace QuanLyRungPhongHo.Models
         public string HoTen { get; set; } = null!;
         public string? ChucVu { get; set; }
         public string? SDT { get; set; }
+        public string? Email { get; set; } // Thêm trường Email
         public string? MaXa { get; set; }
 
         public DanhMucXa? DanhMucXa { get; set; }

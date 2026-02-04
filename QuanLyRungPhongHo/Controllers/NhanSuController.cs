@@ -42,7 +42,8 @@ namespace QuanLyRungPhongHo.Controllers
                                 MaXa = ns.MaXa,
                                 TenXa = x != null ? x.TenXa : "Chưa phân công",
                                 TenDangNhap = t != null ? t.TenDangNhap : "",
-                                Quyen = t != null ? t.Quyen : ""
+                                Quyen = t != null ? t.Quyen : "",
+                                TrangThai = t != null ? t.TrangThai : true
                             };
 
                 if (!string.IsNullOrEmpty(searchString))
@@ -99,7 +100,8 @@ namespace QuanLyRungPhongHo.Controllers
                     Email = ns.Email,
                     MaXa = ns.MaXa,
                     TenDangNhap = tk?.TenDangNhap ?? "",
-                    Quyen = tk?.Quyen ?? "NhanVien_Thon"
+                    Quyen = tk?.Quyen ?? "NhanVien_Thon",
+                    TrangThai = tk?.TrangThai ?? true
                 });
             }
             catch (Exception ex)
@@ -303,75 +305,10 @@ namespace QuanLyRungPhongHo.Controllers
             }
         }
 
-        // Khóa/Mở khóa tài khoản (thay vì xóa để tránh ảnh hưởng dữ liệu liên quan)
+        // Khóa tài khoản (thay vì xóa)
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<JsonResult> Delete(int id)
-        {
-            using (var transaction = await _context.Database.BeginTransactionAsync())
-            {
-                try
-                {
-                    var ns = await _context.NhanSus.FindAsync(id);
-                    if (ns == null)
-                    {
-                        return Json(new { success = false, message = "Không tìm thấy nhân sự!" });
-                    }
-
-                    // Tìm tài khoản của nhân sự
-                    var tk = await _context.TaiKhoans.FirstOrDefaultAsync(t => t.MaNV == id);
-                    if (tk == null)
-                    {
-                        return Json(new { success = false, message = "Không tìm thấy tài khoản của nhân sự này!" });
-                    }
-
-                    // Kiểm tra xem tài khoản có dữ liệu liên quan không
-                    var hasRelatedData = await _context.NhatKyBaoVes.AnyAsync(nk => nk.MaNV_GhiNhan == id) ||
-                                        await _context.LichLamViecs.AnyAsync(ll => ll.MaNV == id);
-
-                    if (hasRelatedData)
-                    {
-                        // Nếu có dữ liệu liên quan, chỉ khóa tài khoản
-                        tk.TrangThai = false; // Khóa tài khoản
-                        _context.TaiKhoans.Update(tk);
-                        await _context.SaveChangesAsync();
-                        await transaction.CommitAsync();
-
-                        return Json(new
-                        {
-                            success = true,
-                            message = "Đã khóa tài khoản nhân sự thành công! (Không xóa do có dữ liệu liên quan)",
-                            isLocked = true
-                        });
-                    }
-                    else
-                    {
-                        // Nếu không có dữ liệu liên quan, vẫn khóa thay vì xóa (an toàn hơn)
-                        tk.TrangThai = false;
-                        _context.TaiKhoans.Update(tk);
-                        await _context.SaveChangesAsync();
-                        await transaction.CommitAsync();
-
-                        return Json(new
-                        {
-                            success = true,
-                            message = "Đã khóa tài khoản nhân sự thành công!",
-                            isLocked = true
-                        });
-                    }
-                }
-                catch (Exception ex)
-                {
-                    await transaction.RollbackAsync();
-                    return Json(new { success = false, message = "Lỗi: " + ex.Message });
-                }
-            }
-        }
-
-        // Mở khóa tài khoản
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<JsonResult> UnlockAccount(int id)
+        public async Task<JsonResult> ToggleLock(int id)
         {
             try
             {
@@ -381,16 +318,20 @@ namespace QuanLyRungPhongHo.Controllers
                     return Json(new { success = false, message = "Không tìm thấy tài khoản!" });
                 }
 
-                if (tk.TrangThai)
-                {
-                    return Json(new { success = false, message = "Tài khoản đang ở trạng thái hoạt động!" });
-                }
-
-                tk.TrangThai = true;
+                // Đổi trạng thái
+                tk.TrangThai = !tk.TrangThai;
                 _context.TaiKhoans.Update(tk);
                 await _context.SaveChangesAsync();
 
-                return Json(new { success = true, message = "Mở khóa tài khoản thành công!" });
+                string statusMessage = tk.TrangThai ? "Đã mở khóa tài khoản!" : "Đã khóa tài khoản!";
+
+                return Json(new
+                {
+                    success = true,
+                    message = statusMessage,
+                    newStatus = tk.TrangThai,
+                    isLocked = !tk.TrangThai
+                });
             }
             catch (Exception ex)
             {
@@ -429,7 +370,8 @@ namespace QuanLyRungPhongHo.Controllers
                                 MaXa = ns.MaXa,
                                 TenXa = x != null ? x.TenXa : "Chưa phân công",
                                 TenDangNhap = t != null ? t.TenDangNhap : "",
-                                Quyen = t != null ? t.Quyen : ""
+                                Quyen = t != null ? t.Quyen : "",
+                                TrangThai = t != null ? t.TrangThai : true
                             };
 
                 if (!string.IsNullOrEmpty(searchString))

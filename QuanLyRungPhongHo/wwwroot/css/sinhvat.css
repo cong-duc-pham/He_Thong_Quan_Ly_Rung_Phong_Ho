@@ -96,6 +96,23 @@ body {
         color: var(--muted);
     }
 
+/* Dark mode: đảm bảo text rõ ràng */
+.theme-dark input,
+.theme-dark select,
+.theme-dark textarea,
+html.dark input,
+html.dark select,
+html.dark textarea {
+    color: #e5e7eb !important;
+}
+
+.theme-dark input::placeholder,
+html.dark input::placeholder,
+.theme-dark textarea::placeholder,
+html.dark textarea::placeholder {
+    color: #9ca3af !important;
+}
+
 /* ===== TABLE ===== */
 .table-custom {
     width: 100%;

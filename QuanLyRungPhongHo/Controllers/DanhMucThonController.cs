@@ -19,6 +19,30 @@ namespace QuanLyRungPhongHo.Controllers
             _context = context;
         }
 
+        // Tự động sinh mã thôn (T_<MaXa>_001, T_<MaXa>_002, ...)
+        private async Task<string> GenerateMaThon(string maXa)
+        {
+            var lastMaThon = await _context.DanhMucThons
+                .Where(t => t.MaXa == maXa && t.MaThon.StartsWith($"T_{maXa}_"))
+                .OrderByDescending(t => t.MaThon)
+                .Select(t => t.MaThon)
+                .FirstOrDefaultAsync();
+
+            if (string.IsNullOrEmpty(lastMaThon))
+            {
+                return $"T_{maXa}_001";
+            }
+
+            // Lấy phần số từ mã cuối cùng
+            var parts = lastMaThon.Split('_');
+            if (parts.Length == 3 && int.TryParse(parts[2], out int lastNumber))
+            {
+                return $"T_{maXa}_{(lastNumber + 1):D3}";
+            }
+
+            return $"T_{maXa}_001";
+        }
+
         // GET: DanhMucThon
         // Hiển thị danh sách Thôn với tìm kiếm theo Xã/Tên và phân trang
         [CheckPermission("DanhMucThon.View")]
@@ -94,21 +118,21 @@ namespace QuanLyRungPhongHo.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [CheckPermission("DanhMucThon.Create")]
-        public async Task<IActionResult> Create([Bind("MaThon,TenThon,MaXa")] DanhMucThon danhMucThon)
+        public async Task<IActionResult> Create([Bind("TenThon,MaXa")] DanhMucThon danhMucThon)
         {
             try
             {
-                // Kiểm tra trùng Mã Thôn
-                if (await _context.DanhMucThons.AnyAsync(t => t.MaThon == danhMucThon.MaThon))
-                {
-                    ModelState.AddModelError("MaThon", "Mã thôn đã tồn tại trong hệ thống");
-                }
+                // Tự động sinh mã thôn
+                danhMucThon.MaThon = await GenerateMaThon(danhMucThon.MaXa);
+
+                // Xóa lỗi validation của MaThon vì đã tự động sinh
+                ModelState.Remove("MaThon");
 
                 if (ModelState.IsValid)
                 {
                     _context.Add(danhMucThon);
                     await _context.SaveChangesAsync();
-                    TempData["SuccessMessage"] = $"Thêm thôn '{danhMucThon.TenThon}' thành công!";
+                    TempData["SuccessMessage"] = $"Thêm thôn '{danhMucThon.TenThon}' (Mã: {danhMucThon.MaThon}) thành công!";
                     return RedirectToAction(nameof(Index));
                 }
             }

@@ -27,6 +27,32 @@ namespace QuanLyRungPhongHo.Controllers
             return View(sinhVats);
         }
 
+        // Ajax Search
+        [HttpGet]
+        [CheckPermission("SinhVat.View")]
+        public async Task<IActionResult> Search(string keyword)
+        {
+            var query = _context.SinhVats.Include(s => s.LoRung).AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(keyword))
+            {
+                keyword = keyword.ToLower().Trim();
+                query = query.Where(s => 
+                    s.TenLoai.ToLower().Contains(keyword) ||
+                    s.LoaiSV.ToLower().Contains(keyword) ||
+                    s.MucDoQuyHiem.ToLower().Contains(keyword) ||
+                    (s.LoRung != null && (
+                        s.LoRung.SoTieuKhu.ToString().Contains(keyword) ||
+                        s.LoRung.SoKhoanh.ToString().Contains(keyword) ||
+                        s.LoRung.SoLo.ToString().Contains(keyword)
+                    ))
+                );
+            }
+
+            var results = await query.ToListAsync();
+            return PartialView("_SinhVatTableRows", results);
+        }
+
         // GET: SinhVat/Create
         [CheckPermission("SinhVat.Create")]
         public async Task<IActionResult> Create()

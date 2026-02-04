@@ -299,6 +299,19 @@ body .container {
     box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
 }
 
+/* Dark mode: đảm bảo text hiển thị rõ ràng */
+[data-theme="dark"] .digioi-form-group input,
+[data-theme="dark"] .digioi-form-group select,
+.dark-mode .digioi-form-group input,
+.dark-mode .digioi-form-group select {
+    color: #e5e7eb !important;
+}
+
+[data-theme="dark"] .digioi-form-group input::placeholder,
+.dark-mode .digioi-form-group input::placeholder {
+    color: #94a3b8 !important;
+}
+
 /* ===== INFO BAR ===== */
 .digioi-info-bar {
     display: flex;

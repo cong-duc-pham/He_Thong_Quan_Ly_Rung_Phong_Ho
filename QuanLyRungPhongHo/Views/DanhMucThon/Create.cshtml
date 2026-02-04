@@ -19,16 +19,10 @@
             <form asp-action="Create" method="post">
                 <div asp-validation-summary="ModelOnly" class="digioi-alert digioi-alert-danger"></div>
 
-                <div class="digioi-form-group">
-                    <label asp-for="MaThon">
-                        <i class="bi bi-tag"></i> @Localizer["MaThon"] <span class="text-danger">*</span>
-                    </label>
-                    <input asp-for="MaThon"
-                           placeholder="@Localizer["MaThonPlaceholder"]"
-                           maxlength="10" />
-                    <span asp-validation-for="MaThon" class="digioi-text-danger"></span>
-                    <div class="digioi-form-text">@Localizer["MaThonHelp"]</div>
-                </div>
+                <!-- Thông báo mã tự động -->
+                @* <div class="alert alert-info mb-3">
+                    <i class="bi bi-info-circle"></i> <strong>@Localizer["AutoGenerate"]:</strong> Mã thôn sẽ được tự động sinh theo định dạng T_<MãXã>_001, T_<MãXã>_002, ...
+                </div> *@
 
                 <div class="digioi-form-group">
                     <label asp-for="TenThon">

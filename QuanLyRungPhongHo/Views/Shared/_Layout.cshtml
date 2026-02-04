@@ -112,9 +112,7 @@
                         @Localizer["Hello"],
                         <strong>@(User.FindFirst("HoTen")?.Value ?? User.Identity.Name)</strong>
                     </span>
-                    <span class="role">
-                        (@(User.FindFirst("ChucVu")?.Value ?? Localizer["Staff"].Value))
-                    </span>
+                    
                 </div>
 
                 <form asp-controller="Account" asp-action="Logout" method="post" style="display:inline;">
@@ -195,11 +193,6 @@
                                 </a>
                             </li>
                             <li>
-                                <a href="@Url.Action("Index", "DonXinNghi")">
-                                    <i class="fas fa-file-alt"></i> @Localizer["LeaveRequest"]
-                                </a>
-                            </li>
-                            <li>
                                 <a href="@Url.Action("Index", "ChamCong")">
                                     <i class="fas fa-fingerprint"></i> @Localizer["Attendance"]
                                 </a>
@@ -263,7 +256,6 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     
     <script src="~/js/theme-manager.js" asp-append-version="true"></script>
-
 
     <script src="~/js/main.js" asp-append-version="true"></script>
     <script src="~/js/sinhvat.js"></script>

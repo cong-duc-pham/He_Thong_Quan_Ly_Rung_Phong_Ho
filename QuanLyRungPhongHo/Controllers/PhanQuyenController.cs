@@ -73,11 +73,20 @@ namespace QuanLyRungPhongHo.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdatePermission(string roleName, int permissionId, bool isGranted)
         {
+            // LOG để debug
+            Console.WriteLine("======================");
+            Console.WriteLine("UpdatePermission được gọi!");
+            Console.WriteLine($"RoleName: {roleName}");
+            Console.WriteLine($"PermissionId: {permissionId}");
+            Console.WriteLine($"IsGranted: {isGranted}");
+            Console.WriteLine("======================");
+
             try
             {
                 // Kiểm tra role hợp lệ
                 if (!Roles.ContainsKey(roleName))
                 {
+                    Console.WriteLine($"ERROR: Role không hợp lệ: {roleName}");
                     return Json(new { success = false, message = "Role không hợp lệ" });
                 }
 
@@ -85,8 +94,11 @@ namespace QuanLyRungPhongHo.Controllers
                 var permission = await _context.Permissions.FindAsync(permissionId);
                 if (permission == null)
                 {
+                    Console.WriteLine($"ERROR: Permission không tồn tại: {permissionId}");
                     return Json(new { success = false, message = "Quyền không tồn tại" });
                 }
+
+                Console.WriteLine($"Found permission: {permission.PermissionCode} - {permission.PermissionName}");
 
                 // Tìm hoặc tạo RolePermission
                 var rolePermission = await _context.RolePermissions
@@ -95,6 +107,7 @@ namespace QuanLyRungPhongHo.Controllers
                 if (rolePermission == null)
                 {
                     // Tạo mới
+                    Console.WriteLine("Creating new RolePermission");
                     rolePermission = new RolePermission
                     {
                         RoleName = roleName,
@@ -107,12 +120,14 @@ namespace QuanLyRungPhongHo.Controllers
                 else
                 {
                     // Cập nhật
+                    Console.WriteLine($"Updating existing RolePermission (old value: {rolePermission.IsGranted})");
                     rolePermission.IsGranted = isGranted;
                     rolePermission.ModifiedDate = DateTime.Now;
                     _context.RolePermissions.Update(rolePermission);
                 }
 
                 await _context.SaveChangesAsync();
+                Console.WriteLine("SaveChanges SUCCESS!");
 
                 return Json(new 
                 { 
@@ -122,6 +137,8 @@ namespace QuanLyRungPhongHo.Controllers
             }
             catch (Exception ex)
             {
+                Console.WriteLine($"EXCEPTION: {ex.Message}");
+                Console.WriteLine($"Stack Trace: {ex.StackTrace}");
                 return Json(new { success = false, message = $"Lỗi: {ex.Message}" });
             }
         }
@@ -154,7 +171,13 @@ namespace QuanLyRungPhongHo.Controllers
                 "CaLam.View",
                 "CaLam.Create",
                 "CaLam.Edit",
-                "CaLam.Delete"
+                "CaLam.Delete",
+                // Đơn xin nghỉ - Không còn sử dụng
+                "DonXinNghi.View",
+                "DonXinNghi.Create",
+                "DonXinNghi.Edit",
+                "DonXinNghi.Delete",
+                "DonXinNghi.Approve"
             };
 
             // Xóa các RolePermission liên quan đến Permission cũ
@@ -231,13 +254,6 @@ namespace QuanLyRungPhongHo.Controllers
                 new() { PermissionCode = "PhanLichLamViec.Create", PermissionName = "Tạo phân lịch làm việc", ModuleName = "Phân Lịch Làm Việc" },
                 new() { PermissionCode = "PhanLichLamViec.Edit", PermissionName = "Sửa phân lịch làm việc", ModuleName = "Phân Lịch Làm Việc" },
                 new() { PermissionCode = "PhanLichLamViec.Delete", PermissionName = "Xóa phân lịch làm việc", ModuleName = "Phân Lịch Làm Việc" },
-
-                // Module: Đơn Xin Nghỉ
-                new() { PermissionCode = "DonXinNghi.View", PermissionName = "Xem đơn xin nghỉ", ModuleName = "Đơn Xin Nghỉ" },
-                new() { PermissionCode = "DonXinNghi.Create", PermissionName = "Tạo đơn xin nghỉ", ModuleName = "Đơn Xin Nghỉ" },
-                new() { PermissionCode = "DonXinNghi.Edit", PermissionName = "Sửa đơn xin nghỉ", ModuleName = "Đơn Xin Nghỉ" },
-                new() { PermissionCode = "DonXinNghi.Delete", PermissionName = "Xóa đơn xin nghỉ", ModuleName = "Đơn Xin Nghỉ" },
-                new() { PermissionCode = "DonXinNghi.Approve", PermissionName = "Duyệt đơn xin nghỉ", ModuleName = "Đơn Xin Nghỉ" },
 
                 // Module: Chấm Công
                 new() { PermissionCode = "ChamCong.View", PermissionName = "Xem chấm công", ModuleName = "Chấm Công" },
@@ -326,13 +342,6 @@ namespace QuanLyRungPhongHo.Controllers
                 new() { PermissionCode = "PhanLichLamViec.Edit", PermissionName = "Sửa phân lịch làm việc", ModuleName = "Phân Lịch Làm Việc" },
                 new() { PermissionCode = "PhanLichLamViec.Delete", PermissionName = "Xóa phân lịch làm việc", ModuleName = "Phân Lịch Làm Việc" },
 
-                // Module: Đơn Xin Nghỉ
-                new() { PermissionCode = "DonXinNghi.View", PermissionName = "Xem đơn xin nghỉ", ModuleName = "Đơn Xin Nghỉ" },
-                new() { PermissionCode = "DonXinNghi.Create", PermissionName = "Tạo đơn xin nghỉ", ModuleName = "Đơn Xin Nghỉ" },
-                new() { PermissionCode = "DonXinNghi.Edit", PermissionName = "Sửa đơn xin nghỉ", ModuleName = "Đơn Xin Nghỉ" },
-                new() { PermissionCode = "DonXinNghi.Delete", PermissionName = "Xóa đơn xin nghỉ", ModuleName = "Đơn Xin Nghỉ" },
-                new() { PermissionCode = "DonXinNghi.Approve", PermissionName = "Duyệt đơn xin nghỉ", ModuleName = "Đơn Xin Nghỉ" },
-
                 // Module: Chấm Công
                 new() { PermissionCode = "ChamCong.View", PermissionName = "Xem chấm công", ModuleName = "Chấm Công" },
                 new() { PermissionCode = "ChamCong.Create", PermissionName = "Tạo chấm công", ModuleName = "Chấm Công" },
@@ -377,8 +386,6 @@ namespace QuanLyRungPhongHo.Controllers
                 "NhatKyBaoVe.View", "NhatKyBaoVe.Create", "NhatKyBaoVe.Edit", "NhatKyBaoVe.Delete",
                 // Sinh vật - Full quyền
                 "SinhVat.View", "SinhVat.Create", "SinhVat.Edit", "SinhVat.Delete",
-                // Đơn xin nghỉ - Xem, Duyệt
-                "DonXinNghi.View", "DonXinNghi.Approve",
                 // Chấm công - Full quyền
                 "ChamCong.View", "ChamCong.Create", "ChamCong.Edit", "ChamCong.Delete",
                 // Báo cáo - Xem và xuất
@@ -391,8 +398,6 @@ namespace QuanLyRungPhongHo.Controllers
             {
                 // Xem các danh mục (chỉ xem, không sửa)
                 "DanhMucXa.View", "DanhMucThon.View", "LoRung.View", "NhanSu.View", "SinhVat.View",
-                // Đơn xin nghỉ - Tạo và xem (để gửi đơn)
-                "DonXinNghi.View", "DonXinNghi.Create",
                 // Chấm công - Chỉ xem
                 "ChamCong.View",
                 // Nhật ký bảo vệ - Xem, Tạo, Sửa (không xóa)

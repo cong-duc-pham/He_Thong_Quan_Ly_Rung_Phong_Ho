@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using QuanLyRungPhongHo.Data;
 using QuanLyRungPhongHo.Models;
+using QuanLyRungPhongHo.Attributes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +11,7 @@ using System.Threading.Tasks;
 
 namespace QuanLyRungPhongHo.Controllers
 {
+    [Authorize] // Chỉ yêu cầu đăng nhập, quyền được kiểm tra bởi CheckPermission
     public class LichLamViecController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -18,6 +21,7 @@ namespace QuanLyRungPhongHo.Controllers
             _context = context;
         }
 
+        [CheckPermission("LichLamViec.View")]
         public async Task<IActionResult> Index()
         {
             // Load danh sách nhân viên sẵn vào View
@@ -35,6 +39,7 @@ namespace QuanLyRungPhongHo.Controllers
         }
 
         [HttpGet]
+        [CheckPermission("LichLamViec.View")]
         public async Task<IActionResult> GetEmployees()
         {
             try
@@ -57,6 +62,7 @@ namespace QuanLyRungPhongHo.Controllers
         }
 
         [HttpGet]
+        [CheckPermission("LichLamViec.View")]
         public async Task<IActionResult> GetShifts()
         {
             try
@@ -82,6 +88,7 @@ namespace QuanLyRungPhongHo.Controllers
         }
 
         [HttpGet]
+        [CheckPermission("LichLamViec.View")]
         public async Task<IActionResult> GetSchedule(DateTime weekStart)
         {
             try
@@ -141,6 +148,7 @@ namespace QuanLyRungPhongHo.Controllers
         }
 
         [HttpPost]
+        [CheckPermission("LichLamViec.Create")]
         public async Task<IActionResult> SaveSchedule([FromBody] ScheduleRequest request)
         {
             try
@@ -254,6 +262,7 @@ namespace QuanLyRungPhongHo.Controllers
         }
 
         [HttpPost]
+        [CheckPermission("LichLamViec.Delete")]
         public async Task<IActionResult> ClearWeekSchedule([FromBody] ClearWeekRequest request)
         {
             try

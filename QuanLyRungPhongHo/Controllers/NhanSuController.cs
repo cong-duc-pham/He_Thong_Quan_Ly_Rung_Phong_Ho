@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using QuanLyRungPhongHo.Attributes;
 using QuanLyRungPhongHo.Data;
 using QuanLyRungPhongHo.Models;
 using QuanLyRungPhongHo.Validators;
@@ -23,6 +24,7 @@ namespace QuanLyRungPhongHo.Controllers
         }
 
         //  Hiển thị danh sách + Search + Filter
+        [CheckPermission("NhanSu.View")]
         public async Task<IActionResult> Index(string searchString, string roleFilter, string maXaFilter)
         {
             try
@@ -77,6 +79,7 @@ namespace QuanLyRungPhongHo.Controllers
 
         // lấy chi tiết 1 nhân viên
         [HttpGet]
+        [CheckPermission("NhanSu.View")]
         public async Task<JsonResult> GetById(int id)
         {
             try
@@ -111,6 +114,7 @@ namespace QuanLyRungPhongHo.Controllers
         // Lưu (Thêm hoặc Sửa) với validation chi tiết chuyên nghiệp
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [CheckPermission("NhanSu.Create", "NhanSu.Edit")]
         public async Task<JsonResult> Save(NhanSuViewModel model)
         {
             try
@@ -306,6 +310,7 @@ namespace QuanLyRungPhongHo.Controllers
         // Khóa/Mở khóa tài khoản (thay vì xóa để tránh ảnh hưởng dữ liệu liên quan)
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [CheckPermission("NhanSu.Delete")]
         public async Task<JsonResult> Delete(int id)
         {
             using (var transaction = await _context.Database.BeginTransactionAsync())
@@ -371,6 +376,7 @@ namespace QuanLyRungPhongHo.Controllers
         // Mở khóa tài khoản
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [CheckPermission("NhanSu.Edit")]
         public async Task<JsonResult> UnlockAccount(int id)
         {
             try
@@ -410,6 +416,7 @@ namespace QuanLyRungPhongHo.Controllers
 
         // API Search real-time (JSON response)
         [HttpGet]
+        [CheckPermission("NhanSu.View")]
         public async Task<JsonResult> SearchRealtime(string searchString, string roleFilter, string maXaFilter)
         {
             try

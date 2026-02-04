@@ -7,43 +7,56 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - @Localizer["AppName"]</title>
-
+    <title>@ViewData["Title"] - @Localizer["AppName"]</title>   
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
+    <link rel="stylesheet" href="~/css/lichlamviec.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/digioi.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/sinhvat.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/baocao-thongke.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/PhanQuyen.css" asp-append-version="true" />
+   
     <link href="~/css/styles.css" rel="stylesheet" />
-    <link href="~/css/forestry.css" rel="stylesheet" asp-append-version="true" />
+    @* <link href="~/css/forestry.css" rel="stylesheet" asp-append-version="true" /> *@
 
     @await RenderSectionAsync("Styles", required: false)
 </head>
 
 <body>
     <script>
+        // Khởi tạo theme ngay lập tức để tránh flash
         (function () {
             try {
-                var raw = localStorage.getItem('qlrph.settings');
-                if (!raw) return;
-                var s = JSON.parse(raw);
-                var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-                var body = document.body;
+                var theme = localStorage.getItem('qlrph.theme') || 'light';
                 var root = document.documentElement;
-                var isDark = s.theme === 'dark' || (s.theme === 'auto' && prefersDark);
-                if (isDark) {
-                    body.classList.add('theme-dark');
-                    root.classList.add('dark');
+                var body = document.body;
+                
+                if (theme === 'auto') {
+                    var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+                    theme = prefersDark ? 'dark' : 'light';
                 }
-                if (s.compactSidebar) body.classList.add('compact-sidebar');
-                if (s.density === 'compact') body.classList.add('density-compact');
-                if (s.density === 'spacious') body.classList.add('density-spacious');
-                if (s.highlightAlert) body.classList.add('highlight-alert');
-            } catch (e) { }
+                
+                if (theme === 'dark') {
+                    root.classList.add('dark');
+                    body.classList.add('theme-dark');
+                } else {
+                    root.classList.add('light');
+                    body.classList.add('theme-light');
+                }
+                
+                // Áp dụng các settings khác nếu có
+                var raw = localStorage.getItem('qlrph.settings');
+                if (raw) {
+                    var s = JSON.parse(raw);
+                    if (s.compactSidebar) body.classList.add('compact-sidebar');
+                    if (s.density === 'compact') body.classList.add('density-compact');
+                    if (s.density === 'spacious') body.classList.add('density-spacious');
+                    if (s.highlightAlert) body.classList.add('highlight-alert');
+                }
+            } catch (e) { console.warn('Lỗi khởi tạo theme:', e); }
         })();
     </script>
 
@@ -60,6 +73,11 @@
         </div>
 
         <div class="header-right">
+            <!-- Theme Toggle Button -->
+            <button id="themeToggle" class="theme-toggle-btn" type="button" title="Đổi theme">
+                <i class="fas fa-sun"></i>
+            </button>
+
             @if (User.Identity?.IsAuthenticated == true)
             {
                 <div class="user-info">
@@ -220,16 +238,45 @@
         </main>
     </div>
 
+    <script src="~/js/lichlamviec.js" asp-append-version="true"></script>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script src="~/js/theme-manager.js" asp-append-version="true"></script>
+
+
     <script src="~/js/main.js" asp-append-version="true"></script>
     <script src="~/js/sinhvat.js"></script>
-    <script src="~/js/forestry.js" asp-append-version="true"></script>
+    @* <script src="~/js/forestry.js" asp-append-version="true"></script> *@
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="~/js/digioi.js" asp-append-version="true"></script>
     <script src="~/js/lorung.js" asp-append-version="true"></script>
     <script src="~/js/nhansu.js" asp-append-version="true"></script>
     <script src="~/js/baocao-thongke.js" asp-append-version="true"></script>
+    <script>
+        // Khởi tạo theme toggle button
+        document.addEventListener('DOMContentLoaded', function() {
+            const themeToggle = document.getElementById('themeToggle');
+            if (themeToggle && window.themeManager) {
+                // Cập nhật UI ban đầu
+                window.themeManager.updateToggleButton();
+                
+                // Xử lý click - cycle qua 3 chế độ: light -> dark -> auto -> light
+                themeToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    window.themeManager.cycleTheme();
+                });
+                
+                // Lắng nghe sự kiện thay đổi theme
+                window.addEventListener('themechange', function(e) {
+                    console.log('Theme changed to:', e.detail.theme, '(effective:', e.detail.effectiveTheme + ')');
+                });
+            }
+        });
+    </script>
+    
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

@@ -61,8 +61,17 @@
   <data name="PageTitleCreate" xml:space="preserve">
     <value>Thêm sinh vật</value>
   </data>
+  <data name="PageTitle" xml:space="preserve">
+    <value>Thêm Sinh Vật Rừng</value>
+  </data>
   <data name="SpeciesNameLabel" xml:space="preserve">
     <value>Tên loài</value>
+  </data>
+  <data name="SpeciesName" xml:space="preserve">
+    <value>Tên loài</value>
+  </data>
+  <data name="SpeciesNamePlaceholder" xml:space="preserve">
+    <value>Nhập tên loài sinh vật...</value>
   </data>
   <data name="SpeciesNameRequired" xml:space="preserve">
     <value>Vui lòng nhập tên loài</value>
@@ -70,7 +79,13 @@
   <data name="TypeLabel" xml:space="preserve">
     <value>Loại sinh vật</value>
   </data>
+  <data name="WildlifeType" xml:space="preserve">
+    <value>Loại sinh vật</value>
+  </data>
   <data name="ChooseType" xml:space="preserve">
+    <value>-- Chọn loại --</value>
+  </data>
+  <data name="SelectType" xml:space="preserve">
     <value>-- Chọn loại --</value>
   </data>
   <data name="TypeRequired" xml:space="preserve">
@@ -88,7 +103,13 @@
   <data name="RarityLabel" xml:space="preserve">
     <value>Mức độ quý hiếm</value>
   </data>
+  <data name="RarityLevel" xml:space="preserve">
+    <value>Mức độ quý hiếm</value>
+  </data>
   <data name="ChooseRarity" xml:space="preserve">
+    <value>-- Chọn mức độ --</value>
+  </data>
+  <data name="SelectRarity" xml:space="preserve">
     <value>-- Chọn mức độ --</value>
   </data>
   <data name="RarityRequired" xml:space="preserve">
@@ -109,7 +130,13 @@
   <data name="ForestLotLabel" xml:space="preserve">
     <value>Lô rừng</value>
   </data>
+  <data name="ForestLot" xml:space="preserve">
+    <value>Lô rừng</value>
+  </data>
   <data name="ChooseForestLot" xml:space="preserve">
+    <value>-- Chọn lô rừng --</value>
+  </data>
+  <data name="SelectForestLot" xml:space="preserve">
     <value>-- Chọn lô rừng --</value>
   </data>
   <data name="ForestLotRequired" xml:space="preserve">
@@ -123,5 +150,8 @@
   </data>
   <data name="BackToList" xml:space="preserve">
     <value>Quay lại danh sách</value>
+  </data>
+  <data name="Back" xml:space="preserve">
+    <value>Quay lại</value>
   </data>
 </root>

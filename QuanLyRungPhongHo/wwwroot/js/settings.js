@@ -50,11 +50,8 @@ function persistLayoutState(patch) {
 function initializeSettings() {
     const layoutState = readLayoutState();
 
-    // Theme
-    const theme = layoutState.theme || localStorage.getItem(SETTINGS_KEYS.THEME) || 'light';
-    document.getElementById('setting-theme').value = theme;
-    applyTheme(theme);
-    persistLayoutState({ theme });
+    // Theme - KHÔNG setup ở đây nữa, để inline script trong Index.cshtml xử lý
+    // để tránh conflict và đảm bảo themeManager đã load xong
     
     // Language
     const language = layoutState.language || localStorage.getItem(SETTINGS_KEYS.LANGUAGE) || 'vi';
@@ -87,14 +84,8 @@ function initializeSettings() {
 
 // ===== SETUP EVENT LISTENERS =====
 function setupEventListeners() {
-    // Theme change
-    document.getElementById('setting-theme').addEventListener('change', function(e) {
-        const theme = e.target.value;
-        localStorage.setItem(SETTINGS_KEYS.THEME, theme);
-        applyTheme(theme);
-        persistLayoutState({ theme });
-        showSuccessAlert('Đã thay đổi chủ đề giao diện');
-    });
+    // Theme change - KHÔNG setup ở đây, để inline script trong Index.cshtml xử lý
+    // Tránh conflict và đảm bảo themeManager đã sẵn sàng
     
     // Language change
     const langEl = document.getElementById('setting-language');
@@ -170,24 +161,58 @@ function saveContactInformation() {
         return;
     }
     
-    // Save to localStorage
-    localStorage.setItem(SETTINGS_KEYS.CONTACT_EMAIL, email);
-    localStorage.setItem(SETTINGS_KEYS.CONTACT_PHONE, phone);
-    localStorage.setItem(SETTINGS_KEYS.CONTACT_NOTE, note);
-    
-    // Show success message with animation
-    showSuccessAlert('Đã lưu cài đặt cá nhân (lưu trên trình duyệt này)');
-    
-    // Add button animation
+    // Show loading state
     const button = document.getElementById('btn-save-contact');
-    button.classList.add('btn-success');
-    button.innerHTML = '<i class="fa-solid fa-check me-2"></i>Đã lưu!';
+    const originalHtml = button.innerHTML;
+    button.disabled = true;
+    button.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i>Đang lưu...';
     
-    setTimeout(() => {
-        button.classList.remove('btn-success');
-        button.classList.add('btn-primary');
-        button.innerHTML = '<i class="fa-solid fa-floppy-disk me-2"></i>Lưu cài đặt cá nhân';
-    }, 2000);
+    // Send to server
+    fetch('/Settings/SaveContactSettings', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+        },
+        body: JSON.stringify({
+            Email: email,
+            SoDienThoai: phone,
+            GhiChuNoiBo: note
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Also save to localStorage for offline access
+            localStorage.setItem(SETTINGS_KEYS.CONTACT_EMAIL, email);
+            localStorage.setItem(SETTINGS_KEYS.CONTACT_PHONE, phone);
+            localStorage.setItem(SETTINGS_KEYS.CONTACT_NOTE, note);
+            
+            // Show success message
+            showSuccessAlert(data.message || 'Đã lưu cài đặt cá nhân thành công');
+            
+            // Button animation
+            button.classList.add('btn-success');
+            button.innerHTML = '<i class="fa-solid fa-check me-2"></i>Đã lưu!';
+            
+            setTimeout(() => {
+                button.classList.remove('btn-success');
+                button.classList.add('btn-primary');
+                button.innerHTML = originalHtml;
+                button.disabled = false;
+            }, 2000);
+        } else {
+            showErrorAlert(data.message || 'Có lỗi xảy ra khi lưu');
+            button.innerHTML = originalHtml;
+            button.disabled = false;
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showErrorAlert('Không thể kết nối đến máy chủ');
+        button.innerHTML = originalHtml;
+        button.disabled = false;
+    });
 }
 
 // ===== VALIDATION =====

@@ -107,7 +107,12 @@ body {
 
     .table-custom thead {
         background: linear-gradient(90deg, var(--thead-1), var(--thead-2));
-        color: #e8f8ee;
+        color: #ffffff !important;
+    }
+
+    .table-custom thead th,
+    .table-custom thead td {
+        color: #ffffff !important;
     }
 
     .table-custom th,

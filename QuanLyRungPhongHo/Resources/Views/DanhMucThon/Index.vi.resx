@@ -97,11 +97,29 @@
   <data name="BelongsToCommune" xml:space="preserve">
     <value>Thuộc Xã</value>
   </data>
+  <data name="BelongToCommune" xml:space="preserve">
+    <value>Thuộc Xã</value>
+  </data>
   <data name="ForestLotCount" xml:space="preserve">
+    <value>Số lô rừng</value>
+  </data>
+  <data name="NumberOfLots" xml:space="preserve">
     <value>Số lô rừng</value>
   </data>
   <data name="Action" xml:space="preserve">
     <value>Hành động</value>
+  </data>
+  <data name="Actions" xml:space="preserve">
+    <value>Thao tác</value>
+  </data>
+  <data name="No" xml:space="preserve">
+    <value>STT</value>
+  </data>
+  <data name="NoDataFound" xml:space="preserve">
+    <value>Không tìm thấy dữ liệu</value>
+  </data>
+  <data name="Search" xml:space="preserve">
+    <value>Tìm kiếm</value>
   </data>
   <data name="Edit" xml:space="preserve">
     <value>Sửa</value>

@@ -72,6 +72,22 @@
         box-shadow: 0 0 0 0.15rem rgba(25,135,84,0.25);
     }
 
+/* Dark mode */
+html.dark .form-control,
+html.dark input,
+html.dark select,
+html.dark textarea {
+    color: #e2e8f0 !important;
+    background: #0f172a !important;
+    border-color: #1f2937;
+}
+
+html.dark .form-control::placeholder,
+html.dark input::placeholder,
+html.dark textarea::placeholder {
+    color: #94a3b8 !important;
+}
+
 /* ===== Form text ===== */
 .form-text {
     font-size: 0.8rem;

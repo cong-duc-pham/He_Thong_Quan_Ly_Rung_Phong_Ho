@@ -371,6 +371,18 @@ body {
             background: var(--llv-surface);
         }
 
+/* Dark mode input fix */
+html.dark input,
+html.dark select,
+html.dark textarea {
+    color: #e2e8f0 !important;
+}
+
+html.dark input::placeholder,
+html.dark textarea::placeholder {
+    color: #94a3b8 !important;
+}
+
     .search-box i {
         position: absolute;
         left: 12px;

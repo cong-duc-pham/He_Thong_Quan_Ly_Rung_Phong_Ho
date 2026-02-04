@@ -6,10 +6,9 @@ namespace QuanLyRungPhongHo.Models
     public class DanhMucThon
     {
         [Key]
-        [Required(ErrorMessage = "Mã thôn không được để trống")]
-        [StringLength(10, ErrorMessage = "Mã thôn không được vượt quá 10 ký tự")]
+        [StringLength(20, ErrorMessage = "Mã thôn không được vượt quá 20 ký tự")]
         [Display(Name = "Mã Thôn/Bản")]
-        public string MaThon { get; set; } = null!;
+        public string MaThon { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Tên thôn không được để trống")]
         [StringLength(100, ErrorMessage = "Tên thôn không được vượt quá 100 ký tự")]

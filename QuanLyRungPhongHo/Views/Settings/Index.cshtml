@@ -152,9 +152,12 @@
                 <p class="text-muted small">@Localizer["SecurityNote"]</p>
 
                 <div class="d-flex gap-2">
-                    <a class="btn btn-outline-danger" asp-controller="Account" asp-action="Logout">
-                        <i class="fa-solid fa-right-from-bracket me-2"></i>@Localizer["Logout"]
-                    </a>
+                    <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-outline-danger">
+                            <i class="fa-solid fa-right-from-bracket me-2"></i>@Localizer["Logout"]
+                        </button>
+                    </form>
                     <a class="btn btn-outline-secondary" asp-controller="Home" asp-action="Index">
                         <i class="fa-solid fa-house me-2"></i>@Localizer["Home"]
                     </a>

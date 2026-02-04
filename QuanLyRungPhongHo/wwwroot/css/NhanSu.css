@@ -70,3 +70,20 @@
     border-color: #198754;
     box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, 0.25);
 }
+
+/* Dark mode */
+html.dark input,
+html.dark select,
+html.dark textarea,
+html.dark .form-control,
+html.dark .form-select {
+    color: #e2e8f0 !important;
+    background: #0f172a !important;
+    border-color: #1f2937;
+}
+
+html.dark input::placeholder,
+html.dark textarea::placeholder,
+html.dark .form-control::placeholder {
+    color: #94a3b8 !important;
+}

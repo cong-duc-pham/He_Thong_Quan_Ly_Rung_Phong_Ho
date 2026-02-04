@@ -20,18 +20,10 @@
             <form asp-action="Create" method="post" class="digioi-form">
                 <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
 
-                <!-- Mã xã -->
-                <div class="mb-3">
-                    <label asp-for="MaXa">
-                        <i class="bi bi-tag"></i> @Localizer["MaXa"] <span class="text-danger">@Localizer["Required"]</span>
-                    </label>
-                    <input asp-for="MaXa"
-                           class="form-control"
-                           placeholder="@Localizer["MaXaPlaceholder"]"
-                           maxlength="10" />
-                    <span asp-validation-for="MaXa" class="text-danger"></span>
-                    <div class="form-text">@Localizer["MaXaHelp"]</div>
-                </div>
+                @* <!-- Thông báo mã tự động -->
+                <div class="alert alert-info mb-3">
+                    <i class="bi bi-info-circle"></i> <strong>@Localizer["AutoGenerate"]:</strong> Mã xã sẽ được tự động sinh theo định dạng XA001, XA002, ...
+                </div> *@
 
                 <!-- Tên xã -->
                 <div class="mb-4">

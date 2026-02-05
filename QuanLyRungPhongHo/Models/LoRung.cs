@@ -9,14 +9,17 @@ namespace QuanLyRungPhongHo.Models
         public int MaLo { get; set; } // IDENTITY
 
         [Display(Name = "Số Tiểu Khu")]
+        [Required(ErrorMessage = "Vui lòng nhập số tiểu khu")]
         [Range(1, 999, ErrorMessage = "Số tiểu khu phải từ 1 đến 999")]
         public int? SoTieuKhu { get; set; }
 
         [Display(Name = "Số Khoảnh")]
+        [Required(ErrorMessage = "Vui lòng nhập số khoảnh")]
         [Range(1, 999, ErrorMessage = "Số khoảnh phải từ 1 đến 999")]
         public int? SoKhoanh { get; set; }
 
         [Display(Name = "Số Lô")]
+        [Required(ErrorMessage = "Vui lòng nhập số lô")]
         [Range(1, 999, ErrorMessage = "Số lô phải từ 1 đến 999")]
         public int? SoLo { get; set; }
 

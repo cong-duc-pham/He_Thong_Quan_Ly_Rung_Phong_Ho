@@ -155,9 +155,9 @@
                         {
                             <tr>
                                 <td>@stt</td>
-                                <td><strong>@item.SoTieuKhu</strong></td>
-                                <td><strong>@item.SoKhoanh</strong></td>
-                                <td><strong>@item.SoLo</strong></td>
+                                <td><strong>@(item.SoTieuKhu?.ToString() ?? "—")</strong></td>
+                                <td><strong>@(item.SoKhoanh?.ToString() ?? "—")</strong></td>
+                                <td><strong>@(item.SoLo?.ToString() ?? "—")</strong></td>
                                 <td>@item.DanhMucThon?.TenThon</td>
                                 <td>
                                     <span class="digioi-badge digioi-badge-success">@item.DanhMucThon?.DanhMucXa?.TenXa</span>

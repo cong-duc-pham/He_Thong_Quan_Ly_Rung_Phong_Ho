@@ -343,6 +343,14 @@ LoRung.AjaxHandler = {
         this.container.data('ajax-bound', true);
 
         this.endpoint = this.container.data('endpoint');
+        
+        // IMPORTANT: Nếu không có endpoint (tức là dùng server-side rendering), không init AJAX
+        if (!this.endpoint) {
+            console.log('No AJAX endpoint - using server-side rendering');
+            return;
+        }
+        
+        console.log('Initializing AJAX handler for endpoint:', this.endpoint);
         this.pageSize = parseInt(this.container.attr('data-pagesize'), 10) || 15;
         this.state = {
             page: parseInt(this.container.attr('data-initial-page'), 10) || 1,
@@ -362,11 +370,25 @@ LoRung.AjaxHandler = {
         this.$pagination = $('#lorung-pagination');
 
         this.bindEvents();
-        this.loadData();
+        
+        // Chỉ load data nếu table đang empty hoặc có class 'force-reload'
+        const hasData = this.$tableBody.find('tr').length > 0 && 
+                       !this.$tableBody.find('.digioi-empty').length;
+        
+        if (!hasData || this.container.hasClass('force-reload')) {
+            console.log('Loading initial data via AJAX');
+            this.loadData();
+        } else {
+            console.log('Using server-rendered data');
+        }
     },
 
     bindEvents: function () {
         const self = this;
+        
+        // Flag to prevent auto-trigger during initialization
+        this.isInitializing = true;
+        setTimeout(() => { self.isInitializing = false; }, 500);
 
         this.$form.on('submit', function (e) {
             e.preventDefault();
@@ -376,6 +398,7 @@ LoRung.AjaxHandler = {
         });
 
         this.$xa.on('change', function () {
+            if (self.isInitializing) return;
             self.state.xa = $(this).val();
             self.state.thon = '';
             self.state.page = 1;
@@ -383,18 +406,21 @@ LoRung.AjaxHandler = {
         });
 
         this.$thon.on('change', function () {
+            if (self.isInitializing) return;
             self.state.thon = $(this).val();
             self.state.page = 1;
             self.loadData();
         });
 
         this.$loai.on('change', function () {
+            if (self.isInitializing) return;
             self.state.loai = $(this).val();
             self.state.page = 1;
             self.loadData();
         });
 
         this.$trangThai.on('change', function () {
+            if (self.isInitializing) return;
             self.state.trangThai = $(this).val();
             self.state.page = 1;
             self.loadData();
@@ -452,13 +478,18 @@ LoRung.AjaxHandler = {
             pageSize: self.pageSize
         })
             .done(function (res) {
+                console.log('API Response:', res); // Debug log
                 if (res.error) {
                     self.showError(res.error);
                     return;
                 }
+                if (res.items && res.items.length > 0) {
+                    console.log('First item:', res.items[0]); // Debug log
+                }
                 self.render(res);
             })
-            .fail(function () {
+            .fail(function (xhr, status, error) {
+                console.error('API Error:', error, xhr); // Debug log
                 self.showError('Không thể tải dữ liệu lô rừng.');
             });
     },
@@ -480,24 +511,27 @@ LoRung.AjaxHandler = {
             let rows = '';
             let stt = start;
             items.forEach(item => {
-                const badgeClass = this.getTrangThaiBadge(item.trangThai);
-                const dienTichText = item.dienTich ? DiGioi.Utils.formatArea(item.dienTich) : '—';
+                const badgeClass = this.getTrangThaiBadge(item.TrangThai);
+                const dienTichText = item.DienTich ? DiGioi.Utils.formatArea(item.DienTich) : '—';
+                const soTieuKhu = item.SoTieuKhu ?? '—';
+                const soKhoanh = item.SoKhoanh ?? '—';
+                const soLo = item.SoLo ?? '—';
 
                 rows += `
                     <tr>
                         <td>${stt}</td>
-                        <td><strong>${item.soTieuKhu}</strong></td>
-                        <td><strong>${item.soKhoanh}</strong></td>
-                        <td><strong>${item.soLo}</strong></td>
-                        <td>${item.tenThon || ''}</td>
-                        <td><span class="digioi-badge digioi-badge-success">${item.tenXa || ''}</span></td>
+                        <td><strong>${soTieuKhu}</strong></td>
+                        <td><strong>${soKhoanh}</strong></td>
+                        <td><strong>${soLo}</strong></td>
+                        <td>${item.TenThon || ''}</td>
+                        <td><span class="digioi-badge digioi-badge-success">${item.TenXa || ''}</span></td>
                         <td>${dienTichText}</td>
-                        <td>${item.loaiRung || ''}</td>
-                        <td><span class="digioi-badge ${badgeClass}">${item.trangThai || ''}</span></td>
+                        <td>${item.LoaiRung || ''}</td>
+                        <td><span class="digioi-badge ${badgeClass}">${item.TrangThai || ''}</span></td>
                         <td>
                             <div class="digioi-btn-group">
-                                <a href="/LoRung/Edit/${item.maLo}" class="digioi-btn digioi-btn-warning"><i class="bi bi-pencil-square"></i></a>
-                                <a href="/LoRung/Delete/${item.maLo}" class="digioi-btn digioi-btn-danger"><i class="bi bi-trash"></i></a>
+                                <a href="/LoRung/Edit/${item.MaLo}" class="digioi-btn digioi-btn-warning"><i class="bi bi-pencil-square"></i></a>
+                                <a href="/LoRung/Delete/${item.MaLo}" class="digioi-btn digioi-btn-danger"><i class="bi bi-trash"></i></a>
                             </div>
                         </td>
                     </tr>`;
@@ -550,6 +584,7 @@ LoRung.AjaxHandler = {
     },
 
     getTrangThaiBadge: function (trangThai) {
+        if (!trangThai) return 'digioi-badge-secondary';
         switch (trangThai) {
             case 'Rừng giàu':
                 return 'digioi-badge-success';

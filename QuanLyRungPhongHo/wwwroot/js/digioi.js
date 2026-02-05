@@ -455,6 +455,14 @@ DiGioi.ThonHandler = {
         this.container.data('ajax-bound', true);
 
         this.endpoint = this.container.data('endpoint');
+        
+        // Nếu không có endpoint, không init AJAX
+        if (!this.endpoint) {
+            console.log('Thon: No AJAX endpoint - using server-side rendering');
+            return;
+        }
+        
+        console.log('Thon: Initializing AJAX handler');
         this.pageSize = parseInt(this.container.attr('data-pagesize'), 10) || 10;
         this.state = {
             page: parseInt(this.container.attr('data-initial-page'), 10) || 1,
@@ -469,11 +477,25 @@ DiGioi.ThonHandler = {
         this.$xaSelect = $('#thon-filter-xa');
 
         this.bindEvents();
-        this.loadData();
+        
+        // Chỉ load data nếu table đang empty
+        const hasData = this.$tableBody.find('tr').length > 0 && 
+                       !this.$tableBody.find('.digioi-empty').length;
+        
+        if (!hasData || this.container.hasClass('force-reload')) {
+            console.log('Thon: Loading initial data via AJAX');
+            this.loadData();
+        } else {
+            console.log('Thon: Using server-rendered data');
+        }
     },
 
     bindEvents: function () {
         const self = this;
+        
+        // Flag to prevent auto-trigger during initialization
+        this.isInitializing = true;
+        setTimeout(() => { self.isInitializing = false; }, 500);
 
         $('#thon-filter-form').on('submit', function (e) {
             e.preventDefault();
@@ -484,12 +506,14 @@ DiGioi.ThonHandler = {
         });
 
         this.$xaSelect.on('change', function () {
+            if (self.isInitializing) return;
             self.state.xa = $(this).val();
             self.state.page = 1;
             self.loadData();
         });
 
         DiGioi.SearchFilter.initLiveSearch('#thon-filter-search', function (value) {
+            if (self.isInitializing) return;
             self.state.search = value;
             self.state.page = 1;
             self.loadData();
@@ -527,13 +551,18 @@ DiGioi.ThonHandler = {
             pageSize: self.pageSize
         })
             .done(function (res) {
+                console.log('Thon API Response:', res);
                 if (res.error) {
                     self.showError(res.error);
                     return;
                 }
+                if (res.items && res.items.length > 0) {
+                    console.log('Thon First item:', res.items[0]);
+                }
                 self.render(res);
             })
-            .fail(function () {
+            .fail(function (xhr, status, error) {
+                console.error('Thon API Error:', error, xhr);
                 self.showError('Không thể tải dữ liệu thôn.');
             });
     },
@@ -555,17 +584,22 @@ DiGioi.ThonHandler = {
             let rows = '';
             let stt = start;
             items.forEach(item => {
+                const maThon = item.MaThon ?? '—';
+                const tenThon = item.TenThon ?? '—';
+                const tenXa = item.TenXa ?? '—';
+                const soLoRung = item.SoLoRung ?? 0;
+                
                 rows += `
                     <tr>
                         <td>${stt}</td>
-                        <td><strong>${item.maThon}</strong></td>
-                        <td>${item.tenThon}</td>
-                        <td><span class="digioi-badge digioi-badge-success">${item.tenXa}</span></td>
-                        <td class="text-center"><span class="digioi-badge digioi-badge-secondary">${item.soLoRung}</span></td>
+                        <td><strong>${maThon}</strong></td>
+                        <td>${tenThon}</td>
+                        <td><span class="digioi-badge digioi-badge-success">${tenXa}</span></td>
+                        <td class="text-center"><span class="digioi-badge digioi-badge-secondary">${soLoRung}</span></td>
                         <td class="text-center">
                             <div class="digioi-btn-group">
-                                <a href="/DanhMucThon/Edit/${item.maThon}" class="digioi-btn digioi-btn-warning"><i class="bi bi-pencil-square"></i></a>
-                                <a href="/DanhMucThon/Delete/${item.maThon}" class="digioi-btn digioi-btn-danger"><i class="bi bi-trash"></i></a>
+                                <a href="/DanhMucThon/Edit/${item.MaThon}" class="digioi-btn digioi-btn-warning"><i class="bi bi-pencil-square"></i></a>
+                                <a href="/DanhMucThon/Delete/${item.MaThon}" class="digioi-btn digioi-btn-danger"><i class="bi bi-trash"></i></a>
                             </div>
                         </td>
                     </tr>`;

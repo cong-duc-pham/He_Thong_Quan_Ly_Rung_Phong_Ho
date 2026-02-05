@@ -18,6 +18,90 @@ namespace QuanLyRungPhongHo.Controllers
             _context = context;
         }
 
+        // Helper: Kiểm tra có đúng ca làm việc được phân công không
+        private (bool isValid, string message) ValidateCaLamViec(CaLamViec caLamViec, DateTime currentTime, bool isCheckIn)
+        {
+            var currentTimeOnly = currentTime.TimeOfDay;
+            var gioBatDau = caLamViec.GioBatDau;
+            var gioKetThuc = caLamViec.GioKetThuc;
+
+            // Khung giờ cho phép vào ca: 30 phút trước đến 2 giờ sau giờ bắt đầu
+            var allowCheckInFrom = gioBatDau.Add(TimeSpan.FromMinutes(-30));
+            var allowCheckInTo = gioBatDau.Add(TimeSpan.FromHours(2));
+
+            // Khung giờ cho phép tan ca: 1 giờ trước đến 1 giờ sau giờ kết thúc
+            var allowCheckOutFrom = gioKetThuc.Add(TimeSpan.FromHours(-1));
+            var allowCheckOutTo = gioKetThuc.Add(TimeSpan.FromHours(1));
+
+            // DEBUG LOG
+            Console.WriteLine($"=== KIỂM TRA CA LÀM VIỆC ===");
+            Console.WriteLine($"Ca: {caLamViec.TenCa}");
+            Console.WriteLine($"Giờ ca: {gioBatDau:hh\\:mm} - {gioKetThuc:hh\\:mm}");
+            Console.WriteLine($"Giờ hiện tại: {currentTimeOnly:hh\\:mm\\:ss}");
+            Console.WriteLine($"Loại: {(isCheckIn ? "VÀO CA" : "TAN CA")}");
+
+            if (isCheckIn)
+            {
+                Console.WriteLine($"Khung giờ cho phép vào ca: {allowCheckInFrom:hh\\:mm} - {allowCheckInTo:hh\\:mm}");
+                
+                // CHẶN nếu quá sớm
+                if (currentTimeOnly < allowCheckInFrom)
+                {
+                    var minutesUntil = (int)(allowCheckInFrom - currentTimeOnly).TotalMinutes;
+                    Console.WriteLine($"❌ Quá sớm - còn {minutesUntil} phút");
+                    return (false, $"❌ Chưa đến giờ vào ca! Ca {caLamViec.TenCa} ({gioBatDau:hh\\:mm} - {gioKetThuc:hh\\:mm}). Bạn có thể vào ca từ {allowCheckInFrom:hh\\:mm}.");
+                }
+                
+                // CHẶN nếu quá muộn
+                if (currentTimeOnly > allowCheckInTo)
+                {
+                    Console.WriteLine($"❌ Quá muộn - đã qua {allowCheckInTo:hh\\:mm}");
+                    return (false, $"❌ Đã quá giờ vào ca! Ca {caLamViec.TenCa} bắt đầu lúc {gioBatDau:hh\\:mm}. Thời gian vào ca tối đa đến {allowCheckInTo:hh\\:mm}.");
+                }
+
+                // Trong khung giờ hợp lệ - kiểm tra vào muộn
+                if (currentTimeOnly > gioBatDau.Add(TimeSpan.FromMinutes(15)))
+                {
+                    var lateMinutes = (int)(currentTimeOnly - gioBatDau).TotalMinutes;
+                    Console.WriteLine($"⚠️ Vào ca muộn {lateMinutes} phút (vẫn hợp lệ)");
+                    return (true, $"⚠️ Bạn đang vào ca muộn {lateMinutes} phút so với giờ quy định ({gioBatDau:hh\\:mm}). Ca {caLamViec.TenCa}.");
+                }
+
+                Console.WriteLine($"✅ Vào ca đúng giờ");
+                return (true, $"✓ Vào ca thành công - Ca {caLamViec.TenCa} ({gioBatDau:hh\\:mm} - {gioKetThuc:hh\\:mm})");
+            }
+            else
+            {
+                Console.WriteLine($"Khung giờ cho phép tan ca: {allowCheckOutFrom:hh\\:mm} - {allowCheckOutTo:hh\\:mm}");
+                
+                // CHẶN nếu quá sớm
+                if (currentTimeOnly < allowCheckOutFrom)
+                {
+                    var minutesUntil = (int)(allowCheckOutFrom - currentTimeOnly).TotalMinutes;
+                    Console.WriteLine($"❌ Quá sớm - còn {minutesUntil} phút");
+                    return (false, $"❌ Chưa đến giờ tan ca! Ca {caLamViec.TenCa} kết thúc lúc {gioKetThuc:hh\\:mm}. Bạn có thể tan ca từ {allowCheckOutFrom:hh\\:mm}.");
+                }
+                
+                // CHẶN nếu quá muộn
+                if (currentTimeOnly > allowCheckOutTo)
+                {
+                    Console.WriteLine($"❌ Quá muộn - đã qua {allowCheckOutTo:hh\\:mm}");
+                    return (false, $"❌ Đã quá giờ tan ca! Ca {caLamViec.TenCa} kết thúc lúc {gioKetThuc:hh\\:mm}. Thời gian tan ca tối đa đến {allowCheckOutTo:hh\\:mm}.");
+                }
+
+                // Trong khung giờ hợp lệ - kiểm tra tan sớm
+                if (currentTimeOnly < gioKetThuc)
+                {
+                    var earlyMinutes = (int)(gioKetThuc - currentTimeOnly).TotalMinutes;
+                    Console.WriteLine($"⚠️ Tan ca sớm {earlyMinutes} phút (vẫn hợp lệ)");
+                    return (true, $"⚠️ Bạn đang tan ca sớm {earlyMinutes} phút so với giờ quy định ({gioKetThuc:hh\\:mm}). Ca {caLamViec.TenCa}.");
+                }
+
+                Console.WriteLine($"✅ Tan ca đúng giờ");
+                return (true, $"✓ Tan ca thành công - Ca {caLamViec.TenCa} ({gioBatDau:hh\\:mm} - {gioKetThuc:hh\\:mm})");
+            }
+        }
+
         // GET: ChamCong/Index - Hiển thị lịch làm việc và chấm công
         [CheckPermission("ChamCong.View")]
         public async Task<IActionResult> Index()
@@ -144,11 +228,19 @@ namespace QuanLyRungPhongHo.Controllers
 
                 var lichLamViec = await _context.LichLamViecs
                     .Include(l => l.ChamCongs)
+                    .Include(l => l.CaLamViec)
                     .FirstOrDefaultAsync(l => l.MaLich == maLich && l.MaNV == taikhoan.MaNV);
 
                 if (lichLamViec == null)
                 {
                     TempData["ErrorMessage"] = "Không tìm thấy lịch làm việc!";
+                    return RedirectToAction("Index");
+                }
+
+                // Kiểm tra ca làm việc
+                if (lichLamViec.CaLamViec == null)
+                {
+                    TempData["ErrorMessage"] = "Lịch làm việc không có thông tin ca!";
                     return RedirectToAction("Index");
                 }
 
@@ -160,6 +252,14 @@ namespace QuanLyRungPhongHo.Controllers
                 }
 
                 var currentTime = DateTime.Now;
+
+                // Kiểm tra ca làm việc - CHẶN nếu ngoài khung giờ cho phép
+                var validation = ValidateCaLamViec(lichLamViec.CaLamViec, currentTime, isCheckIn: true);
+                if (!validation.isValid)
+                {
+                    TempData["ErrorMessage"] = validation.message;
+                    return RedirectToAction("Index");
+                }
 
                 if (chamCong == null)
                 {
@@ -177,7 +277,16 @@ namespace QuanLyRungPhongHo.Controllers
                 }
 
                 await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = $"✓ Vào ca thành công lúc {currentTime:HH:mm:ss}";
+                
+                // Hiển thị thông báo
+                if (validation.message.Contains("⚠️"))
+                {
+                    TempData["WarningMessage"] = validation.message + $" Đã ghi nhận vào ca lúc {currentTime:HH:mm:ss}.";
+                }
+                else
+                {
+                    TempData["SuccessMessage"] = validation.message + $" lúc {currentTime:HH:mm:ss}";
+                }
                 
                 return RedirectToAction("Index");
             }
@@ -213,11 +322,19 @@ namespace QuanLyRungPhongHo.Controllers
 
                 var lichLamViec = await _context.LichLamViecs
                     .Include(l => l.ChamCongs)
+                    .Include(l => l.CaLamViec)
                     .FirstOrDefaultAsync(l => l.MaLich == maLich && l.MaNV == taikhoan.MaNV);
 
                 if (lichLamViec == null)
                 {
                     TempData["ErrorMessage"] = "Không tìm thấy lịch làm việc!";
+                    return RedirectToAction("Index");
+                }
+
+                // Kiểm tra ca làm việc
+                if (lichLamViec.CaLamViec == null)
+                {
+                    TempData["ErrorMessage"] = "Lịch làm việc không có thông tin ca!";
                     return RedirectToAction("Index");
                 }
 
@@ -235,6 +352,14 @@ namespace QuanLyRungPhongHo.Controllers
                 }
 
                 var currentTime = DateTime.Now;
+
+                // Kiểm tra ca làm việc - CHẶN nếu ngoài khung giờ cho phép
+                var validation = ValidateCaLamViec(lichLamViec.CaLamViec, currentTime, isCheckIn: false);
+                if (!validation.isValid)
+                {
+                    TempData["ErrorMessage"] = validation.message;
+                    return RedirectToAction("Index");
+                }
                 chamCong.GioRa = currentTime;
 
                 var soGioLam = (currentTime - chamCong.GioVao.Value).TotalHours;
@@ -243,7 +368,15 @@ namespace QuanLyRungPhongHo.Controllers
                 _context.ChamCongs.Update(chamCong);
                 await _context.SaveChangesAsync();
 
-                TempData["SuccessMessage"] = $"✓ Tan ca thành công lúc {currentTime:HH:mm:ss} | Tổng: {chamCong.SoGioLam}h";
+                // Hiển thị thông báo
+                if (validation.message.Contains("⚠️"))
+                {
+                    TempData["WarningMessage"] = validation.message + $" Đã ghi nhận tan ca lúc {currentTime:HH:mm:ss} | Tổng: {chamCong.SoGioLam}h";
+                }
+                else
+                {
+                    TempData["SuccessMessage"] = validation.message + $" lúc {currentTime:HH:mm:ss} | Tổng: {chamCong.SoGioLam}h";
+                }
                 
                 return RedirectToAction("Index");
             }

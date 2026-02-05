@@ -56,34 +56,34 @@
         } else {
             let tableRows = '';
             items.forEach(item => {
-                const emailDisplay = item.email ? `<div><small class="text-muted"><i class="bi bi-envelope"></i> ${item.email}</small></div>` : '';
-                const statusBadge = item.trangThai
+                const emailDisplay = item.Email ? `<div><small class="text-muted"><i class="bi bi-envelope"></i> ${item.Email}</small></div>` : '';
+                const statusBadge = item.TrangThai
                     ? '<span class="badge bg-success">Hoạt động</span>'
                     : '<span class="badge bg-danger">Bị khóa</span>';
-                const lockBtnIcon = item.trangThai ? 'bi-lock' : 'bi-unlock';
-                const lockBtnText = item.trangThai ? '' : '';
-                const lockBtnClass = item.trangThai ? 'btn-warning' : 'btn-success';
+                const lockBtnIcon = item.TrangThai ? 'bi-lock' : 'bi-unlock';
+                const lockBtnText = item.TrangThai ? '' : '';
+                const lockBtnClass = item.TrangThai ? 'btn-warning' : 'btn-success';
 
                 tableRows += `
-                    <tr class="${!item.trangThai ? 'table-secondary' : ''}">
+                    <tr class="${!item.TrangThai ? 'table-secondary' : ''}">
                         <td>
-                            <div class="fw-bold">${item.hoTen}</div>
+                            <div class="fw-bold">${item.HoTen}</div>
                             ${statusBadge}
                         </td>
-                        <td><span class="badge bg-primary">${item.chucVu}</span></td>
+                        <td><span class="badge bg-primary">${item.ChucVu}</span></td>
                         <td>
-                            <div><small class="text-muted"><i class="bi bi-telephone"></i> ${item.sdt}</small></div>
+                            <div><small class="text-muted"><i class="bi bi-telephone"></i> ${item.SDT}</small></div>
                             ${emailDisplay}
                         </td>
-                        <td>${item.tenXa}</td>
+                        <td>${item.TenXa}</td>
                         <td>
-                            ${item.tenDangNhap ? `<span>${item.tenDangNhap}</span> <span class="text-muted">(${item.quyen})</span>` : '<span class="text-danger">Chưa có TK</span>'}
+                            ${item.TenDangNhap ? `<span>${item.TenDangNhap}</span> <span class="text-muted">(${item.Quyen})</span>` : '<span class="text-danger">Chưa có TK</span>'}
                         </td>
                         <td class="text-center">
-                            <button class="btn btn-sm btn-outline-primary" onclick="editData(${item.maNV}, event)" title="Sửa thông tin">
+                            <button class="btn btn-sm btn-outline-primary" onclick="editData(${item.MaNV}, event)" title="Sửa thông tin">
                                 <i class="bi bi-pencil"></i>
                             </button>
-                            <button class="btn btn-sm btn-outline-${lockBtnClass}" onclick="toggleLock(${item.maNV}, ${item.trangThai})" title="${item.trangThai ? 'Khóa tài khoản' : 'Mở khóa tài khoản'}">
+                            <button class="btn btn-sm btn-outline-${lockBtnClass}" onclick="toggleLock(${item.MaNV}, ${item.TrangThai})" title="${item.TrangThai ? 'Khóa tài khoản' : 'Mở khóa tài khoản'}">
                                 <i class="bi ${lockBtnIcon}"></i>
                             </button>
                         </td>
@@ -94,33 +94,33 @@
             // Render mobile view
             let mobileCards = '';
             items.forEach(item => {
-                const emailMobileDisplay = item.email ? `<p class="mb-1 small"><i class="bi bi-envelope"></i> ${item.email}</p>` : '';
-                const statusBadge = item.trangThai
+                const emailMobileDisplay = item.Email ? `<p class="mb-1 small"><i class="bi bi-envelope"></i> ${item.Email}</p>` : '';
+                const statusBadge = item.TrangThai
                     ? '<span class="badge bg-success">Hoạt động</span>'
                     : '<span class="badge bg-danger">Bị khóa</span>';
-                const lockBtnText = item.trangThai ? 'Khóa' : 'Mở khóa';
-                const lockBtnClass = item.trangThai ? 'btn-warning' : 'btn-success';
+                const lockBtnText = item.TrangThai ? 'Khóa' : 'Mở khóa';
+                const lockBtnClass = item.TrangThai ? 'btn-warning' : 'btn-success';
 
                 mobileCards += `
-                    <div class="card mb-3 shadow-sm border-start border-4 ${item.trangThai ? 'border-success' : 'border-secondary'}">
+                    <div class="card mb-3 shadow-sm border-start border-4 ${item.TrangThai ? 'border-success' : 'border-secondary'}">
                         <div class="card-body">
                             <div class="d-flex justify-content-between mb-2">
-                                <h6 class="fw-bold text-success mb-0">${item.hoTen}</h6>
+                                <h6 class="fw-bold text-success mb-0">${item.HoTen}</h6>
                                 <div>
-                                    <span class="badge bg-primary">${item.chucVu}</span>
+                                    <span class="badge bg-primary">${item.ChucVu}</span>
                                     ${statusBadge}
                                 </div>
                             </div>
-                            <p class="mb-1 small"><i class="bi bi-geo-alt"></i> ${item.tenXa}</p>
-                            <p class="mb-1 small"><i class="bi bi-telephone"></i> ${item.sdt}</p>
+                            <p class="mb-1 small"><i class="bi bi-geo-alt"></i> ${item.TenXa}</p>
+                            <p class="mb-1 small"><i class="bi bi-telephone"></i> ${item.SDT}</p>
                             ${emailMobileDisplay}
-                            <p class="mb-2 small"><i class="bi bi-person"></i> TK: ${item.tenDangNhap || 'Chưa có'}</p>
+                            <p class="mb-2 small"><i class="bi bi-person"></i> TK: ${item.TenDangNhap || 'Chưa có'}</p>
                             <div class="d-flex gap-2">
-                                <button class="btn btn-outline-primary btn-sm flex-fill" onclick="editData(${item.maNV}, event)">
+                                <button class="btn btn-outline-primary btn-sm flex-fill" onclick="editData(${item.MaNV}, event)">
                                     <i class="bi bi-pencil"></i> Sửa
                                 </button>
-                                <button class="btn btn-outline-${lockBtnClass} btn-sm flex-fill" onclick="toggleLock(${item.maNV}, ${item.trangThai})">
-                                    <i class="bi ${item.trangThai ? 'bi-lock' : 'bi-unlock'}"></i> ${lockBtnText}
+                                <button class="btn btn-outline-${lockBtnClass} btn-sm flex-fill" onclick="toggleLock(${item.MaNV}, ${item.TrangThai})">
+                                    <i class="bi ${item.TrangThai ? 'bi-lock' : 'bi-unlock'}"></i> ${lockBtnText}
                                 </button>
                             </div>
                         </div>
@@ -366,15 +366,15 @@ function editData(id, event) {
                 }
             });
 
-            // Fill data
-            document.getElementById('MaNV').value = data.maNV;
-            document.getElementById('HoTen').value = data.hoTen || '';
-            document.getElementById('ChucVu').value = data.chucVu || '';
-            document.getElementById('SDT').value = data.sdt || '';
-            document.getElementById('Email').value = data.email || '';
-            document.getElementById('MaXa').value = data.maXa || '';
-            document.getElementById('TenDangNhap').value = data.tenDangNhap || '';
-            document.getElementById('Quyen').value = data.quyen || 'Kiem_Lam';
+            // Fill data - Sử dụng PascalCase để khớp với API response
+            document.getElementById('MaNV').value = data.MaNV;
+            document.getElementById('HoTen').value = data.HoTen || '';
+            document.getElementById('ChucVu').value = data.ChucVu || '';
+            document.getElementById('SDT').value = data.SDT || '';
+            document.getElementById('Email').value = data.Email || '';
+            document.getElementById('MaXa').value = data.MaXa || '';
+            document.getElementById('TenDangNhap').value = data.TenDangNhap || '';
+            document.getElementById('Quyen').value = data.Quyen || 'Kiem_Lam';
 
             // Mật khẩu không bắt buộc khi sửa
             const matKhauField = document.getElementById('MatKhau');

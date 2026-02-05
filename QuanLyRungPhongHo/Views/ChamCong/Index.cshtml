@@ -26,6 +26,13 @@
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     }
+    @if (TempData["WarningMessage"] != null)
+    {
+        <div class="alert alert-warning alert-dismissible fade show">
+            <i class="bi bi-exclamation-triangle"></i> @TempData["WarningMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
     @if (TempData["ErrorMessage"] != null)
     {
         <div class="alert alert-danger alert-dismissible fade show">
@@ -88,7 +95,11 @@
                     {
                         <div class="alert alert-info mb-0">
                             <i class="bi bi-info-circle"></i> <strong>Ca làm việc hôm nay</strong><br>
-                            <small>@schedule.TenCa | @schedule.GioBatDau - @schedule.GioKetThuc | @schedule.TenLo</small>
+                            <small>
+                                <strong>@schedule.TenCa</strong>: @schedule.GioBatDau - @schedule.GioKetThuc<br>
+                                <strong>Khu vực:</strong> @schedule.TenLo<br>
+                                <span class="text-muted">💡 Có thể vào ca từ 30 phút trước giờ bắt đầu</span>
+                            </small>
                         </div>
                     }
                 </div>
